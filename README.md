@@ -1,5 +1,5 @@
 # Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline
-This Python pipeline automatically generates seamless, cloud-free mosaics from multisensor satellite imagery. It integrates cloud masking, seamline optimization, and radiometric blending into a fast, reproducible workflow for large-scale or time-series processing.
+This Python pipeline automatically generates seamless, cloud-free mosaics from multisensor satellite imagery and also supports mosaicking of corresponding panchromatic (pan) images. It integrates cloud masking, seamline optimization, and radiometric blending into a fast, reproducible workflow for large-scale or time-series processing.
 
 Official code for: "**A Computational Pipeline for Automated Cloud Removal and Seamless Multisensor Satellite Image Mosaicking**" (Hsiao-Jou Hsu, et al.).
 
@@ -11,6 +11,17 @@ Official code for: "**A Computational Pipeline for Automated Cloud Removal and S
 - **Automated Blending**: Applies **Poisson blending** along the generated seamline for a smooth, gradual transition between adjacent tiles.
 
 - **Iterative & Scalable**: Sorts images by spatial proximity and iteratively mosaics each image onto a growing base map (MosTai.tif), allowing it to scale to hundreds of images.
+
+
+# **Repository Structure**
+
+    mosaic_pipeline/
+     ├── README.md
+     ├── auto_mosaic_pipeline.py
+     ├── para.txt
+     ├── example_input/
+     └── example_output/
+
 
 # Example: The Mosaicking Process
 The core of this pipeline is its ability to find an optimal seamline and blend two images. As demonstrated in the manuscript (e.g., Figures 7, 11, 12), the algorithm finds complex paths along roads, rivers, and valleys to hide the seam.
@@ -49,7 +60,7 @@ Before running, you must edit the ``` bash para.txt ``` file to match your data 
     "kernel": "61"
 }
 ``` 
-```bash path_method``` : Weighting algorithm for seamline cost. `a6c` and ```a7c``` are supported (see ```seamline.py:buildGraph```).
+```bash path_method``` : Weighting algorithm for seamline cost. `a6c` (Simple L1 Norm) and ```a7c```(Advanced Cost) are supported.
 
 ```bash res``` : The target output resolution for the mosaic (e.g., "6" for 6 meters).
 
@@ -112,5 +123,5 @@ The ```main.py``` script follows this logical flow:
 
 # Citation
 If you use this code or methodology in your research, please cite our paper:
-```(Placeholder - Add your full paper citation here once it is published)
-Hsu, H.J., Tseng, K.H., Tsai, F., et al. (2025). "A Computational Pipeline for Automated Cloud Removal and Seamless Multisensor Satellite Image Mosaicking." [Journal Name], [Volume], [Pages].```
+
+Hsu, H. J., Tseng, K. H., Tsai, F., et al. (2025). A computational pipeline for automated cloud removal and seamless multisensor satellite image mosaicking. Manuscript in preparation.
