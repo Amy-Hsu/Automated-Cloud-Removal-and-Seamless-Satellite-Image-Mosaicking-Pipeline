@@ -18,10 +18,13 @@ The core of this pipeline is its ability to find an optimal seamline and blend t
 Installation
 
 1. Clone the repository:
-git clone [https://github.com/your-username/your-repository-name.git](https://github.com/your-username/your-repository-name.git)
+``` bash
+git clone https://github.com/your-username/your-repository-name.git
 cd your-repository-name
+```
+
 2. Install dependencies:We recommend using a Conda environment to manage the complex geospatial libraries.# Create a new conda environment
-conda create -n mosaic python=3.9
+```conda create -n mosaic python=3.9
 conda activate mosaic
 
 # Install dependencies (GDAL is best installed via conda-forge)
@@ -29,7 +32,12 @@ conda install -c conda-forge gdal rasterio geopandas shapely
 
 # Install remaining packages with pip
 pip install -r requirements.txt
-If not using Conda, you can try pip install -r requirements.txt directly, but GDAL installation can be challenging.Configuration (para.txt)Before running, you must edit the para.txt file to match your data and environment.{
+
+If not using Conda, you can try 
+pip install -r requirements.txt```
+directly, but GDAL installation can be challenging.
+
+Configuration (para.txt)Before running, you must edit the para.txt file to match your data and environment.{
     "path_method": "a6c",
     "res": "6",
     "pan_res": "1.5",
