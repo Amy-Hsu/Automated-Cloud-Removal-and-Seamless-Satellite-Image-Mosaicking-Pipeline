@@ -1,0 +1,10 @@
+numpy
+opencv-python
+GDAL
+rasterio
+matplotlib
+networkx
+scipy
+geopandas
+tqdm
+Shapely
