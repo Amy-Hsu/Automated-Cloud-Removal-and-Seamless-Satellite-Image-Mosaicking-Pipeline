@@ -8,7 +8,7 @@ Dijkstra's algorithm for optimal seamline generation, and Poisson blending.
 
 Key Dependencies: numpy, cv2, rasterio, networkx, geopandas, shapely.
 
-Author: Hsiao-Jou Hsu
+Author: Amy Hsu
 """
 
 import numpy as np
@@ -637,8 +637,7 @@ def run_mosaicking_pipeline(params: Dict[str, Any]):
             MOSAIC_NAME, ds2_path, params, window, feather_mask, union_gt
         )
         
-        # --- CLOUD MASK UPDATE ---
-        # NOTE: A hardcoded cloud mask folder name is often used in this type of script.
+        # --- CLOUD MASK UPDATE ---   
         # e.g., 'SPOT67Cloud_Mask'
         cloud_mask_folder = 'SPOT67Cloud_Mask' # Assuming this is a sibling folder
         new_mask_name = ds2_path.replace('.img', '.tif') # Assuming cloud mask has same name but .tif
