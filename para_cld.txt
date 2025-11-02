@@ -4,8 +4,9 @@
 "CldMaskPath":"H:\\test\\cldDatabase",
 "MosaicImgAddress":"H:\\test\\MosTai.tif",
 "MosaicCldAddress":"H:\\test\\TaiMas.tif",
-"CandiMaskFolderName":"SPOT67Cloud_Hsiao_Rou",
+"CandiMaskFolderName":"SPOT67Cloud_Mask",
 "PanMosaicImgAddress":"H:\\test\\MosTai_Pan.tif",
 "pan_res":"1.5",
 "PanImgAddress":"H:\\test\\raw_pan"
+
 }
