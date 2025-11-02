@@ -19,8 +19,8 @@ Official code for: "**A Computational Pipeline for Automated Cloud Removal and S
      ├── README.md
      ├── auto_mosaic_pipeline.py
      ├── para.txt
-     ├── example_input/
-     └── example_output/
+     ├── cloud_selection_and_blending.py
+     └── para_cld.txt
 
 
 # Example: The Mosaicking Process
