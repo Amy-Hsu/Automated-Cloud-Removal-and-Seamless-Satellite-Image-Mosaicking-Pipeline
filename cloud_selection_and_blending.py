@@ -11,7 +11,7 @@ This script handles the final, critical stage of the pipeline:
 3. Selects the optimal (highest SSIM) candidate patch for each cloud area.
 4. Performs seamless replacement using OpenCV's cv2.seamlessClone (Poisson Blending).
 
-Author: Amy Hsu
+Author: Hsu
 """
 
 import numpy as np
@@ -704,4 +704,5 @@ print('All done!')
 print(Count,'/',total,' reconstructions of cloud-contaminated area')
 end = timer()
 print('time(hr):',(end - start)/60/60) # Time in seconds
+
 
