@@ -124,4 +124,4 @@ The ```main.py``` script follows this logical flow:
 # Citation
 If you use this code or methodology in your research, please cite our paper:
 
-Hsu, H. J., Tseng, K. H., Tsai, F., et al. (2025). A computational pipeline for automated cloud removal and seamless multisensor satellite image mosaicking. Manuscript in preparation.
+Hsu, H. J., Tseng, K. H., Tsai, F., et al. (2025). A Novel Approach to Automated Cloud Removal and Seamless Multisensor Satellite Image Mosaicking. Manuscript in preparation.
