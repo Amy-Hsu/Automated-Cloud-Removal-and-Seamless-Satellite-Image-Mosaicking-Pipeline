@@ -700,9 +700,10 @@ for i in range(len(ReadOrder)-1):#
             shutil.rmtree(filepath)
         except OSError:
             os.remove(filepath)
-print('All done!')
+print('All done.')
 print(Count,'/',total,' reconstructions of cloud-contaminated area')
 end = timer()
 print('time(hr):',(end - start)/60/60) # Time in seconds
+
 
 
