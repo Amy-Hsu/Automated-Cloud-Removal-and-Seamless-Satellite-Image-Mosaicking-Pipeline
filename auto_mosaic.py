@@ -1026,10 +1026,10 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
     pl_2rc=[]
     pt_2rc=[]
     for i in range(len(p_left)):
-        pl_2rc.append(((p_left[i]-LeftTop_overlapped[0])/(res)))#
-        pt_2rc.append(((LeftTop_overlapped[1]-p_top[i])/(res)))#
+        pl_2rc.append(((p_left[i]-LeftTop_overlapped[0])/(res)))
+        pt_2rc.append(((LeftTop_overlapped[1]-p_top[i])/(res)))
     fc=[]
-    fr=[]# 
+    fr=[]
     if (1/scale_factor)==1:
         trueID_intersect=[]
         for i in range(len(pl_2rc)):   
@@ -1140,10 +1140,10 @@ for f in files:
 
 coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
 
-dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))#在二维数据点中求欧几里得距离  
+dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))
 distIndex=np.argsort(dist) 
 ReadOrder=[file[i] for i in distIndex.tolist()]
-print("檔案處理順序：", ReadOrder)
+print("Processing Order：", ReadOrder)
 
 allWindow=[]
 ImgInd=[]
@@ -1287,11 +1287,6 @@ for i in range(len(ReadOrder)-1):
             dst.write(sf.astype(rasterio.uint8), 1)
         del sf
         
-                
-
-        
-        
-        
         print('Mosaic "',image1_ds[:-4],'" images...')
         mask_blurred_4chan=blendMask(57,im_floodfill_f) 
         
@@ -1416,7 +1411,7 @@ for i in range(len(ReadOrder)-1):
                     
                     
                 
-        MosTai.close()#
+        MosTai.close()
         
         TaiMas= rasterio.open(
             'TaiMas.tif',
@@ -1789,6 +1784,7 @@ with open('transform.npy', 'wb') as f:
 print('All done!')
 end = timer()
 print('Total time spent(hr):',(end - start)/60/60) # Time in seconds # Time in seconds
+
 
 
 
