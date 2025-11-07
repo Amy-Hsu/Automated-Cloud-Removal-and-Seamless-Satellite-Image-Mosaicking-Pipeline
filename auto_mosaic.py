@@ -3,8 +3,8 @@
 Seamless Mosaicking Pipeline for Satellite Imagery
 
 This script automates the generation of a seamless, large-scale mosaic from 
-overlapping satellite image tiles. It uses geometric intersection, sparse-node 
-Dijkstra's algorithm for optimal seamline generation, and Poisson blending.
+overlapping satellite image tiles. It uses geometric intersection, sparse-graph 
+Dijkstra's algorithm for optimal seamline generation, and SSIM-guided Poisson blending.
 
 Key Dependencies: numpy, cv2, rasterio, networkx, geopandas, shapely.
 
@@ -1761,5 +1761,6 @@ with open('transform.npy', 'wb') as f:
 print('All done!')
 end = timer()
 print('Total time spent(hr):',(end - start)/60/60) # Time in seconds # Time in seconds
+
 
 
