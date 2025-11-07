@@ -1,7 +1,7 @@
 # Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline
 This Python pipeline automatically generates seamless, cloud-free mosaics from multisensor satellite imagery and also supports mosaicking of corresponding panchromatic (pan) images. It integrates cloud masking, seamline optimization, and radiometric blending into a fast, reproducible workflow for large-scale or time-series processing.
 
-Official code for: "**A Computational Pipeline for Automated Cloud Removal and Seamless Multisensor Satellite Image Mosaicking**" (Hsiao-Jou Hsu, et al.).
+Official code for: "**A Novel Approach to Automated Cloud Removal and Seamless Multisensor Satellite Image Mosaicking**" (Hsiao-Jou Hsu, et al.).
 
 # Key Features
 - **Optimal Seamline Generation**: Implements a **sparse-node Dijkstra's algorithm** to find the "cheapest" seamline along natural features, minimizing visible edges.
