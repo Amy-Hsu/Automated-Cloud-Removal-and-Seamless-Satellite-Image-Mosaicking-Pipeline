@@ -42,8 +42,7 @@ start = timer()
 def addAtPos(matrix1, matrix2, xypos, inPlace=True):
     """
     Add matrix2 into matrix1 at position xypos (x,y), in-place or in new matrix.
-    Handles matrix2 going off edges of matrix1.
-    https://stackoverflow.com/questions/9886303/adding-different-sized-shaped-displaced-numpy-matrices/9887491#9887491
+    Handles matrix2 going off edges of matrix1. 
     """
     x, y = xypos
     h1, w1 = matrix1.shape
@@ -60,8 +59,7 @@ def addAtPos(matrix1, matrix2, xypos, inPlace=True):
     y2max = min(-y + h1, h2)
     if inPlace:      
         matrix1[y1min:y1max, x1min:x1max] += matrix2[y2min:y2max, x2min:x2max]
-    else:
-       
+    else:       
         matrix1copy = matrix1.copy()        
         matrix1copy[y1min:y1max, x1min:x1max] += matrix2[y2min:y2max, x2min:x2max]
         return matrix1copy
@@ -834,9 +832,7 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
     
     return data_final,data_final2,height, width
 
-def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):
-   
-    
+def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):       
     image1_ds = rasterio.open(raster1)     
     gt1=image1_ds.transform    
     image2_ds = rasterio.open(raster2,'r+')
@@ -844,12 +840,10 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
     window=Window(  (gt1[2]-MosTai_gt[2])/res  , (MosTai_gt[5]-gt1[5])/res , image1_ds.shape[1], image1_ds.shape[0])
     r1 = [gt1[2], gt1[5], gt1[2] + (gt1[0] * image1_ds.width), gt1[5] + (gt1[4] * image1_ds.height)]
     
-    col1 = image1_ds.width # 
-    row1 = image1_ds.height # 
-    array1 = scipy.ndimage.zoom(np.dstack((image1_ds.read(3),image1_ds.read(2),image1_ds.read(1))),(scale_factor,scale_factor,1), order=1,) #
-
-    
-    array2 = scipy.ndimage.zoom(np.dstack((image2_ds.read(3,window=window),image2_ds.read(2,window=window),image2_ds.read(1,window=window))),(scale_factor,scale_factor,1), order=1, )#
+    col1 = image1_ds.width 
+    row1 = image1_ds.height 
+    array1 = scipy.ndimage.zoom(np.dstack((image1_ds.read(3),image1_ds.read(2),image1_ds.read(1))),(scale_factor,scale_factor,1), order=1,) 
+    array2 = scipy.ndimage.zoom(np.dstack((image2_ds.read(3,window=window),image2_ds.read(2,window=window),image2_ds.read(1,window=window))),(scale_factor,scale_factor,1), order=1, )
 
     gt = A.translation(r1[0], r1[1]) *  A.scale(res, -res) * image1_ds.transform.scale(
         (image1_ds.width / image1_ds.width ), 
@@ -986,7 +980,7 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
     u_con=addAtPos(union_m, image1_ds.read(1), xypos1, inPlace=False)
     uni_con=addAtPos(u_con, image2_ds.read(1,window=window), xypos1, inPlace=False) 
 
-    del u_con,xypos1#,
+    del u_con,xypos1
     gc.collect()
     union_gt = A.translation(r1[0], r1[1]) *  A.scale(res, -res)      
     uni_conn=np.array(uni_con)
@@ -1044,7 +1038,7 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
                 if 'ab' in locals():
                     del ab
                 spiralList=spiral(35,35)            
-                for n in range(len(spiralList)) :#
+                for n in range(len(spiralList)) :
                     if r+spiralList[n][1]<imgg1_ui8_nd_gy.shape[0] and c+spiralList[n][0]<imgg1_ui8_nd_gy.shape[1]:
                         if imgg1_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and imgg2_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and 'aa' not in locals()  :
                            trueID_intersect.append((r+spiralList[n][1]+1-1)*width+c+spiralList[n][0]+1)
@@ -1074,7 +1068,7 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
                     del aa
                 if 'ab' in locals():
                     del ab
-                for n in range(len(spiralList)) :#
+                for n in range(len(spiralList)) :
                     if r+spiralList[n][1]<imgg1_ui8_nd_gy.shape[0] and c+spiralList[n][0]<imgg1_ui8_nd_gy.shape[1]:
                         if imgg1_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and imgg2_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and 'ab' not in locals()  :
                            trueID_intersect.append((r+spiralList[n][1]+1-1)*width+c+spiralList[n][0]+1)
@@ -1093,9 +1087,6 @@ def blendMask(blendPix,im_floodfill_f):
     mask_blurred  = cv2.GaussianBlur(im_floodfill_ftest,(blendPix,blendPix),0)
     mask_blurred_1chan = mask_blurred.astype('float32') / (blendPix+1)
     return mask_blurred_1chan
-
-
-
 
 with open('para.txt', 'r') as f:
     datastore = json.load(f)
@@ -1151,8 +1142,8 @@ Union_gt=[]
 for i in range(len(ReadOrder)-1):   
     if i!=0:
         loop=i
-        image1_ds = ReadOrder[i+1]#
-        image2_ds = 'MosTai.tif'#
+        image1_ds = ReadOrder[i+1]
+        image2_ds = 'MosTai.tif'
         print('Image Process Progress:',i+2,'/',len(ReadOrder))
         print('Image Preprocessing...')
         image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaic(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
@@ -1161,20 +1152,15 @@ for i in range(len(ReadOrder)-1):
         imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
         imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
         
-      
         imgg1_ui8=image1_isect_array/imgBits
         imgg2_ui8=image2_isect_array/imgBits
-        
     
         imgg1_ui8.astype(np.uint8)
         imgg2_ui8.astype(np.uint8)
-        
       
         imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
         imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
         
-        
-       
         imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
         imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
         del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image2_isect_array
@@ -1199,9 +1185,7 @@ for i in range(len(ReadOrder)-1):
         seamlineff=addAtPos(union_conn, seamlinef, xypos, inPlace=False)  
         seamlineff3=BorderConnection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
         
-        
         seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
-        
                
         sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)#np.resize =! cv2.resize
         del seamlineff,seamlineff3 #,seamlinef
@@ -1406,10 +1390,7 @@ for i in range(len(ReadOrder)-1):
                     MosTai.write( outcome, indexes=k+1, window=write_window3)
             
                     del outcome, b1,b1d ,write_window3
-                    gc.collect()
-                    
-                    
-                    
+                    gc.collect()       
                 
         MosTai.close()
         
@@ -1434,9 +1415,7 @@ for i in range(len(ReadOrder)-1):
         
         cldMas=eval(imgind[0][3]) *(1- mask_blurred_4chan)+ eval(imgind[0][4]) *( mask_blurred_4chan)
         cldMas[np.where(cldMas>0)]=1
-        
-                
-                
+
         cldMas=cldMas.astype(imgtype)
         print('Writing cloud mask to disk...')
         TaiMas.write( cldMas, indexes=1, window=write_window)          
@@ -1445,9 +1424,7 @@ for i in range(len(ReadOrder)-1):
         del mask_blurred_4chan ,cldMas,cldList,b1,b1d    
         gc.collect()
     else:
-        
 
-        
         image1_ds =ReadOrder[i]
         image2_ds =ReadOrder[i+1]
         if (testOverlap(ReadOrder)[0]==True):
@@ -1784,9 +1761,5 @@ with open('transform.npy', 'wb') as f:
 print('All done!')
 end = timer()
 print('Total time spent(hr):',(end - start)/60/60) # Time in seconds # Time in seconds
-
-
-
-
 
 
