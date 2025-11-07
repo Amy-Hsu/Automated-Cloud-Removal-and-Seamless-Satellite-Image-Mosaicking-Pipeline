@@ -8,7 +8,7 @@ Dijkstra's algorithm for optimal seamline generation, and Poisson blending.
 
 Key Dependencies: numpy, cv2, rasterio, networkx, geopandas, shapely.
 
-@author: Amy
+@author: hsu
 """
 
 
@@ -357,7 +357,7 @@ def BlendPreprocess(i,image1_ds,mask_blurred_4chan,res,union_gt):
     return b1
 
 
-def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def BlendPreprocessOrderForMosic(image1_ds,image2_ds,mask_blurred_4chan,write_window):
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
@@ -385,7 +385,7 @@ def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,wr
              
     return b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num
 
-def BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def BlendPreprocessForMosic(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
@@ -834,7 +834,7 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
     
     return data_final,data_final2,height, width
 
-def findRasterIntersectForMosaicTaiwan(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):
+def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):
    
     
     image1_ds = rasterio.open(raster1)     
@@ -1155,7 +1155,7 @@ for i in range(len(ReadOrder)-1):
         image2_ds = 'MosTai.tif'#
         print('Image Process Progress:',i+2,'/',len(ReadOrder))
         print('Image Preprocessing...')
-        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaicTaiwan(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
+        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaic(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
         Union_gt.append(union_gt)
        
         imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
@@ -1303,7 +1303,7 @@ for i in range(len(ReadOrder)-1):
             dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
         
         del im_floodfill,im_floodfill_f        
-        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
+        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=BlendPreprocessOrderForMosic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
         
         img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
               (1,image1_ds,im1_1num, 'b1d','b1' ),
@@ -1372,7 +1372,7 @@ for i in range(len(ReadOrder)-1):
             else:
                 
                 ind=k+1
-                b1,b1d=BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
+                b1,b1d=BlendPreprocessForMosic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
                     
                 try:
                 
@@ -1784,6 +1784,7 @@ with open('transform.npy', 'wb') as f:
 print('All done!')
 end = timer()
 print('Total time spent(hr):',(end - start)/60/60) # Time in seconds # Time in seconds
+
 
 
 
