@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Seamless Mosaicking Pipeline for Satellite Imagery
-
-This script automates the generation of a seamless, large-scale mosaic from 
-overlapping satellite image tiles. It uses geometric intersection, sparse-graph 
-Dijkstra's algorithm for optimal seamline generation.
-
-Key Dependencies: numpy, cv2, rasterio, networkx, geopandas, shapely.
-
-@author: hsu
+Created on Mon Apr 19 13:56:58 2021
+update on 7/31/2024: line 11, 226, 240 
+@author: amy hsu
 """
 
-
+#%matplotlib inline
 import numpy as np
 import cv2
 from osgeo import gdal
@@ -37,12 +31,15 @@ import json
 import gc
 from shapely import wkt
 import glob
-start = timer()
+CLOUD_MASK_FOLDER = 'cloud_masks'
 
+start = timer()
+# @profile
 def addAtPos(matrix1, matrix2, xypos, inPlace=True):
     """
     Add matrix2 into matrix1 at position xypos (x,y), in-place or in new matrix.
-    Handles matrix2 going off edges of matrix1. 
+    Handles matrix2 going off edges of matrix1.
+    https://stackoverflow.com/questions/9886303/adding-different-sized-shaped-displaced-numpy-matrices/9887491#9887491
     """
     x, y = xypos
     h1, w1 = matrix1.shape
@@ -59,7 +56,8 @@ def addAtPos(matrix1, matrix2, xypos, inPlace=True):
     y2max = min(-y + h1, h2)
     if inPlace:      
         matrix1[y1min:y1max, x1min:x1max] += matrix2[y2min:y2max, x2min:x2max]
-    else:       
+    else:
+       
         matrix1copy = matrix1.copy()        
         matrix1copy[y1min:y1max, x1min:x1max] += matrix2[y2min:y2max, x2min:x2max]
         return matrix1copy
@@ -104,7 +102,8 @@ def testOverlap(ReadOrder):
             return True  ,ReadOrder   
                 
 def findRasterIntersect(raster1,raster2,res,scale_factor):
-  
+    #raster1 = image1_ds
+    #raster2 = image2_ds
     image1_ds = rasterio.open(raster1,nodata=0)
     image2_ds = rasterio.open(raster2,nodata=0)
     gt1=image1_ds.transform
@@ -355,7 +354,7 @@ def BlendPreprocess(i,image1_ds,mask_blurred_4chan,res,union_gt):
     return b1
 
 
-def BlendPreprocessOrderForMosic(image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,write_window):
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
@@ -383,7 +382,7 @@ def BlendPreprocessOrderForMosic(image1_ds,image2_ds,mask_blurred_4chan,write_wi
              
     return b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num
 
-def BlendPreprocessForMosic(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
@@ -531,17 +530,23 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                                 all_list[:] = [r for r in range(len(allList)) if seamlineff[int(allList[r][0]),int( allList[r][1]) ] ==0]
                                     
                             
+                            
+                            
                             seamlineff2=seamlineff.copy()
                             seamlineff2[np.where(seamlineff>0)]=-1
                             wall, clear, goal = -1, 0, 1000
                             width, height = seamlineff.shape[1], seamlineff.shape[0]    
                               
                             for r in range(len(all_list)):
-                                seamlineff2[ int(allList[ all_list[r]][0]) , int(allList[ all_list[r]][1])  ]=1000                           
-                                                   
+                                seamlineff2[ int(allList[ all_list[r]][0]) , int(allList[ all_list[r]][1])  ]=1000
+                           
+                        
+                        
+                           
                             path2 = bfs(seamlineff2, (posi[1],posi[0] ),wall, clear, goal,width, height)#col first,than row
                             
-                                                    
+                            
+                        
                             for s in range(len(path2)):
                                 seamlineff3[path2[s][1],path2[s][0]]=1                            
                         ab    
@@ -558,7 +563,9 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                                     seamlineff3[posi[0],j:posi[1]+1]=1#
                                     
                                 else:
-                                    seamlineff3[posi[0]:i,j]=1         
+                                    seamlineff3[posi[0]:i,j]=1                 
+                                   
+                                    
                                     
                             elif i==posi[0]:             
                                 if j>posi[1]:
@@ -585,7 +592,9 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                             i_t=[]
                             j_t=[]
                             i_t[:] = [r for r in i_tolerance if 0 <= r < height]
-                            j_t[:] = [c for c in j_tolerance if 0 <= c < width]  
+                            j_t[:] = [c for c in j_tolerance if 0 <= c < width]
+                            
+                            
                           
                             topList=list(zip(np.zeros(len(j_t)),j_t))
                             bottomList=list(zip((np.ones(len(j_t))*(height-1)),j_t))
@@ -612,6 +621,9 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                                 allList=topList+bottomList+rightList+leftList
                                 all_list[:] = [r for r in range(len(allList)) if seamlineff[int(allList[r][0]),int( allList[r][1]) ] ==0]
                                     
+                            
+                            
+                            
                             seamlineff2=seamlineff.copy()
                             seamlineff2[np.where(seamlineff>1)]=-1
                             wall, clear, goal = -1, 0, 1000
@@ -623,16 +635,24 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                                 seamlineff2[ :,0  ]=1000
                                 seamlineff2[ -1,:  ]=1000
                                 seamlineff2[ :,-1  ]=1000
-                                                  
-                            path2 = bfs(seamlineff2, (posi[1],posi[0] ),wall, clear, goal,width, height)                            
-                                                    
+                        
+                          
+                            path2 = bfs(seamlineff2, (posi[1],posi[0] ),wall, clear, goal,width, height)#
+                            
+                            
+                        
                             for s in range(len(path2)):
-                                seamlineff3[path2[s][1],path2[s][0]]=1     
-        elif seamlineff[i,j]!=0 and i!=0 and j!=0:            
+                                seamlineff3[path2[s][1],path2[s][0]]=1 
+                        
+                
+    
+        elif seamlineff[i,j]!=0 and i!=0 and j!=0:  #   
+          
             for k in [1,0,-1]:
                 for l in [0,1,-1]:
                     if seamlineff[ i+ k ,j+ l  ] ==0 and 'aa' not in locals():
-                        p1=[ i+ k ,j+ l ]#row ,col                        
+                        p1=[ i+ k ,j+ l ]#row ,col
+                        
                         aa=0
                         
                         i_tolerance=np.linspace(p1[0]-100,p1[0]+100,(p1[0]+100)-(p1[0]-100)+1)
@@ -641,6 +661,8 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                         j_t=[]
                         i_t[:] = [r for r in i_tolerance if 0 <= r < height]
                         j_t[:] = [c for c in j_tolerance if 0 <= c < width]
+                        
+                        
                        
                         topList=list(zip(np.zeros(len(j_t)),j_t))
                         bottomList=list(zip((np.ones(len(j_t))*(height-1)),j_t))
@@ -666,7 +688,9 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                         else:
                             allList=topList+bottomList+rightList+leftList
                             all_list[:] = [r for r in range(len(allList)) if seamlineff[int(allList[r][0]),int( allList[r][1]) ] ==0]
-                                                    
+                            
+                        
+                        
                         
                         seamlineff2=seamlineff.copy()
                         seamlineff2[np.where(seamlineff>0)]=-1
@@ -675,10 +699,13 @@ def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
                         
                         
                         for r in range(len(all_list)):
-                            seamlineff2[ int(allList[ all_list[r]][0]) , int(allList[ all_list[r]][1])  ]=1000                       
+                            seamlineff2[ int(allList[ all_list[r]][0]) , int(allList[ all_list[r]][1])  ]=1000
+                       
                     
-                        print((p1[1],p1[0] ))                      
+                        print((p1[1],p1[0] ))
+                      
                         path2 = bfs(seamlineff2, (p1[1],p1[0] ),wall, clear, goal,width, height)#col first,than row
+                        
                         
                     
                         for s in range(len(path2)):
@@ -693,18 +720,24 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
     G = nx.Graph()
     new_d=np.squeeze(np.asarray(data_final)).flatten()
     new_d2=np.squeeze(np.asarray(data_final2)).flatten()    
-    algos_r={'a6c':'((1/(abs(new_d[x-1]-new_d[right-1]))) if new_d[x-1]-new_d[right-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[right-1]))if new_d2[x-1]-new_d2[right-1] !=0 else 10000000000 )',
+    algos_r={'a6':'1/(abs(int(new_d[x-1])-int(new_d[right-1]))+0.000000000000000001)+1/(abs(int(new_d2[x-1])-int(new_d2[right-1]))+0.000000000000000001)',
+             'a7':'1/((abs(int(new_d[x-1])-int(new_d[right-1]))+0.000000000000000001)+(abs(int(new_d2[x-1])-int(new_d2[right-1]))+0.000000000000000001))',
+             'a6c':'((1/(abs(new_d[x-1]-new_d[right-1]))) if new_d[x-1]-new_d[right-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[right-1]))if new_d2[x-1]-new_d2[right-1] !=0 else 10000000000 )',
              'a7c':'1/(abs(new_d[x-1]-new_d[right-1])+abs(new_d2[x-1]-new_d2[right-1])) if new_d[x-1]-new_d[right-1]!=0 or new_d2[x-1]-new_d2[right-1]!=0 else 10000000000 '
              }    
     
-    algos_d={'a6c':'((1/(abs(new_d[x-1]-new_d[down-1]))) if new_d[x-1]-new_d[down-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[down-1]))if new_d2[x-1]-new_d2[down-1] !=0 else 10000000000 )',
+    algos_d={'a6':'1/(abs(int(new_d[x-1])-int(new_d[down-1]))+0.000000000000000001)+1/(abs(int(new_d2[x-1])-int(new_d2[down-1]))+0.000000000000000001)',  
+             'a7':'1/((abs(int(new_d[x-1])-int(new_d[down-1]))+0.000000000000000001)+(abs(int(new_d2[x-1])-int(new_d2[down-1]))+0.000000000000000001))' ,
+             'a6c':'((1/(abs(new_d[x-1]-new_d[down-1]))) if new_d[x-1]-new_d[down-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[down-1]))if new_d2[x-1]-new_d2[down-1] !=0 else 10000000000 )',
              'a7c':'1/(abs(new_d[x-1]-new_d[down-1])+abs(new_d2[x-1]-new_d2[down-1])) if new_d[x-1]-new_d[down-1]!=0 or new_d2[x-1]-new_d2[down-1]!=0 else 10000000000',
              }    
-    j=0            
+    j=0        
+    
     rightck=[]
     downck=[]
-    xck=[]    
-    for x in tqdm.tqdm(range(1,width*height+1)):
+    xck=[]
+    
+    for x in tqdm.tqdm(range(1,width*height+1)):# 
     
         conf1=new_d[x-1].tolist()
         conf2=new_d2[x-1].tolist()
@@ -790,7 +823,7 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
         else:
             right=width-1
         
-        dataf[up:down,left:right]=data[up:down,left:right]
+        dataf[up:down,left:right]=data[up:down,left:right]#don't need to use addAtPos
     data_final= copy.deepcopy(dataf)
   
     
@@ -832,23 +865,30 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
     
     return data_final,data_final2,height, width
 
-def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):       
+def findRasterIntersectForMosaicTaiwan(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):
+   
+    
     image1_ds = rasterio.open(raster1)     
     gt1=image1_ds.transform    
-    image2_ds = rasterio.open(raster2,'r+')
+    image2_ds = rasterio.open(raster2,'r+') # MosTai img
    
     window=Window(  (gt1[2]-MosTai_gt[2])/res  , (MosTai_gt[5]-gt1[5])/res , image1_ds.shape[1], image1_ds.shape[0])
     r1 = [gt1[2], gt1[5], gt1[2] + (gt1[0] * image1_ds.width), gt1[5] + (gt1[4] * image1_ds.height)]
     
-    col1 = image1_ds.width 
-    row1 = image1_ds.height 
-    array1 = scipy.ndimage.zoom(np.dstack((image1_ds.read(3),image1_ds.read(2),image1_ds.read(1))),(scale_factor,scale_factor,1), order=1,) 
-    array2 = scipy.ndimage.zoom(np.dstack((image2_ds.read(3,window=window),image2_ds.read(2,window=window),image2_ds.read(1,window=window))),(scale_factor,scale_factor,1), order=1, )
+    col1 = image1_ds.width # 
+    row1 = image1_ds.height # 
+    array1 = scipy.ndimage.zoom(np.dstack((image1_ds.read(3),image1_ds.read(2),image1_ds.read(1))),(scale_factor,scale_factor,1), order=1,) #
+
+    
+    array2 = scipy.ndimage.zoom(np.dstack((image2_ds.read(3,window=window),image2_ds.read(2,window=window),image2_ds.read(1,window=window))),(scale_factor,scale_factor,1), order=1, )#
 
     gt = A.translation(r1[0], r1[1]) *  A.scale(res, -res) * image1_ds.transform.scale(
         (image1_ds.width / image1_ds.width ), 
         (image1_ds.height / image1_ds.height ) 
     )  
+
+    
+    
     a1=pathlib.Path(raster1).absolute()
     a2=pathlib.Path('NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute() 
     filepath = str(a2)+ os.path.join('\\',raster1[:-3]+'temp.shp')
@@ -880,25 +920,32 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
         geom2 =res_union_new.geometry[0]
     else:
         geom1 = shapefile1.geometry[0]
-        geom2 =res_union_new.geometry[0] 
+        geom2 =res_union_new.geometry[0]
+  
+    
     
    
-    points = geom1.boundary.intersection(geom2.boundary)
-    Lpoints = list(points) 
+    points = geom1.boundary.intersection(geom2.boundary) # multipoint
+    Lpoints = list(points) # point list
     del geom1,geom2
     gc.collect()
     intersection_points=[]       
     for i in range(len(Lpoints)):
-        intersection_points.append(Lpoints[i].wkt )        
-    
+        intersection_points.append(Lpoints[i].wkt )#corner left_top(SPOT67)    
+        
+        
+       
         
     if len(intersection_points)>2:        
        
         res_diff=gpd.overlay(shapefile1, res_union_new, how='difference')
+
        
-        res_diff_sep = res_diff['geometry'].values[0]        
+        res_diff_sep = res_diff['geometry'].values[0]
+        
         res_diff_sep_gdf = gpd.GeoDataFrame(res_diff_sep)
-        res_diff_sep_gdf.columns = ['geometry']      
+        res_diff_sep_gdf.columns = ['geometry']
+      
       
         res_diff_sep_gdf["area"] = res_diff_sep_gdf.area/ 10**6
         a=np.argsort(res_diff_sep_gdf["area"] )
@@ -915,7 +962,9 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
         for i in range(2):
             intersection_pointsN.append(intersection_points[int(aw[i])])
         intersection_points=[]
-        intersection_points=intersection_pointsN                
+        intersection_points=intersection_pointsN
+        
+        
         
         if len(res_diff_sep_gdf)>1:
             res_union =gpd.overlay(shapefile1, res_union_new, how='union')
@@ -953,7 +1002,9 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
                 res_union_new.loc[:,deval ]
                 res_union_new.drop(res_union_new.loc[:,deval ],inplace=True,axis=1)
            
-            del deval   
+            del deval 
+            
+            
             
         del res_diff,res_diff_sep,a,fin,flist,aq,aw,intersection_pointsN,res_diff_sep_gdf
         gc.collect()
@@ -980,7 +1031,7 @@ def findRasterIntersectForMosaic(raster1,raster2,MosTai_gt,res,scale_factor,res_
     u_con=addAtPos(union_m, image1_ds.read(1), xypos1, inPlace=False)
     uni_con=addAtPos(u_con, image2_ds.read(1,window=window), xypos1, inPlace=False) 
 
-    del u_con,xypos1
+    del u_con,xypos1#,
     gc.collect()
     union_gt = A.translation(r1[0], r1[1]) *  A.scale(res, -res)      
     uni_conn=np.array(uni_con)
@@ -1020,10 +1071,10 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
     pl_2rc=[]
     pt_2rc=[]
     for i in range(len(p_left)):
-        pl_2rc.append(((p_left[i]-LeftTop_overlapped[0])/(res)))
-        pt_2rc.append(((LeftTop_overlapped[1]-p_top[i])/(res)))
+        pl_2rc.append(((p_left[i]-LeftTop_overlapped[0])/(res)))#
+        pt_2rc.append(((LeftTop_overlapped[1]-p_top[i])/(res)))#
     fc=[]
-    fr=[]
+    fr=[]# 
     if (1/scale_factor)==1:
         trueID_intersect=[]
         for i in range(len(pl_2rc)):   
@@ -1038,7 +1089,7 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
                 if 'ab' in locals():
                     del ab
                 spiralList=spiral(35,35)            
-                for n in range(len(spiralList)) :
+                for n in range(len(spiralList)) :#
                     if r+spiralList[n][1]<imgg1_ui8_nd_gy.shape[0] and c+spiralList[n][0]<imgg1_ui8_nd_gy.shape[1]:
                         if imgg1_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and imgg2_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and 'aa' not in locals()  :
                            trueID_intersect.append((r+spiralList[n][1]+1-1)*width+c+spiralList[n][0]+1)
@@ -1046,11 +1097,11 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
                            c=c+spiralList[n][0]
                            aa=0
                           
-            fc.append(c)
-            fr.append(r)
+            fc.append(c)# 
+            fr.append(r)# 
     else:
        
-        trueID_intersect=[]
+        trueID_intersect=[]# 
         for i in range(len(pl_2rc)):   
             c=int(pl_2rc[i]/(1/scale_factor))
             r=int(pt_2rc[i]/(1/scale_factor)) 
@@ -1068,7 +1119,7 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
                     del aa
                 if 'ab' in locals():
                     del ab
-                for n in range(len(spiralList)) :
+                for n in range(len(spiralList)) :#
                     if r+spiralList[n][1]<imgg1_ui8_nd_gy.shape[0] and c+spiralList[n][0]<imgg1_ui8_nd_gy.shape[1]:
                         if imgg1_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and imgg2_ui8_nd_gy[r+spiralList[n][1],c+spiralList[n][0]]!=0 and 'ab' not in locals()  :
                            trueID_intersect.append((r+spiralList[n][1]+1-1)*width+c+spiralList[n][0]+1)
@@ -1087,6 +1138,8 @@ def blendMask(blendPix,im_floodfill_f):
     mask_blurred  = cv2.GaussianBlur(im_floodfill_ftest,(blendPix,blendPix),0)
     mask_blurred_1chan = mask_blurred.astype('float32') / (blendPix+1)
     return mask_blurred_1chan
+
+#%%
 
 with open('para.txt', 'r') as f:
     datastore = json.load(f)
@@ -1131,10 +1184,10 @@ for f in files:
 
 coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
 
-dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))
+dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))# compute Euclidean distance among 2D data points
 distIndex=np.argsort(dist) 
 ReadOrder=[file[i] for i in distIndex.tolist()]
-print("Processing Order：", ReadOrder)
+print("File processing order:", ReadOrder)
 
 allWindow=[]
 ImgInd=[]
@@ -1142,25 +1195,30 @@ Union_gt=[]
 for i in range(len(ReadOrder)-1):   
     if i!=0:
         loop=i
-        image1_ds = ReadOrder[i+1]
-        image2_ds = 'MosTai.tif'
+        image1_ds = ReadOrder[i+1]#
+        image2_ds = 'MosTai.tif'#
         print('Image Process Progress:',i+2,'/',len(ReadOrder))
         print('Image Preprocessing...')
-        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaic(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
+        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaicTaiwan(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
         Union_gt.append(union_gt)
        
         imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
         imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
         
+      
         imgg1_ui8=image1_isect_array/imgBits
         imgg2_ui8=image2_isect_array/imgBits
+        
     
         imgg1_ui8.astype(np.uint8)
         imgg2_ui8.astype(np.uint8)
+        
       
         imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
         imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
         
+        
+       
         imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
         imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
         del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image2_isect_array
@@ -1185,7 +1243,9 @@ for i in range(len(ReadOrder)-1):
         seamlineff=addAtPos(union_conn, seamlinef, xypos, inPlace=False)  
         seamlineff3=BorderConnection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
         
+        
         seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
+        
                
         sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)#np.resize =! cv2.resize
         del seamlineff,seamlineff3 #,seamlinef
@@ -1271,6 +1331,11 @@ for i in range(len(ReadOrder)-1):
             dst.write(sf.astype(rasterio.uint8), 1)
         del sf
         
+                
+
+        
+        
+        
         print('Mosaic "',image1_ds[:-4],'" images...')
         mask_blurred_4chan=blendMask(57,im_floodfill_f) 
         
@@ -1287,7 +1352,7 @@ for i in range(len(ReadOrder)-1):
             dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
         
         del im_floodfill,im_floodfill_f        
-        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=BlendPreprocessOrderForMosic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
+        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
         
         img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
               (1,image1_ds,im1_1num, 'b1d','b1' ),
@@ -1311,8 +1376,7 @@ for i in range(len(ReadOrder)-1):
         kwargs.update(BIGTIFF="IF_SAFER")
       
         
-        # plt.imshow(b1d)        
-        for k in range(4): 
+        for k in range(4):
             if k==0:
                 try:
                     
@@ -1356,7 +1420,7 @@ for i in range(len(ReadOrder)-1):
             else:
                 
                 ind=k+1
-                b1,b1d=BlendPreprocessForMosic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
+                b1,b1d=BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
                     
                 try:
                 
@@ -1390,9 +1454,12 @@ for i in range(len(ReadOrder)-1):
                     MosTai.write( outcome, indexes=k+1, window=write_window3)
             
                     del outcome, b1,b1d ,write_window3
-                    gc.collect()       
+                    gc.collect()
+                    
+                    
+                    
                 
-        MosTai.close()
+        MosTai.close()#
         
         TaiMas= rasterio.open(
             'TaiMas.tif',
@@ -1408,14 +1475,16 @@ for i in range(len(ReadOrder)-1):
         kwargs = TaiMas.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
        
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+'SPOT67Cloud_Hsiao_Rou'+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
         b1=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)     
        
         b1d=MskBlendPreprocessForOrderLoop('TaiMas.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
         
         cldMas=eval(imgind[0][3]) *(1- mask_blurred_4chan)+ eval(imgind[0][4]) *( mask_blurred_4chan)
         cldMas[np.where(cldMas>0)]=1
-
+        
+                
+                
         cldMas=cldMas.astype(imgtype)
         print('Writing cloud mask to disk...')
         TaiMas.write( cldMas, indexes=1, window=write_window)          
@@ -1424,7 +1493,9 @@ for i in range(len(ReadOrder)-1):
         del mask_blurred_4chan ,cldMas,cldList,b1,b1d    
         gc.collect()
     else:
+        
 
+        
         image1_ds =ReadOrder[i]
         image2_ds =ReadOrder[i+1]
         if (testOverlap(ReadOrder)[0]==True):
@@ -1716,9 +1787,9 @@ for i in range(len(ReadOrder)-1):
         MosTai.close()
         
        
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+'SPOT67Cloud_Hsiao_Rou'+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
         b1=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+'SPOT67Cloud_Hsiao_Rou'+'\\'+'*'+image2_ds[:-4]+'*.tif')
+        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image2_ds[:-4]+'*.tif')
         b1d=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)
        
        
@@ -1760,8 +1831,4 @@ with open('transform.npy', 'wb') as f:
     np.save(f, coords)      
 print('All done!')
 end = timer()
-print('Total time spent(hr):',(end - start)/60/60) # Time in seconds # Time in seconds
-
-
-
-
+print('Total time spent(hr):',(end - start)/60/60) # Time in seconds

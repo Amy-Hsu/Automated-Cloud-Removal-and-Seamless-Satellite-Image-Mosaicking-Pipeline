@@ -1,0 +1,4488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution xmlns="http://tempuri.org/XMLSchema.xsd">
+	<Operator Namespace="IMAGINE" Name="Process">
+		<DisplayName>1115_f5_2</DisplayName>
+		<Description></Description>
+		<Attribute Name="CellSize">
+			<Data>
+				<StringValue>4x 4y meters</StringValue>
+				<Type Namespace="IMAGINE" Name="CellSize"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="CellSizeFromInput">
+			<Data>
+				<StringValue>Raster Input 4</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="CellSizeRule">
+			<Data>
+				<StringValue>Same as Input</StringValue>
+				<Type Namespace="IMAGINE" Name="CellSizeRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridFromInput">
+			<Data>
+				<StringValue>Raster Input</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridOrigin">
+			<Data>
+				<StringValue>0x 0y meters Center_of_cell</StringValue>
+				<Type Namespace="IMAGINE" Name="GridOrigin"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridRule">
+			<Data>
+				<StringValue>From cell size and window</StringValue>
+				<Type Namespace="IMAGINE" Name="GridRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="ProjectionRule">
+			<Data>
+				<StringValue>{&quot;File&quot;:&quot;c:/program files/intergraph/erdas imagine 2014/etc/projections/epsg.plb&quot;,&quot;Proj&quot;:&quot;TWD97 / TM2 zone 121 (3826)&quot;,&quot;Rule&quot;:&quot;Specify&quot;}
+</StringValue>
+				<Type Namespace="IMAGINE" Name="ProjectionRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowExtentRule">
+			<Data>
+				<StringValue>Pixel edges</StringValue>
+				<Type Namespace="IMAGINE" Name="EWindowExtentRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowFromInput">
+			<Data>
+				<StringValue>Raster Input</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowRule">
+			<Data>
+				<StringValue>Intersection</StringValue>
+				<Type Namespace="IMAGINE" Name="EWindowRule"/>
+			</Data>
+		</Attribute>
+		<Process>
+			<Namespace></Namespace>
+			<Name></Name>
+			<DisplayName>1115_f5_2</DisplayName>
+			<DisplayCategory>General</DisplayCategory>
+			<Icon>block.ico</Icon>
+			<ColorCategory>Submodel</ColorCategory>
+			<UIProviderNamespace></UIProviderNamespace>
+			<UIProviderName></UIProviderName>
+			<IsUsableInExpression>false</IsUsableInExpression>
+			<Syntax>Model (  )</Syntax>
+			<Operators>Float</Operators>
+			<Operators>Float 2</Operators>
+			<Operators>Float 3</Operators>
+			<Operators>Float 4</Operators>
+			<Operators>EITHER 1 IF </Operators>
+			<Operators>EITHER 1 IF  2</Operators>
+			<Operators>Raster Input</Operators>
+			<Operators>Raster Output</Operators>
+			<Operators>Raster Input 2</Operators>
+			<Operators>$n24_sp2017xs_12m*ABS</Operators>
+			<Operators>EITHER 0 IF </Operators>
+			<Operators>Integer</Operators>
+			<Operators>Integer 2</Operators>
+			<Operators>HISTMATCH </Operators>
+			<Operators>HISTMATCH  2</Operators>
+			<Operators>HISTMATCH  3</Operators>
+			<Operators>HISTMATCH  4</Operators>
+			<Operators>Table File Output</Operators>
+			<Operators>Table File Output 2</Operators>
+			<Operators>Table File Output 3</Operators>
+			<Operators>Table File Output 4</Operators>
+			<Operators>Raster Output 2</Operators>
+			<Operators>EITHER
+STACKLAYERS </Operators>
+			<Operators>Raster Input 3</Operators>
+			<Operators>Raster Input 4</Operators>
+			<Operators>EITHER</Operators>
+			<Operators>Float 5</Operators>
+			<Operators>Float 6</Operators>
+			<Operators>Float 7</Operators>
+			<Operators>MAX </Operators>
+			<Operators>MIN </Operators>
+			<Operators>Float 8</Operators>
+			<Operators>Float 9</Operators>
+			<Operators>CONDITIONAL </Operators>
+			<Operators>EITHER 2</Operators>
+			<Operators>Float 10</Operators>
+			<Operators>Float 11</Operators>
+			<Operators>Float 12</Operators>
+			<Operators>MAX  2</Operators>
+			<Operators>MIN  2</Operators>
+			<Operators>Float 13</Operators>
+			<Operators>Float 14</Operators>
+			<Operators>CONDITIONAL  2</Operators>
+			<Operators>EITHER 3</Operators>
+			<Operators>Float 15</Operators>
+			<Operators>Float 16</Operators>
+			<Operators>Float 17</Operators>
+			<Operators>Scalar Input 2</Operators>
+			<Operators>MAX  3</Operators>
+			<Operators>MIN  3</Operators>
+			<Operators>Float 18</Operators>
+			<Operators>Float 19</Operators>
+			<Operators>CONDITIONAL  3</Operators>
+			<Operators>EITHER 1 IF  3</Operators>
+			<Operators>Integer 3</Operators>
+			<Operators>Statistics 6</Operators>
+			<Operators>Statistics 5</Operators>
+			<Operators>Statistics 4</Operators>
+			<Operators>Statistics 3</Operators>
+			<Operators>Statistics 2</Operators>
+			<Operators>Statistics</Operators>
+			<Tails>Raster Output 2</Tails>
+		</Process>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 1 IF " ChildPort="n1_memory"/>
+		<Connections ParentDisplayName="CONDITIONAL " ParentPort="Result" ChildPort="Input"/>
+		<Parents>CONDITIONAL </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1309</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2007</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 2</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 1 IF " ChildPort="n2_memory"/>
+		<Connections ParentDisplayName="CONDITIONAL  2" ParentPort="Result" ChildPort="Input"/>
+		<Parents>CONDITIONAL  2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1480</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1993</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 3</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 1 IF " ChildPort="n3_memory"/>
+		<Connections ParentDisplayName="CONDITIONAL  3" ParentPort="Result" ChildPort="Input"/>
+		<Parents>CONDITIONAL  3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1670</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2010</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 4</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER 1 IF " ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 1 IF  2" ChildPort="n4_memory"/>
+		<Parents>EITHER 1 IF </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1469</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2326</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 1 IF </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER 1 IF ( $n1_memory==1  || $n1_memory==5 || $n2_memory==1 || $n2_memory==5  || $n3_memory==1 || $n3_memory==5 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n1_memory">
+			<DisplayName>n1_memory</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n2_memory">
+			<DisplayName>n2_memory</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n3_memory">
+			<DisplayName>n3_memory</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float" ParentPort="Output" ChildPort="n1_memory"/>
+		<Connections ParentDisplayName="Float 2" ParentPort="Output" ChildPort="n2_memory"/>
+		<Connections ParentDisplayName="Float 3" ParentPort="Output" ChildPort="n3_memory"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 4" ChildPort="Input"/>
+		<Parents>Float</Parents>
+		<Parents>Float 2</Parents>
+		<Parents>Float 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1483</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2179</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 1 IF  2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER 1 IF ( $n4_memory==1  ||  $n7_river6m==1  ||  $n9_tai_bor==0    ||  $n62_temp==1 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n4_memory">
+			<DisplayName>n4_memory</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n7_river6m">
+			<DisplayName>n7_river6m</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n9_tai_bor">
+			<DisplayName>n9_tai_bor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n62_temp">
+			<DisplayName>n62_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 4" ParentPort="Output" ChildPort="n4_memory"/>
+		<Connections ParentDisplayName="Raster Input" ParentPort="RasterOut" ChildPort="n7_river6m"/>
+		<Connections ParentDisplayName="Raster Input 2" ParentPort="RasterOut" ChildPort="n9_tai_bor"/>
+		<Connections ParentDisplayName="Integer 3" ParentPort="Output" ChildPort="n62_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Raster Output" ChildPort="RasterIn"/>
+		<Parents>Float 4</Parents>
+		<Parents>Raster Input</Parents>
+		<Parents>Raster Input 2</Parents>
+		<Parents>Integer 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1471</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2520</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterInput">
+		<DisplayName>Raster Input</DisplayName>
+		<Description></Description>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f2_test/testa/ref/river6m.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="DataType">
+			<DisplayName>DataType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Binary</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Interpolation">
+			<DisplayName>Interpolation</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Nearest Neighbor</StringValue>
+				<Type Namespace="IMAGINE" Name="InterpolationType"/>
+			</Data>
+		</Port>
+		<Port Name="MapBoundary">
+			<DisplayName>MapBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="FileBoundary">
+			<DisplayName>FileBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="AOI">
+			<DisplayName>AOI</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Recode">
+			<DisplayName>Recode</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributeTable">
+			<DisplayName>AttributeTable</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributesOnRasterOut">
+			<DisplayName>AttributesOnRasterOut</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 1 IF  2" ChildPort="n7_river6m"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1649</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2327</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterOutput">
+		<DisplayName>Raster Output</DisplayName>
+		<Description></Description>
+		<Port Name="RasterIn">
+			<DisplayName>RasterIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameIn">
+			<DisplayName>FilenameIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>f:/auto_spot/results/mask/mask2.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="PixelType">
+			<DisplayName>PixelType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>u1</StringValue>
+				<Type Namespace="IMAGINE" Name="PixelType"/>
+			</Data>
+		</Port>
+		<Port Name="BlockWidth">
+			<DisplayName>BlockWidth</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="BlockHeight">
+			<DisplayName>BlockHeight</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Thematicity">
+			<DisplayName>Thematicity</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Thematicity"/>
+			</Data>
+		</Port>
+		<Port Name="ComputePyramids">
+			<DisplayName>ComputePyramids</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="NoDataValue">
+			<DisplayName>NoDataValue</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameOut">
+			<DisplayName>FilenameOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER 1 IF  2" ParentPort="Result" ChildPort="RasterIn"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="$n24_sp2017xs_12m*ABS" ChildPort="n8_mask1"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 0 IF " ChildPort="n8_mask1"/>
+		<Parents>EITHER 1 IF  2</Parents>
+		<Attribute Name="FlowControl">
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1473</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2790</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterInput">
+		<DisplayName>Raster Input 2</DisplayName>
+		<Description></Description>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f2_test/testa/ref/tai_bor.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="DataType">
+			<DisplayName>DataType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Binary</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Interpolation">
+			<DisplayName>Interpolation</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Nearest Neighbor</StringValue>
+				<Type Namespace="IMAGINE" Name="InterpolationType"/>
+			</Data>
+		</Port>
+		<Port Name="MapBoundary">
+			<DisplayName>MapBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="FileBoundary">
+			<DisplayName>FileBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="AOI">
+			<DisplayName>AOI</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Recode">
+			<DisplayName>Recode</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributeTable">
+			<DisplayName>AttributeTable</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributesOnRasterOut">
+			<DisplayName>AttributesOnRasterOut</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 1 IF  2" ChildPort="n9_tai_bor"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1304</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2326</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>$n24_sp2017xs_12m*ABS</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>$n24_sp2017xs_12m*ABS($n8_mask1-1) </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n24_sp2017xs_12m">
+			<DisplayName>n24_sp2017xs_12m</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n8_mask1">
+			<DisplayName>n8_mask1</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Output" ParentPort="RasterOut" ChildPort="n8_mask1"/>
+		<Connections ParentDisplayName="Raster Input 3" ParentPort="RasterOut" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentPort="Result" ChildDisplayName="Integer" ChildPort="Input"/>
+		<Parents>Raster Input 3</Parents>
+		<Parents>Raster Output</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1695</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2788</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 0 IF </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER 0 IF ( PIXELX==0 &amp;&amp; PIXELY==0 ) OR
+EITHER 65535 IF ( PIXELX==0 &amp;&amp; PIXELY==1 ) OR $n25_a0002562*ABS($n8_mask1-1) OTHERWISE 
+OTHERWISE
+</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n8_mask1">
+			<DisplayName>n8_mask1</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Output" ParentPort="RasterOut" ChildPort="n8_mask1"/>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Connections ParentPort="Result" ChildDisplayName="Integer 2" ChildPort="Input"/>
+		<Parents>Raster Input 4</Parents>
+		<Parents>Raster Output</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1237</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2797</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Integer">
+		<DisplayName>Integer</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="$n24_sp2017xs_12m*ABS" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH " ChildPort="n12_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  2" ChildPort="n12_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  3" ChildPort="n12_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  4" ChildPort="n12_temp"/>
+		<Parents>$n24_sp2017xs_12m*ABS</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1692</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2928</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Integer">
+		<DisplayName>Integer 2</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER 0 IF " ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH " ChildPort="n13_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  2" ChildPort="n13_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  3" ChildPort="n13_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="HISTMATCH  4" ChildPort="n13_temp"/>
+		<Parents>EITHER 0 IF </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>0</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1242</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3098</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>HISTMATCH </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>HISTMATCH ( HISTOGRAM ($n13_temp(2), IGNORE 0), HISTOGRAM ($n12_temp(2), IGNORE 0) ) </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n13_temp">
+			<DisplayName>n13_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n12_temp">
+			<DisplayName>n12_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Integer" ParentPort="Output" ChildPort="n12_temp"/>
+		<Connections ParentDisplayName="Integer 2" ParentPort="Output" ChildPort="n13_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Table File Output 2" ChildPort="TableIn"/>
+		<Parents>Integer 2</Parents>
+		<Parents>Integer</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1582</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3092</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>HISTMATCH  2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>HISTMATCH ( HISTOGRAM ($n13_temp(1), IGNORE 0), HISTOGRAM ($n12_temp(1), IGNORE 0) ) </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n13_temp">
+			<DisplayName>n13_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n12_temp">
+			<DisplayName>n12_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Integer" ParentPort="Output" ChildPort="n12_temp"/>
+		<Connections ParentDisplayName="Integer 2" ParentPort="Output" ChildPort="n13_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Table File Output" ChildPort="TableIn"/>
+		<Parents>Integer 2</Parents>
+		<Parents>Integer</Parents>
+		<Attribute Name="FlowControl">
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1418</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3085</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>HISTMATCH  3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>HISTMATCH ( HISTOGRAM ($n13_temp(3), IGNORE 0), HISTOGRAM ($n12_temp(3), IGNORE 0) ) </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n13_temp">
+			<DisplayName>n13_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n12_temp">
+			<DisplayName>n12_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Integer" ParentPort="Output" ChildPort="n12_temp"/>
+		<Connections ParentDisplayName="Integer 2" ParentPort="Output" ChildPort="n13_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Table File Output 3" ChildPort="TableIn"/>
+		<Parents>Integer 2</Parents>
+		<Parents>Integer</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1747</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3092</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>HISTMATCH  4</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>HISTMATCH ( HISTOGRAM ($n13_temp(4), IGNORE 0), HISTOGRAM ($n12_temp(4), IGNORE 0) ) </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n13_temp">
+			<DisplayName>n13_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n12_temp">
+			<DisplayName>n12_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Integer" ParentPort="Output" ChildPort="n12_temp"/>
+		<Connections ParentDisplayName="Integer 2" ParentPort="Output" ChildPort="n13_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Table File Output 4" ChildPort="TableIn"/>
+		<Parents>Integer 2</Parents>
+		<Parents>Integer</Parents>
+		<Attribute Name="FlowControl">
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1927</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3090</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileOutput">
+		<DisplayName>Table File Output</DisplayName>
+		<Description></Description>
+		<Port Name="TableOut">
+			<DisplayName>TableOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableIn">
+			<DisplayName>TableIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Float</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/distrib/col1.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentDisplayName="HISTMATCH  2" ParentPort="Result" ChildPort="TableIn"/>
+		<Connections ParentPort="TableOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n18_Output"/>
+		<Parents>HISTMATCH  2</Parents>
+		<Attribute Name="FlowControl">
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1410</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3285</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileOutput">
+		<DisplayName>Table File Output 2</DisplayName>
+		<Description></Description>
+		<Port Name="TableOut">
+			<DisplayName>TableOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableIn">
+			<DisplayName>TableIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Float</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/distrib/col2.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentDisplayName="HISTMATCH " ParentPort="Result" ChildPort="TableIn"/>
+		<Connections ParentPort="TableOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n19_Output"/>
+		<Parents>HISTMATCH </Parents>
+		<Attribute Name="FlowControl">
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>3</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1571</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3275</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileOutput">
+		<DisplayName>Table File Output 3</DisplayName>
+		<Description></Description>
+		<Port Name="TableOut">
+			<DisplayName>TableOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableIn">
+			<DisplayName>TableIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Float</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/distrib/col3.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentDisplayName="HISTMATCH  3" ParentPort="Result" ChildPort="TableIn"/>
+		<Connections ParentPort="TableOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n20_Output"/>
+		<Parents>HISTMATCH  3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1746</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3280</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileOutput">
+		<DisplayName>Table File Output 4</DisplayName>
+		<Description></Description>
+		<Port Name="TableOut">
+			<DisplayName>TableOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableIn">
+			<DisplayName>TableIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Float</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/distrib/col4.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentDisplayName="HISTMATCH  4" ParentPort="Result" ChildPort="TableIn"/>
+		<Connections ParentPort="TableOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n21_Output"/>
+		<Parents>HISTMATCH  4</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>3</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1926</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3282</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterOutput">
+		<DisplayName>Raster Output 2</DisplayName>
+		<Description></Description>
+		<Port Name="RasterIn">
+			<DisplayName>RasterIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameIn">
+			<DisplayName>FilenameIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>f:/auto_spot/results/outcomes/match4_2.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="PixelType">
+			<DisplayName>PixelType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>u16</StringValue>
+				<Type Namespace="IMAGINE" Name="PixelType"/>
+			</Data>
+		</Port>
+		<Port Name="BlockWidth">
+			<DisplayName>BlockWidth</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="BlockHeight">
+			<DisplayName>BlockHeight</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Thematicity">
+			<DisplayName>Thematicity</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Thematicity"/>
+			</Data>
+		</Port>
+		<Port Name="ComputePyramids">
+			<DisplayName>ComputePyramids</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="NoDataValue">
+			<DisplayName>NoDataValue</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameOut">
+			<DisplayName>FilenameOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER
+STACKLAYERS " ParentPort="Result" ChildPort="RasterIn"/>
+		<Parents>EITHER
+STACKLAYERS </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1230</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3449</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER
+STACKLAYERS </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER
+STACKLAYERS (
+DIRECT LOOKUP ( $n25_a0002562(1) , $n18_Output ),
+DIRECT LOOKUP ( $n25_a0002562(2) , $n19_Output ),
+DIRECT LOOKUP ( $n25_a0002562(3) , $n20_Output ),
+DIRECT LOOKUP ( $n25_a0002562(4) , $n21_Output ))
+IF ( STACK SUM ( $n25_a0002562 )>0  ) OR 0 OTHERWISE</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n18_Output">
+			<DisplayName>n18_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n19_Output">
+			<DisplayName>n19_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n20_Output">
+			<DisplayName>n20_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n21_Output">
+			<DisplayName>n21_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Table File Output" ParentPort="TableOut" ChildPort="n18_Output"/>
+		<Connections ParentDisplayName="Table File Output 2" ParentPort="TableOut" ChildPort="n19_Output"/>
+		<Connections ParentDisplayName="Table File Output 3" ParentPort="TableOut" ChildPort="n20_Output"/>
+		<Connections ParentDisplayName="Table File Output 4" ParentPort="TableOut" ChildPort="n21_Output"/>
+		<Connections ParentPort="Result" ChildDisplayName="Raster Output 2" ChildPort="RasterIn"/>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Parents>Raster Input 4</Parents>
+		<Parents>Table File Output</Parents>
+		<Parents>Table File Output 2</Parents>
+		<Parents>Table File Output 3</Parents>
+		<Parents>Table File Output 4</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1237</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>3281</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterInput">
+		<DisplayName>Raster Input 3</DisplayName>
+		<Description></Description>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/ref/sp2017xs_12m.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="DataType">
+			<DisplayName>DataType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Interpolation">
+			<DisplayName>Interpolation</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Nearest Neighbor</StringValue>
+				<Type Namespace="IMAGINE" Name="InterpolationType"/>
+			</Data>
+		</Port>
+		<Port Name="MapBoundary">
+			<DisplayName>MapBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="FileBoundary">
+			<DisplayName>FileBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="AOI">
+			<DisplayName>AOI</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Recode">
+			<DisplayName>Recode</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributeTable">
+			<DisplayName>AttributeTable</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributesOnRasterOut">
+			<DisplayName>AttributesOnRasterOut</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>true</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="RasterOut" ChildDisplayName="$n24_sp2017xs_12m*ABS" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 2" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 3" ChildPort="n24_sp2017xs_12m"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1058</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>588</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterInput">
+		<DisplayName>Raster Input 4</DisplayName>
+		<Description></Description>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>F:/Auto_SPOT/mosaic_spot2020_ortho/20200108/A0007592/a0007592.raw</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="DataType">
+			<DisplayName>DataType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Interpolation">
+			<DisplayName>Interpolation</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Nearest Neighbor</StringValue>
+				<Type Namespace="IMAGINE" Name="InterpolationType"/>
+			</Data>
+		</Port>
+		<Port Name="MapBoundary">
+			<DisplayName>MapBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="FileBoundary">
+			<DisplayName>FileBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="AOI">
+			<DisplayName>AOI</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Recode">
+			<DisplayName>Recode</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributeTable">
+			<DisplayName>AttributeTable</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributesOnRasterOut">
+			<DisplayName>AttributesOnRasterOut</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>true</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 0 IF " ChildPort="n25_a0002562"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n25_a0002562"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER" ChildPort="n25_a0002562"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 2" ChildPort="n25_a0002562"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 3" ChildPort="n25_a0002562"/>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER 1 IF  3" ChildPort="n25_a0002562"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2064</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>600</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER $n25_a0002562(1) - $n24_sp2017xs_12m(1) IF ( $n62_temp==0 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n62_temp">
+			<DisplayName>n62_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n24_sp2017xs_12m">
+			<DisplayName>n24_sp2017xs_12m</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Input 3" ParentPort="RasterOut" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Connections ParentDisplayName="Integer 3" ParentPort="Output" ChildPort="n62_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 5" ChildPort="Input"/>
+		<Parents>Integer 3</Parents>
+		<Parents>Raster Input 4</Parents>
+		<Parents>Raster Input 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>614</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>739</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 5</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL " ChildPort="n27_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics 2" ChildPort="Raster"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics" ChildPort="Raster"/>
+		<Parents>EITHER</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>595</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>909</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 6</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MIN " ChildPort="n29_Output"/>
+		<Connections ParentDisplayName="Statistics" ParentPort="Min" ChildPort="Input"/>
+		<Parents>Statistics</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>302</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>986</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 7</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MAX " ChildPort="n31_Output"/>
+		<Connections ParentDisplayName="Statistics 2" ParentPort="Max" ChildPort="Input"/>
+		<Parents>Statistics 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>932</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>986</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MAX </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MAX ( 0.0, $n31_Output[0] ) * MIN ( MAX ( 0.0, $n55_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n31_Output">
+			<DisplayName>n31_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n55_Float">
+			<DisplayName>n55_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 7" ParentPort="Output" ChildPort="n31_Output"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n55_Float"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 9" ChildPort="Input"/>
+		<Parents>Float 7</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>752</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1136</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MIN </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MIN ( 0.0, $n29_Output[0] ) * MIN ( MAX ( 0.0, $n32_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n29_Output">
+			<DisplayName>n29_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n32_Float">
+			<DisplayName>n32_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 6" ParentPort="Output" ChildPort="n29_Output"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 8" ChildPort="Input"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n32_Float"/>
+		<Parents>Float 6</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>472</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1146</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 8</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MIN " ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL " ChildPort="n35_Float"/>
+		<Parents>MIN </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>472</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1276</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 9</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MAX " ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL " ChildPort="n36_Float"/>
+		<Parents>MAX </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>740</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1262</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>CONDITIONAL </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>CONDITIONAL { ($n27_temp &lt; $n35_Float) 1 ,
+
+	(($n27_temp >= $n35_Float) &amp;&amp; ($n27_temp &lt; 0.0)) 2 ,
+
+	($n27_temp == 0.0) 3,
+
+	(($n27_temp > 0.0) &amp;&amp; ($n27_temp &lt;= $n36_Float)) 4,
+
+	($n27_temp > $n36_Float) 5 } </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n27_temp">
+			<DisplayName>n27_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n35_Float">
+			<DisplayName>n35_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n36_Float">
+			<DisplayName>n36_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Result" ChildDisplayName="Float" ChildPort="Input"/>
+		<Connections ParentDisplayName="Float 5" ParentPort="Output" ChildPort="n27_temp"/>
+		<Connections ParentDisplayName="Float 8" ParentPort="Output" ChildPort="n35_Float"/>
+		<Connections ParentDisplayName="Float 9" ParentPort="Output" ChildPort="n36_Float"/>
+		<Parents>Float 5</Parents>
+		<Parents>Float 8</Parents>
+		<Parents>Float 9</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>602</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1376</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER $n25_a0002562(2) - $n24_sp2017xs_12m(2) IF ( $n62_temp==0 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n62_temp">
+			<DisplayName>n62_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n24_sp2017xs_12m">
+			<DisplayName>n24_sp2017xs_12m</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Input 3" ParentPort="RasterOut" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Connections ParentDisplayName="Integer 3" ParentPort="Output" ChildPort="n62_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 10" ChildPort="Input"/>
+		<Parents>Integer 3</Parents>
+		<Parents>Raster Input 4</Parents>
+		<Parents>Raster Input 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1465</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>747</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 10</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER 2" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  2" ChildPort="n39_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics 4" ChildPort="Raster"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics 3" ChildPort="Raster"/>
+		<Parents>EITHER 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1467</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>908</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 11</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MIN  2" ChildPort="n41_Output"/>
+		<Connections ParentDisplayName="Statistics 3" ParentPort="Min" ChildPort="Input"/>
+		<Parents>Statistics 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1165</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>988</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 12</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MAX  2" ChildPort="n43_Output"/>
+		<Connections ParentDisplayName="Statistics 4" ParentPort="Max" ChildPort="Input"/>
+		<Parents>Statistics 4</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1795</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>988</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MAX  2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MAX ( 0.0, $n43_Output[0] ) * MIN ( MAX ( 0.0, $n55_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n43_Output">
+			<DisplayName>n43_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n55_Float">
+			<DisplayName>n55_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 12" ParentPort="Output" ChildPort="n43_Output"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n55_Float"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 14" ChildPort="Input"/>
+		<Parents>Float 12</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1615</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1138</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MIN  2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MIN ( 0.0, $n41_Output[0] ) * MIN ( MAX ( 0.0, $n32_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n41_Output">
+			<DisplayName>n41_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n32_Float">
+			<DisplayName>n32_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 11" ParentPort="Output" ChildPort="n41_Output"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 13" ChildPort="Input"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n32_Float"/>
+		<Parents>Float 11</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1335</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1148</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 13</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MIN  2" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  2" ChildPort="n46_Float"/>
+		<Parents>MIN  2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1335</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1278</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 14</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MAX  2" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  2" ChildPort="n47_Float"/>
+		<Parents>MAX  2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1615</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1268</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>CONDITIONAL  2</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>CONDITIONAL { ($n39_temp &lt; $n46_Float) 1 ,
+
+	(($n39_temp >= $n46_Float) &amp;&amp; ($n39_temp &lt; 0.0)) 2 ,
+
+	($n39_temp == 0.0) 3,
+
+	(($n39_temp > 0.0) &amp;&amp; ($n39_temp &lt;= $n47_Float)) 4,
+
+	($n39_temp > $n47_Float) 5 } </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n39_temp">
+			<DisplayName>n39_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n46_Float">
+			<DisplayName>n46_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n47_Float">
+			<DisplayName>n47_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Result" ChildDisplayName="Float 2" ChildPort="Input"/>
+		<Connections ParentDisplayName="Float 10" ParentPort="Output" ChildPort="n39_temp"/>
+		<Connections ParentDisplayName="Float 13" ParentPort="Output" ChildPort="n46_Float"/>
+		<Connections ParentDisplayName="Float 14" ParentPort="Output" ChildPort="n47_Float"/>
+		<Parents>Float 10</Parents>
+		<Parents>Float 13</Parents>
+		<Parents>Float 14</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1465</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1378</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER $n25_a0002562(3) - $n24_sp2017xs_12m(3) IF ( $n62_temp==0 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n62_temp">
+			<DisplayName>n62_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n24_sp2017xs_12m">
+			<DisplayName>n24_sp2017xs_12m</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Input 3" ParentPort="RasterOut" ChildPort="n24_sp2017xs_12m"/>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Connections ParentDisplayName="Integer 3" ParentPort="Output" ChildPort="n62_temp"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 15" ChildPort="Input"/>
+		<Parents>Integer 3</Parents>
+		<Parents>Raster Input 4</Parents>
+		<Parents>Raster Input 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2584</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>747</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 15</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER 3" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  3" ChildPort="n50_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics 6" ChildPort="Raster"/>
+		<Connections ParentPort="Output" ChildDisplayName="Statistics 5" ChildPort="Raster"/>
+		<Parents>EITHER 3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2584</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>908</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 16</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MIN  3" ChildPort="n52_Output"/>
+		<Connections ParentDisplayName="Statistics 5" ParentPort="Min" ChildPort="Input"/>
+		<Parents>Statistics 5</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2284</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>988</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 17</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="MAX  3" ChildPort="n54_Output"/>
+		<Connections ParentDisplayName="Statistics 6" ParentPort="Max" ChildPort="Input"/>
+		<Parents>Statistics 6</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2914</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>988</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="ScalarInput">
+		<DisplayName>Scalar Input 2</DisplayName>
+		<Description></Description>
+		<Port Name="Value">
+			<DisplayName>Value</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>{&quot;datatype&quot;:10,&quot;layers&quot;:[{&quot;layerData&quot;:[&quot;10&quot;]}],&quot;nCols&quot;:1,&quot;nRows&quot;:1,&quot;numlayers&quot;:1,&quot;objectType&quot;:0}
+</StringValue>
+				<Type Namespace="IMAGINE" Name="Scalar"/>
+			</Data>
+		</Port>
+		<Port Name="Scalar">
+			<DisplayName>Scalar</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Scalar" ChildDisplayName="MAX " ChildPort="n55_Float"/>
+		<Connections ParentPort="Scalar" ChildDisplayName="MIN " ChildPort="n32_Float"/>
+		<Connections ParentPort="Scalar" ChildDisplayName="MAX  2" ChildPort="n55_Float"/>
+		<Connections ParentPort="Scalar" ChildDisplayName="MIN  2" ChildPort="n32_Float"/>
+		<Connections ParentPort="Scalar" ChildDisplayName="MAX  3" ChildPort="n55_Float"/>
+		<Connections ParentPort="Scalar" ChildDisplayName="MIN  3" ChildPort="n32_Float"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>3169</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1129</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MAX  3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MAX ( 0.0, $n54_Output[0] ) * MIN ( MAX ( 0.0, $n55_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n54_Output">
+			<DisplayName>n54_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n55_Float">
+			<DisplayName>n55_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 17" ParentPort="Output" ChildPort="n54_Output"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n55_Float"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 19" ChildPort="Input"/>
+		<Parents>Float 17</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2734</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1138</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>MIN  3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>MIN ( 0.0, $n52_Output[0] ) * MIN ( MAX ( 0.0, $n32_Float ), 100.0 ) / 100.0</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n52_Output">
+			<DisplayName>n52_Output</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n32_Float">
+			<DisplayName>n32_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 16" ParentPort="Output" ChildPort="n52_Output"/>
+		<Connections ParentDisplayName="Scalar Input 2" ParentPort="Scalar" ChildPort="n32_Float"/>
+		<Connections ParentPort="Result" ChildDisplayName="Float 18" ChildPort="Input"/>
+		<Parents>Float 16</Parents>
+		<Parents>Scalar Input 2</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2454</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1148</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 18</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MIN  3" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  3" ChildPort="n58_Float"/>
+		<Parents>MIN  3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2454</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1278</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Float">
+		<DisplayName>Float 19</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="MAX  3" ParentPort="Result" ChildPort="Input"/>
+		<Connections ParentPort="Output" ChildDisplayName="CONDITIONAL  3" ChildPort="n59_Float"/>
+		<Parents>MAX  3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2734</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1268</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>CONDITIONAL  3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>CONDITIONAL { ($n50_temp &lt; $n58_Float) 1 ,
+	(($n50_temp >= $n58_Float) &amp;&amp; ($n50_temp &lt; 0.0)) 2 ,
+	($n50_temp == 0.0) 3,
+	(($n50_temp > 0.0) &amp;&amp; ($n50_temp &lt;= $n59_Float)) 4,
+	($n50_temp > $n59_Float) 5 } </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n50_temp">
+			<DisplayName>n50_temp</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n58_Float">
+			<DisplayName>n58_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n59_Float">
+			<DisplayName>n59_Float</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Result" ChildDisplayName="Float 3" ChildPort="Input"/>
+		<Connections ParentDisplayName="Float 15" ParentPort="Output" ChildPort="n50_temp"/>
+		<Connections ParentDisplayName="Float 18" ParentPort="Output" ChildPort="n58_Float"/>
+		<Connections ParentDisplayName="Float 19" ParentPort="Output" ChildPort="n59_Float"/>
+		<Parents>Float 15</Parents>
+		<Parents>Float 18</Parents>
+		<Parents>Float 19</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2584</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>1378</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER 1 IF  3</DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER 1 IF ($n25_a0002562(1) ==0  &amp;&amp; $n25_a0002562(2)==0 &amp;&amp; $n25_a0002562(3)==0 &amp;&amp; $n25_a0002562(4)==0 ) OR 0 OTHERWISE </StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_a0002562">
+			<DisplayName>n25_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Raster Input 4" ParentPort="RasterOut" ChildPort="n25_a0002562"/>
+		<Connections ParentPort="Result" ChildDisplayName="Integer 3" ChildPort="Input"/>
+		<Parents>Raster Input 4</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2145</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2034</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Integer">
+		<DisplayName>Integer 3</DisplayName>
+		<Description></Description>
+		<Port Name="Input">
+			<DisplayName>Input</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Output">
+			<DisplayName>Output</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 1 IF  2" ChildPort="n62_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER" ChildPort="n62_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 2" ChildPort="n62_temp"/>
+		<Connections ParentPort="Output" ChildDisplayName="EITHER 3" ChildPort="n62_temp"/>
+		<Connections ParentDisplayName="EITHER 1 IF  3" ParentPort="Result" ChildPort="Input"/>
+		<Parents>EITHER 1 IF  3</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>0</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2169</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>2310</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics 6</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 15" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Max" ChildDisplayName="Float 17" ChildPort="Input"/>
+		<Parents>Float 15</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>0</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2754</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>947</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics 5</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 15" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Min" ChildDisplayName="Float 16" ChildPort="Input"/>
+		<Parents>Float 15</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>2434</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>948</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics 4</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 10" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Max" ChildDisplayName="Float 12" ChildPort="Input"/>
+		<Parents>Float 10</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>0</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1635</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>947</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics 3</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 10" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Min" ChildDisplayName="Float 11" ChildPort="Input"/>
+		<Parents>Float 10</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>1315</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>948</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics 2</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 5" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Max" ChildDisplayName="Float 7" ChildPort="Input"/>
+		<Parents>Float 5</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>0</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>772</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>945</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Statistics">
+		<DisplayName>Statistics</DisplayName>
+		<Description></Description>
+		<Port Name="Raster">
+			<DisplayName>Raster</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="ComputeCovariance">
+			<DisplayName>Compute Covariance</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="SkipFactor">
+			<DisplayName>Skip Factor</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Port>
+		<Port Name="ForceRecompute">
+			<DisplayName>Force Recompute</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>false</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Port Name="Ignore">
+			<DisplayName>Ignore</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Min">
+			<DisplayName>Min</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Max">
+			<DisplayName>Max</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mean">
+			<DisplayName>Mean</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Median">
+			<DisplayName>Median</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Mode">
+			<DisplayName>Mode</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="StandardDeviation">
+			<DisplayName>Standard Deviation</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="Covariance">
+			<DisplayName>Covariance</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FullStats">
+			<DisplayName>Full Stats</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>true</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Float 5" ParentPort="Output" ChildPort="Raster"/>
+		<Connections ParentPort="Min" ChildDisplayName="Float 6" ChildPort="Input"/>
+		<Parents>Float 5</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>451</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>946</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+</Solution>

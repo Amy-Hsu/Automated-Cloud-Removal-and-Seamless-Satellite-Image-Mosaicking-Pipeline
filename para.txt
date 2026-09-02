@@ -1,8 +1,0 @@
-{"path_method":"a6c",
-"res":"6",
-"pan_res":"1.5",
-"resampleTo":"5",
-"trueBits":"12",
-"imgPath":"E:\\paper",
-"kernel":"61"
-}

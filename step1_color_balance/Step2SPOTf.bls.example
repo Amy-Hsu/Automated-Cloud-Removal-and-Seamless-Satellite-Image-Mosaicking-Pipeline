@@ -1,0 +1,3 @@
+Input1	Input2	Input3	Input4	Input5	Output1
+C:/mosaic_project/colorBalance/distrib/col1_1.fd.tbl	C:/mosaic_project/raw/a0000001/a0000001.raw	C:/mosaic_project/colorBalance/distrib/col2_1.fd.tbl	C:/mosaic_project/colorBalance/distrib/col3_1.fd.tbl	C:/mosaic_project/colorBalance/distrib/col4_1.fd.tbl	""
+C:/mosaic_project/colorBalance/distrib/col1_2.fd.tbl	C:/mosaic_project/raw/a0000002/a0000002.raw	C:/mosaic_project/colorBalance/distrib/col2_2.fd.tbl	C:/mosaic_project/colorBalance/distrib/col3_2.fd.tbl	C:/mosaic_project/colorBalance/distrib/col4_2.fd.tbl	""

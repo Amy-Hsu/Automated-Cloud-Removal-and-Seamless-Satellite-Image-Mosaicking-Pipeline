@@ -1,0 +1,5 @@
+{"res":"1.5",
+"trueBits":"12",
+"StartLetter":"a",
+"upscale_factor":"4"
+}
