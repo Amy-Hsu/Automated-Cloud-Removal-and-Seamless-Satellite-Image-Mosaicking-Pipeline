@@ -1,0 +1,19 @@
+/*
+** IMAGINE Version 14.0 Batch Commands File
+** Step 1 of the SPOT color-balance workflow.
+** EDIT the output folders below to match your project (NO SPACES in any path!),
+** and point smprocess to the SM_BATCH_GMDX_012516 file shipped in this folder.
+*/
+variable Input1 User;
+variable Input2 User;
+variable Input3 User;
+variable Input4 User;
+variable Output1 Auto "C:/mosaic_project/colorBalance/mask/mask_$(Input4.Name).img" Delete_Before;
+variable Output2 Auto "C:/mosaic_project/colorBalance/distrib/col1_$(Input1.FileNumber).tbl" Delete_Before;
+variable Output3 Auto "C:/mosaic_project/colorBalance/distrib/col2_$(Input1.FileNumber).tbl" Delete_Before;
+variable Output4 Auto "C:/mosaic_project/colorBalance/distrib/col3_$(Input1.FileNumber).tbl" Delete_Before;
+variable Output5 Auto "C:/mosaic_project/colorBalance/distrib/col4_$(Input1.FileNumber).tbl" Delete_Before;
+variable Output6 Auto "C:/mosaic_project/colorBalance/results/$(Input4.Name).img" Delete_Before;
+
+smprocess C:/mosaic_project/colorBalance/SM_BATCH_GMDX_012516 'Raster Input.Filename=$(Input1)' 'Raster Input 2.Filename=$(Input2)' 'Raster Input 3.Filename=$(Input3)' 'Raster Input 4.Filename=$(Input4)' 'Raster Output.FilenameIn=$(Output1)' 'Table File Output.Filename=$(Output2)' 'Table File Output 2.Filename=$(Output3)' 'Table File Output 3.Filename=$(Output4)' 'Table File Output 4.Filename=$(Output5)' 'Raster Output 2.FilenameIn=$(Output6)'
+'$(Output1)$(Output1)$(Output1)$(Output1)$(Output1)$(Output2)$(Output3)$(Output4)$(Output5)$(Output6)$(Output6)'

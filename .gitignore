@@ -1,0 +1,34 @@
+__pycache__/
+*.pyc
+# intermediate / output rasters and vectors
+*.tif
+*.tiff
+*.rrd
+*.rde
+*.aux
+*.aux.xml
+*.ige
+*.ovr
+allWindow.npy
+transform.npy
+ImgInd.npy
+Union_gt.npy
+Union_gt*.npy
+ProcessOrder.txt
+res_union_new.*
+*.temp.shp
+*.temp.shx
+*.temp.dbf
+*.temp.prj
+*.info.txt
+*.bnd.tif
+new_pan/
+cldDatabase/
+# machine-generated ERDAS batch files (contain local user paths)
+Step1SPOTf.bat
+Step2SPOTf.bat
+*.lck
+# tw_city6m.img is user-provided (not shipped)
+*.img
+!step1_color_balance/*.gmd
+.DS_Store

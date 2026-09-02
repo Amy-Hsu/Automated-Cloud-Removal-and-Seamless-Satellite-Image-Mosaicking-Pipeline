@@ -1,0 +1,14 @@
+{"res":"6",
+"trueBits":"12",
+"CandiImgPath":"YOUR_PATH\\cloud_database",
+"CldMaskPath":"YOUR_PATH\\cldDatabase",
+"MosaicImgAddress":"YOUR_PATH\\MosTai.tif",
+"MosaicCldAddress":"YOUR_PATH\\TaiMas.tif",
+"CandiMaskFolderName":"cloud_masks",
+"PanMosaicImgAddress":"YOUR_PATH\\MosTai_Pan.tif",
+"pan_res":"1.5",
+"seaBorderAddress":"YOUR_PATH\\tw_city6m.img",
+"PanImgAddress":"YOUR_PATH\\raw_pan",
+"cloud_tolerance(decimal)":0.25,
+"ssim_threshold(0<val<=1)":0.1
+}

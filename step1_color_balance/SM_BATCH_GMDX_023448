@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution xmlns="http://tempuri.org/XMLSchema.xsd">
+	<Operator Namespace="IMAGINE" Name="Process">
+		<DisplayName>applytable_taibor_noedge</DisplayName>
+		<Description></Description>
+		<Attribute Name="CellSize">
+			<Data>
+				<StringValue>6x 6y meters</StringValue>
+				<Type Namespace="IMAGINE" Name="CellSize"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="CellSizeFromInput">
+			<Data>
+				<StringValue>Raster Input</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="CellSizeRule">
+			<Data>
+				<StringValue>Explicit</StringValue>
+				<Type Namespace="IMAGINE" Name="CellSizeRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="CellSizeSqPixels">
+			<Data>
+				<StringValue>true</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridFromInput">
+			<Data>
+				<StringValue>Raster Input</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridOrigin">
+			<Data>
+				<StringValue>0x 0y meters Center_of_cell</StringValue>
+				<Type Namespace="IMAGINE" Name="GridOrigin"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="GridRule">
+			<Data>
+				<StringValue>From cell size and window</StringValue>
+				<Type Namespace="IMAGINE" Name="GridRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="ProjectionRule">
+			<Data>
+				<StringValue>{&quot;File&quot;:&quot;c:/program files/intergraph/erdas imagine 2014/etc/projections/epsg.plb&quot;,&quot;Proj&quot;:&quot;TWD97 / TM2 zone 121 (3826)&quot;,&quot;Rule&quot;:&quot;Specify&quot;}
+</StringValue>
+				<Type Namespace="IMAGINE" Name="ProjectionRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowExtentRule">
+			<Data>
+				<StringValue>Pixel center</StringValue>
+				<Type Namespace="IMAGINE" Name="EWindowExtentRule"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowFromInput">
+			<Data>
+				<StringValue>Raster Input</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="WindowRule">
+			<Data>
+				<StringValue>Union</StringValue>
+				<Type Namespace="IMAGINE" Name="EWindowRule"/>
+			</Data>
+		</Attribute>
+		<Process>
+			<Namespace></Namespace>
+			<Name></Name>
+			<DisplayName>applytable_taibor_noedge</DisplayName>
+			<DisplayCategory>General</DisplayCategory>
+			<Icon>block.ico</Icon>
+			<ColorCategory>Submodel</ColorCategory>
+			<UIProviderNamespace></UIProviderNamespace>
+			<UIProviderName></UIProviderName>
+			<IsUsableInExpression>false</IsUsableInExpression>
+			<Syntax>Model (  )</Syntax>
+			<Operators>Table File Input</Operators>
+			<Operators>Raster Output</Operators>
+			<Operators>Raster Input</Operators>
+			<Operators>EITHER
+STACKLAYERS </Operators>
+			<Operators>Table File Input 2</Operators>
+			<Operators>Table File Input 3</Operators>
+			<Operators>Table File Input 4</Operators>
+			<Tails>Raster Output</Tails>
+		</Process>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileInput">
+		<DisplayName>Table File Input</DisplayName>
+		<Description></Description>
+		<Port Name="Table">
+			<DisplayName>Table</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/auto_2data_test/distrib/col1_1.fd.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="Table" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n13_Read"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>340</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>298</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterOutput">
+		<DisplayName>Raster Output</DisplayName>
+		<Description></Description>
+		<Port Name="RasterIn">
+			<DisplayName>RasterIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameIn">
+			<DisplayName>FilenameIn</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/auto_2data_test/results/outcomes/match4_final_1.img</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="PixelType">
+			<DisplayName>PixelType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>u16</StringValue>
+				<Type Namespace="IMAGINE" Name="PixelType"/>
+			</Data>
+		</Port>
+		<Port Name="BlockWidth">
+			<DisplayName>BlockWidth</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="BlockHeight">
+			<DisplayName>BlockHeight</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Thematicity">
+			<DisplayName>Thematicity</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Thematicity"/>
+			</Data>
+		</Port>
+		<Port Name="ComputePyramids">
+			<DisplayName>ComputePyramids</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="NoDataValue">
+			<DisplayName>NoDataValue</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="FilenameOut">
+			<DisplayName>FilenameOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="EITHER
+STACKLAYERS " ParentPort="Result" ChildPort="RasterIn"/>
+		<Parents>EITHER
+STACKLAYERS </Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>190</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>491</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="RasterInput">
+		<DisplayName>Raster Input</DisplayName>
+		<Description></Description>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/raw/a0002478/a0002478.raw</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Port Name="DataType">
+			<DisplayName>DataType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Interpolation">
+			<DisplayName>Interpolation</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>Nearest Neighbor</StringValue>
+				<Type Namespace="IMAGINE" Name="InterpolationType"/>
+			</Data>
+		</Port>
+		<Port Name="MapBoundary">
+			<DisplayName>MapBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="FileBoundary">
+			<DisplayName>FileBoundary</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="AOI">
+			<DisplayName>AOI</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="Recode">
+			<DisplayName>Recode</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+		</Port>
+		<Port Name="RasterOut">
+			<DisplayName>RasterOut</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributeTable">
+			<DisplayName>AttributeTable</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="AttributesOnRasterOut">
+			<DisplayName>AttributesOnRasterOut</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>true</Hidden>
+			<Optional>true</Optional>
+			<Data>
+				<StringValue>true</StringValue>
+				<Type Namespace="IMAGINE" Name="Bool"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="RasterOut" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n20_a0002562"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>1</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>188</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>141</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="Expression">
+		<DisplayName>EITHER
+STACKLAYERS </DisplayName>
+		<Description></Description>
+		<Port Name="Expression">
+			<DisplayName>Expression</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>EITHER
+STACKLAYERS (
+DIRECT LOOKUP ( $n20_a0002562(1) , $n13_Read ),
+DIRECT LOOKUP ( $n20_a0002562(2) , $n25_Read ),
+DIRECT LOOKUP ( $n20_a0002562(3) , $n26_Read ),
+DIRECT LOOKUP ( $n20_a0002562(4) , $n27_Read ))
+IF ( STACK SUM ( $n20_a0002562 )>0  ) OR 0 OTHERWISE</StringValue>
+				<Type Namespace="IMAGINE" Name="String"/>
+			</Data>
+		</Port>
+		<Port Name="Result">
+			<DisplayName>Result</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n20_a0002562">
+			<DisplayName>n20_a0002562</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n13_Read">
+			<DisplayName>n13_Read</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n25_Read">
+			<DisplayName>n25_Read</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n26_Read">
+			<DisplayName>n26_Read</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="n27_Read">
+			<DisplayName>n27_Read</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Connections ParentDisplayName="Table File Input" ParentPort="Table" ChildPort="n13_Read"/>
+		<Connections ParentPort="Result" ChildDisplayName="Raster Output" ChildPort="RasterIn"/>
+		<Connections ParentDisplayName="Raster Input" ParentPort="RasterOut" ChildPort="n20_a0002562"/>
+		<Connections ParentDisplayName="Table File Input 2" ParentPort="Table" ChildPort="n25_Read"/>
+		<Connections ParentDisplayName="Table File Input 3" ParentPort="Table" ChildPort="n26_Read"/>
+		<Connections ParentDisplayName="Table File Input 4" ParentPort="Table" ChildPort="n27_Read"/>
+		<Parents>Raster Input</Parents>
+		<Parents>Table File Input</Parents>
+		<Parents>Table File Input 2</Parents>
+		<Parents>Table File Input 3</Parents>
+		<Parents>Table File Input 4</Parents>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>190</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>300</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileInput">
+		<DisplayName>Table File Input 2</DisplayName>
+		<Description></Description>
+		<Port Name="Table">
+			<DisplayName>Table</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/auto_2data_test/distrib/col2_1.fd.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="Table" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n25_Read"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>450</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>300</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileInput">
+		<DisplayName>Table File Input 3</DisplayName>
+		<Description></Description>
+		<Port Name="Table">
+			<DisplayName>Table</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/auto_2data_test/distrib/col3_1.fd.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="Table" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n26_Read"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>560</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>300</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+	<Operator Namespace="IMAGINE" Name="TableFileInput">
+		<DisplayName>Table File Input 4</DisplayName>
+		<Description></Description>
+		<Port Name="Table">
+			<DisplayName>Table</DisplayName>
+			<Description></Description>
+			<Input>false</Input>
+			<Output>true</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+		</Port>
+		<Port Name="TableType">
+			<DisplayName>TableType</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>Integer</StringValue>
+				<Type Namespace="IMAGINE" Name="SimpleDataType"/>
+			</Data>
+		</Port>
+		<Port Name="Filename">
+			<DisplayName>Filename</DisplayName>
+			<Description></Description>
+			<Input>true</Input>
+			<Output>false</Output>
+			<Hidden>false</Hidden>
+			<Optional>false</Optional>
+			<Data>
+				<StringValue>g:/auto_test/color_balance/cb_f5_test/testa/auto_2data_test/distrib/col4_1.fd.tbl</StringValue>
+				<Type Namespace="IMAGINE" Name="File"/>
+			</Data>
+		</Port>
+		<Connections ParentPort="Table" ChildDisplayName="EITHER
+STACKLAYERS " ChildPort="n27_Read"/>
+		<Attribute Name="Orientation">
+			<Data>
+				<StringValue>2</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionX">
+			<Data>
+				<StringValue>670</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+		<Attribute Name="PositionY">
+			<Data>
+				<StringValue>300</StringValue>
+				<Type Namespace="IMAGINE" Name="Int"/>
+			</Data>
+		</Attribute>
+	</Operator>
+</Solution>

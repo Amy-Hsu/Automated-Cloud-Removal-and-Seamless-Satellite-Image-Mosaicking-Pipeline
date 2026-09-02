@@ -1,0 +1,15 @@
+/*
+** IMAGINE Version 14.0 Batch Commands File
+** Step 2 of the SPOT color-balance workflow (apply remapped tables).
+** EDIT the output folder below to match your project (NO SPACES in any path!),
+** and point smprocess to the SM_BATCH_GMDX_023448 file shipped in this folder.
+*/
+variable Input1 User;
+variable Input2 User;
+variable Input3 User;
+variable Input4 User;
+variable Input5 User;
+variable Output1 Auto "C:/mosaic_project/colorBalance/results/$(Input2.Name).img" Delete_Before;
+
+smprocess C:/mosaic_project/colorBalance/SM_BATCH_GMDX_023448 'Table File Input.Filename=$(Input1)' 'Raster Input.Filename=$(Input2)' 'Table File Input 2.Filename=$(Input3)' 'Table File Input 3.Filename=$(Input4)' 'Table File Input 4.Filename=$(Input5)' 'Raster Output.FilenameIn=$(Output1)'
+'$(Output1)'
