@@ -5,8 +5,8 @@ Known failure modes collected while running the pipeline operationally.
 ## General
 
 - **Never** use spaces in any folder or file path.
-- When re-running Step 2, delete all previously generated outputs first (`MosTai.tif`, `TaiMas.tif`, `*.npy`, `ProcessOrder.txt`, seamline files, `res_union_new.*`), otherwise the run fails. Files inside `NSPO_GRID_vectorization/` can usually stay.
-- When re-running Step 3, delete `MosTai_Pan.tif` first. Clear `new_pan/` only if the source Pan imagery changed.
+- When re-running Step 2, delete all previously generated outputs first (`mosaic_xs.tif`, `mosaic_cloudmask.tif`, `*.npy`, `ProcessOrder.txt`, seamline files, `res_union_new.*`), otherwise the run fails. Files inside `NSPO_GRID_vectorization/` can usually stay.
+- When re-running Step 3, delete `mosaic_pan.tif` first. Clear `new_pan/` only if the source Pan imagery changed.
 
 ## Step 2: intersection goes awry
 
@@ -37,4 +37,4 @@ The Pan scene extents must match their XS counterparts exactly, or the blend is 
 
 ## Step 4: repeated cloud filling
 
-Running Step 4 again with fresh candidates may or may not improve the result, but it is safe to try: update `cloud_database/`, `raw_pan/`, and the cloud-mask database (used scenes can be removed to save compute time). Only mask value `1` in `TaiMas.tif` is processed — set values back to `1` manually for areas you want reprocessed; already-filled areas carry the value `(loop_index+1)*10`.
+Running Step 4 again with fresh candidates may or may not improve the result, but it is safe to try: update `cloud_database/`, `raw_pan/`, and the cloud-mask database (used scenes can be removed to save compute time). Only mask value `1` in `mosaic_cloudmask.tif` is processed — set values back to `1` manually for areas you want reprocessed; already-filled areas carry the value `(loop_index+1)*10`.

@@ -1,5 +1,8 @@
 {"res":"1.5",
 "trueBits":"12",
 "StartLetter":"a",
-"upscale_factor":"4"
+"upscale_factor":"4",
+"canvas_crs":"EPSG:3826",
+"canvas_x_max":"406000",
+"canvas_y_min":"2400000"
 }

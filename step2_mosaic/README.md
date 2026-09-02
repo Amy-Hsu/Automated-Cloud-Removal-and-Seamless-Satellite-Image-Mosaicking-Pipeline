@@ -8,6 +8,6 @@ Quick start: place the color-balanced `.img` scenes, `para.txt`, `NSPO_GRID_vect
 
 Note: the cloud-mask folder name is set by the `CLOUD_MASK_FOLDER` constant near the top of `step2mosaic.py`.
 
-Outputs: `MosTai.tif`, `TaiMas.tif`, `ProcessOrder.txt`, `transform.npy`, `allWindow.npy`,
+Outputs: `mosaic_xs.tif`, `mosaic_cloudmask.tif`, `ProcessOrder.txt`, `transform.npy`, `allWindow.npy`,
 `ImgInd.npy`, `Union_gt.npy`, and per-pair seamline/blend rasters — several of these are
 required inputs for Steps 3 and 4.
