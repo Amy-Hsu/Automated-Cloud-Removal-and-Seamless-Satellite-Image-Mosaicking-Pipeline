@@ -9,7 +9,7 @@ tags:
   - seamline optimization
 authors:
   - name: Hsiao-Jou Hsu
-    orcid: 0000-0002-7996-8962
+    orcid: 0009-0008-5863-3229
     affiliation: "1, 2"
     corresponding: true
   - name: Kuo-Hsin Tseng
