@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying paper."
+title: "Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline"
+type: software
+license: MIT
+authors:
+  - family-names: Hsu
+    given-names: Hsiao-Jou
+    orcid: "https://orcid.org/0000-0002-7996-8962"
+  - family-names: Tseng
+    given-names: Kuo-Hsin
+  - family-names: Tsai
+    given-names: Fuan
+  - family-names: Liu
+    given-names: Chun-Lin
+  - family-names: Lo
+    given-names: Chun-Chieh
+  - family-names: Moortgat
+    given-names: Joel
+preferred-citation:
+  type: article
+  title: "A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking"
+  authors:
+    - family-names: Hsu
+      given-names: Hsiao-Jou
+    - family-names: Tseng
+      given-names: Kuo-Hsin
+    - family-names: Tsai
+      given-names: Fuan
+    - family-names: Liu
+      given-names: Chun-Lin
+    - family-names: Lo
+      given-names: Chun-Chieh
+    - family-names: Moortgat
+      given-names: Joel
+  journal: "Applied Computing and Geosciences"
+  year: 2026
+  doi: "10.1016/j.acags.2026.100387"

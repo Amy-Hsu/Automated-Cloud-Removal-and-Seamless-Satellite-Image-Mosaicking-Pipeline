@@ -4,5 +4,8 @@
 "resampleTo":"5",
 "trueBits":"12",
 "imgPath":"YOUR_PATH_HERE",
-"kernel":"61"
+"kernel":"61",
+"canvas_crs":"EPSG:3826",
+"canvas_x_max":"406000",
+"canvas_y_min":"2400000"
 }

@@ -1,31 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 19 13:56:58 2021
-update on 7/31/2024: line 11, 226, 240 
-@author: amy hsu
+Seamless multispectral mosaic generation (Step 2).
+
+Finds optimal seamlines via sparse-node Dijkstra over an image-difference
+cost surface, then mosaics color-balanced scenes with Gaussian feathered
+blending. Also builds a mosaic-wide cloud mask.
+
+Author: Hsiao-Jou Hsu
+License: MIT
 """
 
-#%matplotlib inline
 import numpy as np
 import cv2
 from osgeo import gdal
 import rasterio
-import matplotlib.pyplot as plt
 import networkx as nx
 import scipy.ndimage
 from rasterio import Affine as A
 import geopandas as gpd
 from os import listdir
 from os.path import isfile, join
-from operator import itemgetter   
+from operator import itemgetter
 import copy
-from timeit import default_timer as timer  
+from timeit import default_timer as timer
 import collections
 import tqdm
 import time
 from scipy.spatial import distance
 from rasterio.windows import Window
-import os    
+import os
 import pathlib
 import json
 import gc
@@ -34,8 +37,7 @@ import glob
 CLOUD_MASK_FOLDER = 'cloud_masks'
 
 start = timer()
-# @profile
-def addAtPos(matrix1, matrix2, xypos, inPlace=True):
+def add_at_pos(matrix1, matrix2, xypos, inPlace=True):
     """
     Add matrix2 into matrix1 at position xypos (x,y), in-place or in new matrix.
     Handles matrix2 going off edges of matrix1.
@@ -76,7 +78,8 @@ def spiral(X=50, Y=50):
             dx, dy = -dy, dx
         x, y = x+dx, y+dy        
     return spiralList
-def testOverlap(ReadOrder):
+def test_overlap(ReadOrder):
+    """Check whether the first two images in ReadOrder overlap, swapping if needed."""
     for i in range(1,len(ReadOrder)-1):
         if 'z' not in globals():   
             image1_ds = rasterio.open(ReadOrder[0],nodata=0)
@@ -101,7 +104,8 @@ def testOverlap(ReadOrder):
             z=0
             return True  ,ReadOrder   
                 
-def findRasterIntersect(raster1,raster2,res,scale_factor):
+def find_raster_intersect(raster1,raster2,res,scale_factor):
+    """Compute the spatial intersection of two rasters and return overlap arrays."""
     #raster1 = image1_ds
     #raster2 = image2_ds
     image1_ds = rasterio.open(raster1,nodata=0)
@@ -169,7 +173,7 @@ def findRasterIntersect(raster1,raster2,res,scale_factor):
         else:
 
         
-            cmdIn='gdal_translate -a_srs EPSG:3826 -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', i[:-3]+'tif')
+            cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', i[:-3]+'tif')
             ret =  os.popen(cmdIn).read()
     
             cmdIn='call '+''.join(str(a2))+ os.path.join('\\','BndPolygonize_v.bat ')+''.join(str(a2))  +  os.path.join('\\', i[:-3]+'tif')
@@ -287,9 +291,9 @@ def findRasterIntersect(raster1,raster2,res,scale_factor):
     xypos1=( int( (gt1[2]-union_it[0]) /(res ))  , int( (union_it[1]-gt1[5])/ (res )    )  )
     xypos2=( int( (gt2[2]-union_it[0]) /(res ))  , int( (union_it[1]-gt2[5])/(res )     )  )
    
-    u_con=addAtPos(union_m, image1_ds.read(1), xypos1, inPlace=False)
+    u_con=add_at_pos(union_m, image1_ds.read(1), xypos1, inPlace=False)
   
-    uni_con=addAtPos(u_con, image2_ds.read(1), xypos2, inPlace=False)
+    uni_con=add_at_pos(u_con, image2_ds.read(1), xypos2, inPlace=False)
     del u_con,union_it#
     gc.collect()
     uni_conn=np.array(uni_con)
@@ -300,7 +304,8 @@ def findRasterIntersect(raster1,raster2,res,scale_factor):
     res_union_new.to_file('res_union_new.shp') 
     return array1, array2, col1, row1, intersection,gt,intersection_points,union_gt,union_m,union_conn,res_union_new#,image1_dsf,image2_dsf
    
-def BlendPreprocessForOrder(image1_ds,mask_blurred_4chan,res,union_gt):
+def blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt):
+    """Place a single band into the union canvas and compute blend-order statistics."""
     image1_ds = rasterio.open(image1_ds)
     b2=image1_ds.read(1)
    
@@ -309,13 +314,14 @@ def BlendPreprocessForOrder(image1_ds,mask_blurred_4chan,res,union_gt):
     gt1=image1_ds.transform
       
     xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-    addAtPos(b1, b2, xypos1, inPlace=True)
+    add_at_pos(b1, b2, xypos1, inPlace=True)
     
     im1_0num=round(np.count_nonzero( (mask_blurred_4chan==0) & (b1>0)    ) / np.count_nonzero(mask_blurred_4chan==0),9)
     im1_1num=round(np.count_nonzero( (mask_blurred_4chan==1) & (b1>0)    ) / np.count_nonzero(mask_blurred_4chan==1),9)
     return b1, im1_0num,im1_1num
 
-def MskBlendPreprocessForOrder(image1_ds,mask_blurred_4chan,res,union_gt):
+def mask_blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt):
+    """Binarize and place a cloud mask band into the union canvas."""
     image1_ds = rasterio.open(image1_ds)
     b2=image1_ds.read(1)#
     b2[np.where(b2<=2)]=0
@@ -325,20 +331,22 @@ def MskBlendPreprocessForOrder(image1_ds,mask_blurred_4chan,res,union_gt):
     
     gt1=image1_ds.transform
     xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-    addAtPos(b1, b2, xypos1, inPlace=True)    
+    add_at_pos(b1, b2, xypos1, inPlace=True)    
     
     return b1#
-def MskBlendPreprocessForOrderLoop(image1_ds,mask_blurred_4chan,res,union_gt,window):
+def mask_blend_preprocess_for_order_loop(image1_ds,mask_blurred_4chan,res,union_gt,window):
+    """Place a windowed cloud mask band into the union canvas for iterative mosaicking."""
     image1_ds = rasterio.open(image1_ds,window=window)
     b2=image1_ds.read(1)#
     b1 = np.zeros((mask_blurred_4chan.shape[0],mask_blurred_4chan.shape[1]))   
     
     gt1=image1_ds.transform
     xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-    addAtPos(b1, b2, xypos1, inPlace=True)    
+    add_at_pos(b1, b2, xypos1, inPlace=True)    
     return b1
 
-def BlendPreprocess(i,image1_ds,mask_blurred_4chan,res,union_gt):
+def blend_preprocess(i,image1_ds,mask_blurred_4chan,res,union_gt):
+    """Read band *i* from a raster and place it into the union canvas."""
     image1_ds = rasterio.open(image1_ds)
     b2=image1_ds.read(i)#
   
@@ -347,24 +355,25 @@ def BlendPreprocess(i,image1_ds,mask_blurred_4chan,res,union_gt):
     gt1=image1_ds.transform
      
     xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-    addAtPos(b1, b2, xypos1, inPlace=True)
+    add_at_pos(b1, b2, xypos1, inPlace=True)
     
   
 
     return b1
 
 
-def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def blend_preprocess_order_for_mosaic(image1_ds,image2_ds,mask_blurred_4chan,write_window):
+    """Determine blend ordering for the iterative mosaic step."""
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
             b2=ig.read(1)
-           
+
             b1= np.zeros((mask_blurred_4chan.shape[0],mask_blurred_4chan.shape[1]))    
             
             gt1=ig.transform
             xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-            addAtPos(b1, b2, xypos1, inPlace=True)
+            add_at_pos(b1, b2, xypos1, inPlace=True)
                  
        
         else:                
@@ -373,7 +382,7 @@ def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,wr
           
             b1d =np.zeros((mask_blurred_4chan.shape[0],mask_blurred_4chan.shape[1]))   #np.zeros((5,5,5), dtype=np.int) # a 5x5x5 matrix of zeroes
            
-            addAtPos(b1d, b2d, xypos1, inPlace=True)            
+            add_at_pos(b1d, b2d, xypos1, inPlace=True)            
           
     im1_0num=round(np.count_nonzero( (mask_blurred_4chan==0) & (b1>0)    ) / sum(sum(mask_blurred_4chan==0)),9)
     im1_1num=round(np.count_nonzero( (mask_blurred_4chan==1) & (b1>0)    ) / sum(sum(mask_blurred_4chan==1)),9)
@@ -382,7 +391,8 @@ def BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,wr
              
     return b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num
 
-def BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
+def blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,write_window):
+    """Read band *ind* from both images and place them into the union canvas."""
     for id in [image1_ds,image2_ds]:
         if id ==image1_ds:
             ig = rasterio.open(id)
@@ -392,7 +402,7 @@ def BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,wri
             gt1=ig.transform
             del ig
             xypos1=( int((gt1[2]-union_gt[2])/res) , int((union_gt[5]-gt1[5])/res)  )  
-            addAtPos(b1, b2, xypos1, inPlace=True)
+            add_at_pos(b1, b2, xypos1, inPlace=True)
             del b2,gt1
             gc.collect()
         else:                
@@ -402,7 +412,7 @@ def BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,wri
            
             b1d =np.zeros((mask_blurred_4chan.shape[0],mask_blurred_4chan.shape[1]))#np.zeros((5,5,5), dtype=np.int) # a 5x5x5 matrix of zeroes
             
-            addAtPos(b1d, b2d, xypos1, inPlace=True)  
+            add_at_pos(b1d, b2d, xypos1, inPlace=True)  
             del b2d,xypos1
             gc.collect()
     return b1,b1d
@@ -421,9 +431,8 @@ def bfs(grid, start,wall, clear, goal,width, height):
                 queue.append(path + [(x2, y2)])
                 seen.add((x2, y2))
                 
-def BorderConnection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
-
-    
+def border_connection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
+    """Extend seamline endpoints to the image border via BFS pathfinding."""
     height=seamlineff.shape[0]
     width=seamlineff.shape[1]
     
@@ -823,7 +832,7 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
         else:
             right=width-1
         
-        dataf[up:down,left:right]=data[up:down,left:right]#don't need to use addAtPos
+        dataf[up:down,left:right]=data[up:down,left:right]#don't need to use add_at_pos
     data_final= copy.deepcopy(dataf)
   
     
@@ -858,21 +867,20 @@ def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
             right=fc[i]+pix
         else:
             right=width-1
-        dataf[up:down,left:right]=data2[up:down,left:right]#don't need to use addAtPos
+        dataf[up:down,left:right]=data2[up:down,left:right]#don't need to use add_at_pos
    
     data_final2=dataf
     
     
     return data_final,data_final2,height, width
 
-def findRasterIntersectForMosaicTaiwan(raster1,raster2,MosTai_gt,res,scale_factor,res_union_new):
-   
-    
+def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,res_union_new):
+    """Compute raster intersection against the running mosaic canvas."""
     image1_ds = rasterio.open(raster1)     
     gt1=image1_ds.transform    
-    image2_ds = rasterio.open(raster2,'r+') # MosTai img
+    image2_ds = rasterio.open(raster2,'r+') # mosaic_out img
    
-    window=Window(  (gt1[2]-MosTai_gt[2])/res  , (MosTai_gt[5]-gt1[5])/res , image1_ds.shape[1], image1_ds.shape[0])
+    window=Window(  (gt1[2]-mosaic_gt[2])/res  , (mosaic_gt[5]-gt1[5])/res , image1_ds.shape[1], image1_ds.shape[0])
     r1 = [gt1[2], gt1[5], gt1[2] + (gt1[0] * image1_ds.width), gt1[5] + (gt1[4] * image1_ds.height)]
     
     col1 = image1_ds.width # 
@@ -896,7 +904,7 @@ def findRasterIntersectForMosaicTaiwan(raster1,raster2,MosTai_gt,res,scale_facto
         print('done img2shp:'+raster1)
     else:       
         
-        cmdIn='gdal_translate -a_srs EPSG:3826 -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', raster1[:-3]+'tif')
+        cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', raster1[:-3]+'tif')
         ret =  os.popen(cmdIn).read()
     
         cmdIn='call '+''.join(str(a2))+ os.path.join('\\','BndPolygonize_v.bat ')+''.join(str(a2))  +  os.path.join('\\', raster1[:-3]+'tif')
@@ -1028,8 +1036,8 @@ def findRasterIntersectForMosaicTaiwan(raster1,raster2,MosTai_gt,res,scale_facto
     gc.collect()
     union_m=np.zeros( (int((r1[1]-r1[3])/res)  ,  int((r1[2]-r1[0])/res))  , dtype=np.int32)
  
-    u_con=addAtPos(union_m, image1_ds.read(1), xypos1, inPlace=False)
-    uni_con=addAtPos(u_con, image2_ds.read(1,window=window), xypos1, inPlace=False) 
+    u_con=add_at_pos(union_m, image1_ds.read(1), xypos1, inPlace=False)
+    uni_con=add_at_pos(u_con, image2_ds.read(1,window=window), xypos1, inPlace=False) 
 
     del u_con,xypos1#,
     gc.collect()
@@ -1139,8 +1147,6 @@ def blendMask(blendPix,im_floodfill_f):
     mask_blurred_1chan = mask_blurred.astype('float32') / (blendPix+1)
     return mask_blurred_1chan
 
-#%%
-
 with open('para.txt', 'r') as f:
     datastore = json.load(f)
 
@@ -1152,6 +1158,10 @@ mypath=datastore["imgPath"]
 
 kernel=int(datastore["kernel"])
 pan_res=float(datastore["pan_res"])
+
+canvas_crs = datastore.get("canvas_crs", "EPSG:3826")
+canvas_x_max = float(datastore.get("canvas_x_max", "406000"))
+canvas_y_min = float(datastore.get("canvas_y_min", "2400000"))
 
 
 scale_factor=1/resampleTo
@@ -1196,10 +1206,10 @@ for i in range(len(ReadOrder)-1):
     if i!=0:
         loop=i
         image1_ds = ReadOrder[i+1]#
-        image2_ds = 'MosTai.tif'#
+        image2_ds = 'mosaic_xs.tif'#
         print('Image Process Progress:',i+2,'/',len(ReadOrder))
         print('Image Preprocessing...')
-        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=findRasterIntersectForMosaicTaiwan(image1_ds, image2_ds,MosTai_gt,res,scale_factor,res_union_new)
+        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=find_raster_intersect_for_mosaic(image1_ds, image2_ds,mosaic_gt,res,scale_factor,res_union_new)
         Union_gt.append(union_gt)
        
         imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
@@ -1240,8 +1250,8 @@ for i in range(len(ReadOrder)-1):
         y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
         xypos=(x,y)
         union_conn[union_conn>0]=1
-        seamlineff=addAtPos(union_conn, seamlinef, xypos, inPlace=False)  
-        seamlineff3=BorderConnection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
+        seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)  
+        seamlineff3=border_connection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
         
         
         seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
@@ -1274,8 +1284,8 @@ for i in range(len(ReadOrder)-1):
             
             h, w = sf.shape[:2]
             im_floodfill=np.zeros(sf.shape[:2], np.uint8)
-            addAtPos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
-            addAtPos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
+            add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
+            add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
            
             del sff,sff2,im_floodfill1,im_floodfill2
             gc.collect()
@@ -1319,13 +1329,13 @@ for i in range(len(ReadOrder)-1):
         gc.collect()
         print('Saving seamline for:"',image1_ds[:-4],'"...')
         with rasterio.open(
-            str(image1_ds[:-4])+'MosTai_sl.img',
+            str(image1_ds[:-4])+'_seamline.img',
             'w+',           
             height=sf.shape[0],
             width=sf.shape[1],
             count=1,
             dtype=rasterio.uint8,          
-            crs= {'init': 'EPSG:3826'},#Initialize from a named CRS
+            crs= {'init': canvas_crs},#Initialize from a named CRS
             transform=union_gt,
         ) as dst:
             dst.write(sf.astype(rasterio.uint8), 1)
@@ -1340,19 +1350,19 @@ for i in range(len(ReadOrder)-1):
         mask_blurred_4chan=blendMask(57,im_floodfill_f) 
         
         with rasterio.open(
-            str(image1_ds[:-4])+'MosTai_sl_polygon.img',
+            str(image1_ds[:-4])+'_seamline_polygon.img',
             'w+',           
             height=mask_blurred_4chan.shape[0]*int(res/pan_res),
             width=mask_blurred_4chan.shape[1]*int(res/pan_res),
             count=1,
             dtype=rasterio.float32,          
-            crs= {'init': 'EPSG:3826'},#   
+            crs= {'init': canvas_crs},#   
             transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  
         ) as dst:
             dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
         
         del im_floodfill,im_floodfill_f        
-        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=BlendPreprocessOrderForMosicTaiwan(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
+        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=blend_preprocess_order_for_mosaic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
         
         img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
               (1,image1_ds,im1_1num, 'b1d','b1' ),
@@ -1361,18 +1371,18 @@ for i in range(len(ReadOrder)-1):
         imgind=sorted(img,reverse=True,  key = itemgetter(0,2 ))   
         ImgInd.append(imgind)
        
-        MosTai= rasterio.open(
-                    'MosTai.tif',
+        mosaic_out= rasterio.open(
+                    'mosaic_xs.tif',
                     'r+',
                   
-                    height=int( ( float(max( gt_five))-  2400000   )/res ),
-                    width= int( (   406000-  float(min( gt_five)   ))/res ),
+                    height=int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+                    width= int( (   canvas_x_max-  float(min( gt_five)   ))/res ),
                     count=4,
                     dtype=image1_isect_array.dtype ,
                   
-                    crs= {'init': 'EPSG:3826'},#Initialize from a named CRS
-                    transform=MosTai_gt)
-        kwargs = MosTai.meta.copy()
+                    crs= {'init': canvas_crs},#Initialize from a named CRS
+                    transform=mosaic_gt)
+        kwargs = mosaic_out.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
       
         
@@ -1380,7 +1390,7 @@ for i in range(len(ReadOrder)-1):
             if k==0:
                 try:
                     
-                    write_window = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )# 
+                    write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )# 
                     outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
                     
                     outcome=outcome.astype(imgtype)
@@ -1388,7 +1398,7 @@ for i in range(len(ReadOrder)-1):
                     
                  
                     print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
               
                     del outcome ,b1,b1d 
                     gc.collect()
@@ -1399,19 +1409,19 @@ for i in range(len(ReadOrder)-1):
                     w=int(mask_blurred_4chan.shape[1]/2)
                     outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
                     outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                    
                     print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window2)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
                     del outcome ,write_window2
                     gc.collect()
                     
                     outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
                     outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                    
                     print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window3)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
              
                     del outcome ,b1,b1d ,write_window3
                     gc.collect()
@@ -1420,14 +1430,14 @@ for i in range(len(ReadOrder)-1):
             else:
                 
                 ind=k+1
-                b1,b1d=BlendPreprocessForMosicTaiwan(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
+                b1,b1d=blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
                     
                 try:
                 
                     outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
                     outcome=outcome.astype(imgtype)
                     print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
             
                     del outcome, b1,b1d 
                     gc.collect()
@@ -1439,19 +1449,19 @@ for i in range(len(ReadOrder)-1):
                     w=int(mask_blurred_4chan.shape[1]/2)
                     outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
                     outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                     print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window2)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
                   
                     del outcome,write_window2
                     
                    
                     outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
                     outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                    
                     print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window3)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
             
                     del outcome, b1,b1d ,write_window3
                     gc.collect()
@@ -1459,26 +1469,26 @@ for i in range(len(ReadOrder)-1):
                     
                     
                 
-        MosTai.close()#
+        mosaic_out.close()#
         
-        TaiMas= rasterio.open(
-            'TaiMas.tif',
+        cloudmask_out= rasterio.open(
+            'mosaic_cloudmask.tif',
             'r+',
            
-            height= int( ( float(max( gt_five))-  2400000   )/res ),
-            width=  int( (   406000-  float(min( gt_two)   ))/res ),
+            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
             count=1,
             dtype=image1_isect_array.dtype,
             
-            crs= {'init': 'EPSG:3826'},
-            transform=TaiMas_gt)
-        kwargs = TaiMas.meta.copy()
+            crs= {'init': canvas_crs},
+            transform=cloudmask_gt)
+        kwargs = cloudmask_out.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
        
         cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
-        b1=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)     
+        b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)     
        
-        b1d=MskBlendPreprocessForOrderLoop('TaiMas.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
+        b1d=mask_blend_preprocess_for_order_loop('mosaic_cloudmask.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
         
         cldMas=eval(imgind[0][3]) *(1- mask_blurred_4chan)+ eval(imgind[0][4]) *( mask_blurred_4chan)
         cldMas[np.where(cldMas>0)]=1
@@ -1487,8 +1497,8 @@ for i in range(len(ReadOrder)-1):
                 
         cldMas=cldMas.astype(imgtype)
         print('Writing cloud mask to disk...')
-        TaiMas.write( cldMas, indexes=1, window=write_window)          
-        TaiMas.close()
+        cloudmask_out.write( cldMas, indexes=1, window=write_window)          
+        cloudmask_out.close()
         allWindow.append(write_window)
         del mask_blurred_4chan ,cldMas,cldList,b1,b1d    
         gc.collect()
@@ -1498,46 +1508,46 @@ for i in range(len(ReadOrder)-1):
         
         image1_ds =ReadOrder[i]
         image2_ds =ReadOrder[i+1]
-        if (testOverlap(ReadOrder)[0]==True):
+        if (test_overlap(ReadOrder)[0]==True):
             image1_ds =ReadOrder[i]#
             image2_ds =ReadOrder[i+1]#'
-            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=findRasterIntersect(image1_ds, image2_ds,res,scale_factor)
+            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
             fp = open("ProcessOrder.txt", "w")         
             fp.write(str(ReadOrder) )     
             fp.close()
         else:
-            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=findRasterIntersect(image1_ds, image2_ds,res,scale_factor)
+            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
         Union_gt.append(union_gt)    
-        MosTai_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
-        TaiMas_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
+        mosaic_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
+        cloudmask_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
        
-        MosTai= rasterio.open(
-            'MosTai.tif',
+        mosaic_out= rasterio.open(
+            'mosaic_xs.tif',
             'w+',
            
-            height= int( ( float(max( gt_five))-  2400000   )/res ),
-            width=  int( (   406000-  float(min( gt_two)   ))/res ),
+            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
             count=4,
             dtype=image1_isect_array.dtype,
           
-            crs= {'init': 'EPSG:3826'},#
-            transform=MosTai_gt)
-        kwargs = MosTai.meta.copy()
+            crs= {'init': canvas_crs},#
+            transform=mosaic_gt)
+        kwargs = mosaic_out.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
         
       
-        TaiMas= rasterio.open(
-            'TaiMas.tif',
+        cloudmask_out= rasterio.open(
+            'mosaic_cloudmask.tif',
             'w+',
            
-            height= int( ( float(max( gt_five))-  2400000   )/res ),
-            width=  int( (   406000-  float(min( gt_two)   ))/res ),
+            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
             count=1,
             dtype=image1_isect_array.dtype,
            
-            crs= {'init': 'EPSG:3826'},#
-            transform=TaiMas_gt)
-        kwargs = TaiMas.meta.copy()
+            crs= {'init': canvas_crs},#
+            transform=cloudmask_gt)
+        kwargs = cloudmask_out.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
         
                 
@@ -1580,11 +1590,11 @@ for i in range(len(ReadOrder)-1):
         y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
         xypos=(x,y)
         union_conn[union_conn>0]=1
-        seamlineff=addAtPos(union_conn, seamlinef, xypos, inPlace=False)
+        seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)
        
         ##################################################################################################
         
-        seamlineff3=BorderConnection(seamlineff, gt, union_gt, res, scale_factor, fc,fr )
+        seamlineff3=border_connection(seamlineff, gt, union_gt, res, scale_factor, fc,fr )
         ###########################################################################################################
         
         seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
@@ -1616,8 +1626,8 @@ for i in range(len(ReadOrder)-1):
            
             h, w = sf.shape[:2]
             im_floodfill=np.zeros(sf.shape[:2], np.uint8)
-            addAtPos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
-            addAtPos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
+            add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
+            add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
             
             del sff,sff2,im_floodfill1,im_floodfill2
             gc.collect()
@@ -1669,7 +1679,7 @@ for i in range(len(ReadOrder)-1):
             width=sf.shape[1],
             count=1,
             dtype=rasterio.uint8,           
-            crs= {'init': 'EPSG:3826'},#Initialize from a named CRS
+            crs= {'init': canvas_crs},#Initialize from a named CRS
             transform=union_gt,
         ) as dst:
             dst.write(sf.astype(rasterio.uint8), 1)   
@@ -1678,13 +1688,13 @@ for i in range(len(ReadOrder)-1):
         mask_blurred_4chan=blendMask(57,im_floodfill_f)  
      
         with rasterio.open(
-            str(image1_ds[:-4])+str(image2_ds[:-4])+'MosTai_sl_polygon.img',
+            str(image1_ds[:-4])+str(image2_ds[:-4])+'_seamline_polygon.img',
             'w+',           
             height=mask_blurred_4chan.shape[0]*int(res/pan_res),
             width=mask_blurred_4chan.shape[1]*int(res/pan_res),
             count=1,
             dtype=rasterio.float32,          
-            crs= {'init': 'EPSG:3826'},#Initialize from a named CRS            
+            crs= {'init': canvas_crs},#Initialize from a named CRS            
             transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  union_gt,
         ) as dst:
             dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
@@ -1692,8 +1702,8 @@ for i in range(len(ReadOrder)-1):
             
         del im_floodfill,im_floodfill_f
         
-        b1,im1_0num,im1_1num=BlendPreprocessForOrder(image1_ds,mask_blurred_4chan,res,union_gt)
-        b1d,im2_0num,im2_1num=BlendPreprocessForOrder(image2_ds,mask_blurred_4chan,res,union_gt)
+        b1,im1_0num,im1_1num=blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt)
+        b1d,im2_0num,im2_1num=blend_preprocess_for_order(image2_ds,mask_blurred_4chan,res,union_gt)
         
     
         
@@ -1703,16 +1713,16 @@ for i in range(len(ReadOrder)-1):
               (1,image2_ds,im2_1num, 'b1','b1d')]
         imgind=sorted(img,reverse=True,  key = itemgetter(0,2 )) 
         ImgInd.append(imgind)
-        kwargs = MosTai.meta.copy()
+        kwargs = mosaic_out.meta.copy()
         kwargs.update(BIGTIFF="IF_SAFER")
         for k in range(4):
             if k==0:
                 try:
-                    write_window = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )
+                    write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )
                     outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
                     outcome=outcome.astype(imgtype)                    
                     print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
                    
                     del outcome,b1,b1d,union_m
                     gc.collect()
@@ -1723,17 +1733,17 @@ for i in range(len(ReadOrder)-1):
                     w=int(mask_blurred_4chan.shape[1]/2)
                     outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
                     outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                     print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window2)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
                     del outcome ,write_window2
                     gc.collect()
                     
                     outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
                     outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                     print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window3)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
                     # 
                     del outcome ,b1,b1d ,write_window3
                     gc.collect()                    
@@ -1742,8 +1752,8 @@ for i in range(len(ReadOrder)-1):
             else:  
                 
                 ind=k+1
-                b1=BlendPreprocess(ind,image1_ds,mask_blurred_4chan,res,union_gt)
-                b1d=BlendPreprocess(ind,image2_ds,mask_blurred_4chan,res,union_gt)
+                b1=blend_preprocess(ind,image1_ds,mask_blurred_4chan,res,union_gt)
+                b1d=blend_preprocess(ind,image2_ds,mask_blurred_4chan,res,union_gt)
                    
                 
                 try:
@@ -1753,7 +1763,7 @@ for i in range(len(ReadOrder)-1):
                     outcome=outcome.astype(imgtype)
                     # 
                     print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window)     
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window)     
                     # 
                     del outcome,b1,b1d
                     gc.collect()
@@ -1765,40 +1775,40 @@ for i in range(len(ReadOrder)-1):
                     w=int(mask_blurred_4chan.shape[1]/2)
                     outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
                     outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                    
                     print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window2)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
                    
                     del outcome,write_window2
                     
                    
                     outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
                     outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-MosTai_gt[2])/res,  (MosTai_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
                    
                     print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    MosTai.write( outcome, indexes=k+1, window=write_window3)
+                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
                     
                     del outcome, b1,b1d ,write_window3
                     gc.collect()                    
                     
                     
-        MosTai.close()
+        mosaic_out.close()
         
        
         cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
-        b1=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)
+        b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
         cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image2_ds[:-4]+'*.tif')
-        b1d=MskBlendPreprocessForOrder(cldList[0],mask_blurred_4chan,res,union_gt)
+        b1d=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
        
        
         cldMas=eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)
         cldMas[np.where(cldMas>0)]=1
         cldMas=cldMas.astype(imgtype)
         print('Writing cloud mask to disk...')
-        TaiMas.write( cldMas, indexes=1, window=write_window)     
-        TaiMas.close()
+        cloudmask_out.write( cldMas, indexes=1, window=write_window)     
+        cloudmask_out.close()
         allWindow.append(write_window)
         del mask_blurred_4chan,union_gt,cldMas,cldList,b1,b1d
         gc.collect()
