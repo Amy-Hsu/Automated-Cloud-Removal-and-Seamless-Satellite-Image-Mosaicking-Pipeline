@@ -89,6 +89,12 @@ millions of pixels. Open-source toolkits such as Orfeo ToolBox
 [@grizonnet2017otb] provide mosaicking with feathering and color harmonization.
 Like commercial packages, they assume cloud-free, preprocessed inputs and do not
 feed cloud information back into seamline placement or scene selection.
+geoai-datacubes [@moortgat2026geoai], a related package co-developed by two of
+the present authors, assembles analysis-ready, multi-mission data cubes from
+cloud-hosted catalogues for machine learning. It masks cloudy pixels rather than
+filling them and joins tiles without seamline optimization, so the two are
+complementary: geoai-datacubes can supply input scenes, and this pipeline turns
+them into a seamless, cloud-filled mosaic.
 
 We built a new pipeline rather than extending an existing toolkit because the
 contribution is how the stages are coupled. Cloud masks drive normalization
