@@ -32,3 +32,6 @@ Step2SPOTf.bat
 *.img
 !step1_color_balance/*.gmd
 .DS_Store
+.pytest_cache/
+paper.pdf
+jats/

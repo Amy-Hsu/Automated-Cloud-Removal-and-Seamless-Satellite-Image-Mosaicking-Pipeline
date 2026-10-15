@@ -12,11 +12,11 @@ authors:
   - family-names: Tsai
     given-names: Fuan
   - family-names: Liu
-    given-names: Chun-Lin
+    given-names: Chian-Liang
   - family-names: Lo
-    given-names: Chun-Chieh
+    given-names: Chi-Chuan
   - family-names: Moortgat
-    given-names: Joel
+    given-names: Joachim
 preferred-citation:
   type: article
   title: "A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking"
@@ -28,11 +28,13 @@ preferred-citation:
     - family-names: Tsai
       given-names: Fuan
     - family-names: Liu
-      given-names: Chun-Lin
+      given-names: Chian-Liang
     - family-names: Lo
-      given-names: Chun-Chieh
+      given-names: Chi-Chuan
     - family-names: Moortgat
-      given-names: Joel
+      given-names: Joachim
   journal: "Applied Computing and Geosciences"
+  volume: 31
+  start: 100387
   year: 2026
   doi: "10.1016/j.acags.2026.100387"
