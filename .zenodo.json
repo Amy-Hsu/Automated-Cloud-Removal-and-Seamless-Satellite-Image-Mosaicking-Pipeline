@@ -1,0 +1,18 @@
+{
+  "title": "Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline",
+  "upload_type": "software",
+  "description": "An end-to-end, largely automated pipeline that turns orthorectified multispectral and panchromatic satellite scenes into a single color-balanced, seamless, cloud-filled mosaic, together with a mosaic-wide cloud mask. Steps: radiometric normalization, sparse-graph seamline optimization and mosaicking, panchromatic mosaicking, and SSIM-guided cloud filling with Poisson blending.",
+  "creators": [
+    {"name": "Hsu, Hsiao-Jou", "orcid": "0009-0008-5863-3229", "affiliation": "School of Earth Sciences, The Ohio State University"},
+    {"name": "Tseng, Kuo-Hsin", "affiliation": "Center for Space and Remote Sensing Research, National Central University"},
+    {"name": "Tsai, Fuan", "affiliation": "Center for Space and Remote Sensing Research, National Central University"},
+    {"name": "Liu, Chian-Liang", "affiliation": "Center for Space and Remote Sensing Research, National Central University"},
+    {"name": "Lo, Chi-Chuan", "affiliation": "Center for Space and Remote Sensing Research, National Central University"},
+    {"name": "Moortgat, Joachim", "affiliation": "School of Earth Sciences, The Ohio State University"}
+  ],
+  "license": "MIT",
+  "keywords": ["remote sensing", "satellite imagery", "cloud removal", "image mosaicking", "seamline optimization", "Python"],
+  "related_identifiers": [
+    {"identifier": "10.1016/j.acags.2026.100387", "relation": "isSupplementTo", "scheme": "doi"}
+  ]
+}
