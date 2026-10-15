@@ -3,6 +3,9 @@ message: "If you use this software, please cite the accompanying paper."
 title: "Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline"
 type: software
 license: MIT
+version: 1.1.0
+date-released: "2026-10-15"
+repository-code: "https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline"
 authors:
   - family-names: Hsu
     given-names: Hsiao-Jou
