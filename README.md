@@ -9,7 +9,7 @@ If you use this code, please cite the accompanying paper:
 
 > Hsu, H.-J., Tseng, K.-H., Tsai, F., Liu, C.-L., Lo, C.-C., & Moortgat, J. (2026). A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking. *Applied Computing and Geosciences*, 31, 100387. https://doi.org/10.1016/j.acags.2026.100387
 
-**Golden rule for every step: no spaces anywhere in folder or file paths.**
+**Golden rule for every step: no spaces anywhere in folder or file paths** (the GDAL command lines are built without quoting).
 
 ---
 
@@ -20,7 +20,7 @@ If you use this code, please cite the accompanying paper:
 | 1 | `step1_color_balance/` | Radiometric normalization (color balance) of each raw scene against reference imagery, with dark-area detail preservation | ERDAS IMAGINE 2014 spatial models + `MappingReshapeXS.exe` |
 | 2 | `step2_mosaic/` | Automatic seamline detection (sparse-node Dijkstra over image-difference cost) and seamless mosaicking of the color-balanced XS scenes; builds the mosaic-wide cloud mask | Python (`step2mosaic.py`) + `GetBoundaryMask.exe` |
 | 3 | `step3_pan_mosaic/` | Mosaics the corresponding Pan scenes reusing the seamlines found in Step 2 | Python (`mosaicPan_block_rs.py`) |
-| 4 | `step4_cloud_removal/` | Automatically fills cloud-contaminated areas of the XS and Pan mosaics from a database of candidate scenes, using SSIM-based similarity screening and Gaussian-feathered blending | Python (`step4cloud_removal.py`) |
+| 4 | `step4_cloud_removal/` | Automatically fills cloud-contaminated areas of the XS and Pan mosaics from a database of candidate scenes, using SSIM-based similarity screening and Poisson blending | Python (`step4cloud_removal.py`) |
 
 Outputs after Step 4:
 
@@ -45,11 +45,12 @@ pip install -r requirements.txt
 
 ## Requirements
 
-- **Windows 10** (the pipeline shells out to `.bat`/`.exe` and uses Windows path separators)
-- **ERDAS IMAGINE 2014** for Step 1 (later versions, e.g. 2018/2020, may produce wrong colors)
-- **MATLAB Runtime R2018a (v9.4)** — required by `GetBoundaryMask.exe` in Step 2
-- **GDAL command-line tools** on `PATH` (`gdalwarp`, `gdal_translate`, `gdal_polygonize.py`, `gdal_edit.py`)
-- **Python 3.9** with the packages in `requirements.txt`
+- **Python 3.9+** with the packages in `requirements.txt` (Steps 2–4 run on Windows, macOS and Linux)
+- **GDAL command-line tools** on `PATH` (`gdalwarp`, `gdal_translate`; conda-forge's `gdal` package provides them)
+- **ERDAS IMAGINE 2014** for Step 1 only (later versions, e.g. 2018/2020, may produce wrong colors). Without it, start at Step 2 with scenes color-balanced by any other tool.
+- Optional, Windows only: **MATLAB Runtime R2018a (v9.4)** for the original `GetBoundaryMask.exe` used in Step 2. Elsewhere, or if it is missing, Step 2 uses an equivalent pure-Python footprint polygonizer.
+
+> **OpenCV version:** Step 4 needs OpenCV < 4.11. From 4.11 on, `cv2.seamlessClone` keeps the destination texture and clouds are not removed. `requirements.txt` pins this, and the test suite checks it.
 
 Input data (not included): orthorectified satellite XS scenes (`.raw`/`.img`) with matching Pan scenes and per-scene cloud masks (`.ers` or `.tif`), plus the Step-1 reference images.
 
@@ -136,7 +137,26 @@ step4/
 └── cldDatabase/                           # empty working folder
 ```
 
-Run with `run.bat`. See `docs/TROUBLESHOOTING.md` for known failure modes and their fixes.
+Two `para_cld.txt` settings control which candidates are used:
+
+| Key | Meaning |
+|-----|---------|
+| `ssim_threshold` | Minimum SSIM between a candidate and the cloud-free surroundings of a patch (default `0.75`) |
+| `cloud_tolerance` | Maximum fraction of a patch that may be cloudy in the candidate itself (default `0.25`) |
+
+Pan scenes may be given either in the SPOT layout (`raw_pan/A0000002/A0000002_B1.DAT.raw`) or as `raw_pan/A0000002.tif`.
+
+Run with `run.bat` (or `python step4cloud_removal.py`). See `docs/TROUBLESHOOTING.md` for known failure modes and their fixes.
+
+## Try it: Sentinel-2 demo
+
+The SPOT and Formosat imagery used in the paper cannot be redistributed; to request it, contact the Center for Space and Remote Sensing Research (CSRSR), National Central University, Taiwan. To try the pipeline without it, run Steps 2–4 on free Sentinel-2 imagery:
+
+```bash
+python examples/sentinel2_demo/run_demo.py --workdir demo_output
+```
+
+See [`examples/sentinel2_demo/README.md`](examples/sentinel2_demo/README.md) for details.
 
 ## Testing
 
@@ -164,6 +184,7 @@ step3_pan_mosaic/      Pan mosaic script, para_pan.txt template
 step4_cloud_removal/   cloud-filling script, para_cld.txt template
 docs/                  troubleshooting notes
 tests/                 unit tests (pytest)
+examples/              Sentinel-2 demo of Steps 2-4
 paper.md               JOSS paper source
 ```
 

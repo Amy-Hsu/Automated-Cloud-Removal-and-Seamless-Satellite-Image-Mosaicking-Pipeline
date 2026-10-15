@@ -22,6 +22,21 @@ import json
 from rasterio.enums import Resampling
 
 
+def pan_scene_path(folder, name):
+    """Return the Pan scene for *name*: SPOT DIMAP layout if present, else <folder>/<name>.tif.
+
+    Both upper- and lower-case scene names are tried so that the lookup also
+    works on case-sensitive file systems.
+    """
+    for n in (name, name.upper(), name.lower()):
+        spot = os.path.join(folder, n, n + '_B1.DAT.raw')
+        if os.path.isfile(spot):
+            return spot
+        tif = os.path.join(folder, n + '.tif')
+        if os.path.isfile(tif):
+            return tif
+    return os.path.join(folder, name, name + '_B1.DAT.raw')
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -61,7 +76,7 @@ def main():
             image1_ds = StartLetter+str(int(ReadOrder[i+1][ReadOrder[i+1].find('0'):ReadOrder[i+1].find(StartLetter)+8])+1).zfill(7)+('.img')#
             image2_ds = 'mosaic_pan.tif'#
 
-            raw1Path = pathlib.Path('raw_pan\\'+image1_ds[:-4].upper()+'\\'+image1_ds[:-4].upper()+'_B1.DAT.raw').absolute()
+            raw1Path = pathlib.Path(pan_scene_path('raw_pan', image1_ds[:-4].upper())).absolute()
             new_rawPath = str(pathlib.Path('new_pan').absolute())
             slPath = pathlib.Path(img1_ori+'_seamline_polygon.img').absolute()
 
@@ -72,16 +87,16 @@ def main():
             y_max = a.transform[5]
 
             print('Clipping...')
-            if os.path.isfile(new_rawPath+'\\'+image1_ds+'.tif'):
+            if os.path.isfile(new_rawPath+os.sep+image1_ds+'.tif'):
                 print('Done with image clipping:',image1_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+'\\'+image1_ds+'.tif'
+                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+os.sep+image1_ds+'.tif'
                 ret =  os.popen(cmdIn).read()
 
             seamline_polygon = rasterio.open(slPath)
 
             print('Mosaicking and writing to disk...')
-            with rasterio.open(new_rawPath+'\\'+image1_ds+'.tif') as src:
+            with rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src:
                 for ji, window in src.block_windows(1):
 
                      mosaic_out= rasterio.open( 'mosaic_pan.tif','r+')#
@@ -89,7 +104,7 @@ def main():
                      seamlinef=seamline_polygon.read(1,window=window)
 
                      b1 = src.read(1, window=window)#
-                     write_window = Window(   (  src.transform[2]  -mosaic_pan_gt[2])/res,  (mosaic_pan_gt[5]-  (src.transform[5]-(ji[0]*res))  )/res  ,    seamlinef.shape[1], seamlinef.shape[0]     )
+                     write_window = Window(   (  src.transform[2]  -mosaic_pan_gt[2])/res + window.col_off,  (mosaic_pan_gt[5]-src.transform[5])/res + window.row_off  ,    seamlinef.shape[1], seamlinef.shape[0]     )
                      b1d = mosaic_out.read(1 ,window=write_window)
                      outcome=( eval(ImgInd[i][0][3]).astype(imgtype) *(1- seamlinef)+ eval(ImgInd[i][0][4]).astype(imgtype) *( seamlinef)  ).astype(imgtype)
 
@@ -102,8 +117,8 @@ def main():
             image1_ds= StartLetter+str(int(ReadOrder[i][ReadOrder[i].find('0'):ReadOrder[i].find(StartLetter)+8])+1).zfill(7)+('.img')#spot
             image2_ds =StartLetter+str(int(ReadOrder[i+1][ReadOrder[i+1].find('0'):ReadOrder[i+1].find(StartLetter)+8])+1).zfill(7)+('.img')#spot
 
-            raw1Path = pathlib.Path('raw_pan\\'+image1_ds[:-4].upper()+'\\'+image1_ds[:-4].upper()+'_B1.DAT.raw').absolute()
-            raw2Path = pathlib.Path('raw_pan\\'+image2_ds[:-4].upper()+'\\'+image2_ds[:-4].upper()+'_B1.DAT.raw').absolute()
+            raw1Path = pathlib.Path(pan_scene_path('raw_pan', image1_ds[:-4].upper())).absolute()
+            raw2Path = pathlib.Path(pan_scene_path('raw_pan', image2_ds[:-4].upper())).absolute()
 
             new_rawPath = str(pathlib.Path('new_pan').absolute())
             slPath = pathlib.Path(img1_ori+img2_ori+'_seamline_polygon.img').absolute()
@@ -115,19 +130,19 @@ def main():
             y_max = a.transform[5]
 
             print('Clipping...')
-            if os.path.isfile(new_rawPath+'\\'+image1_ds+'.tif'):
+            if os.path.isfile(new_rawPath+os.sep+image1_ds+'.tif'):
                 print('Done with image clipping:',image1_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+'\\'+image1_ds+'.tif'
+                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+os.sep+image1_ds+'.tif'
                 ret =  os.popen(cmdIn).read()
 
-            if os.path.isfile(new_rawPath+'\\'+image2_ds+'.tif'):
+            if os.path.isfile(new_rawPath+os.sep+image2_ds+'.tif'):
                 print('Done with image clipping:',image2_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw2Path)) +' '+''.join(str(new_rawPath ))+'\\'+image2_ds+'.tif'
+                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw2Path)) +' '+''.join(str(new_rawPath ))+os.sep+image2_ds+'.tif'
                 ret =  os.popen(cmdIn).read()
 
-            img2 = rasterio.open(new_rawPath+'\\'+image2_ds+'.tif')
+            img2 = rasterio.open(new_rawPath+os.sep+image2_ds+'.tif')
             seamline_polygon = rasterio.open(slPath)
 
             mosaic_pan_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res)
@@ -145,7 +160,7 @@ def main():
             kwargs.update(BIGTIFF="IF_SAFER")
 
             print('Mosaicking and writing to disk...')
-            with rasterio.open(new_rawPath+'\\'+image1_ds+'.tif') as src:
+            with rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src:
                 for ji, window in src.block_windows(1):
 
                      seamlinef=seamline_polygon.read(1,window=window)
@@ -153,7 +168,7 @@ def main():
                      b1 = src.read(1, window=window)
                      b1d = img2.read(1 ,window=window)
                      outcome=( eval(ImgInd[i][0][3]).astype(imgtype) *(1- seamlinef)+ eval(ImgInd[i][0][4]).astype(imgtype) *( seamlinef)  ).astype(imgtype)
-                     write_window = Window(   (  img2.transform[2]  -mosaic_pan_gt[2])/res,  (mosaic_pan_gt[5]-  (img2.transform[5]-(ji[0]*res))  )/res  ,    width=seamlinef.shape[1], height=seamlinef.shape[0]     )#
+                     write_window = Window(   (  img2.transform[2]  -mosaic_pan_gt[2])/res + window.col_off,  (mosaic_pan_gt[5]-img2.transform[5])/res + window.row_off  ,    width=seamlinef.shape[1], height=seamlinef.shape[0]     )#
 
                      mosaic_out.write(outcome , 1, window=write_window)
 

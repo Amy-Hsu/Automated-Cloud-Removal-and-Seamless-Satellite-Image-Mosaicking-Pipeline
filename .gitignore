@@ -35,3 +35,4 @@ Step2SPOTf.bat
 .pytest_cache/
 paper.pdf
 jats/
+demo_output/

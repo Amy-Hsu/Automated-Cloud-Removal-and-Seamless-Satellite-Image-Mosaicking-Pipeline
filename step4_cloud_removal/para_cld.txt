@@ -9,7 +9,7 @@
 "pan_res":"1.5",
 "seaBorderAddress":"YOUR_PATH\\land_sea_mask.img",
 "PanImgAddress":"YOUR_PATH\\raw_pan",
-"cloud_tolerance(decimal)":0.25,
-"ssim_threshold(0<val<=1)":0.1,
+"cloud_tolerance":"0.25",
+"ssim_threshold":"0.75",
 "canvas_crs":"EPSG:3826"
 }

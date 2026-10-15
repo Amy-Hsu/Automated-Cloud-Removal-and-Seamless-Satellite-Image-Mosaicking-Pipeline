@@ -4,7 +4,9 @@
 # The GDAL command-line tools (gdalwarp, gdal_translate, gdal_polygonize.py,
 # gdal_edit.py) must also be on PATH; they ship with conda-forge's `gdal`.
 numpy
-opencv-python
+# cv2.seamlessClone (Poisson blending, Step 4) keeps the destination texture
+# from OpenCV 4.11 on, which leaves clouds in place; 4.10 behaves correctly.
+opencv-python>=4.5,<4.11
 rasterio
 geopandas
 shapely
