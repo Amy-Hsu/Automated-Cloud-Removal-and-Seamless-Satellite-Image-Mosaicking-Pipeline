@@ -1,8 +1,11 @@
 # Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline
 
-[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.acags.2026.100387-blue)](https://doi.org/10.1016/j.acags.2026.100387)
+[![tests](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml)
+[![Sentinel-2 demo](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-BA0C2F.svg?style=flat-square)](LICENSE)
+[![Paper](https://img.shields.io/badge/Paper-10.1016%2Fj.acags.2026.100387-0A7BBB.svg?style=flat-square)](https://doi.org/10.1016/j.acags.2026.100387)
 [![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23404699.svg)](https://doi.org/10.5281/zenodo.23404699)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An end-to-end, largely automated pipeline that turns individual orthorectified satellite scenes into a single color-balanced, seamless, cloud-filled mosaic — for both the multispectral (XS) and panchromatic (Pan) products, together with a mosaic-wide cloud mask.
 
