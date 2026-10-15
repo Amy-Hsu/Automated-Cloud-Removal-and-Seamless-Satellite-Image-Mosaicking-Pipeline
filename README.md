@@ -1,6 +1,7 @@
 # Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.acags.2026.100387-blue)](https://doi.org/10.1016/j.acags.2026.100387)
+[![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23404699.svg)](https://doi.org/10.5281/zenodo.23404699)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An end-to-end, largely automated pipeline that turns individual orthorectified satellite scenes into a single color-balanced, seamless, cloud-filled mosaic — for both the multispectral (XS) and panchromatic (Pan) products, together with a mosaic-wide cloud mask.
@@ -8,6 +9,8 @@ An end-to-end, largely automated pipeline that turns individual orthorectified s
 If you use this code, please cite the accompanying paper:
 
 > Hsu, H.-J., Tseng, K.-H., Tsai, F., Liu, C.-L., Lo, C.-C., & Moortgat, J. (2026). A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking. *Applied Computing and Geosciences*, 31, 100387. https://doi.org/10.1016/j.acags.2026.100387
+
+To cite the software itself, use its Zenodo archive: https://doi.org/10.5281/zenodo.23404699 (all versions; each release also has its own DOI).
 
 **Golden rule for every step: no spaces anywhere in folder or file paths** (the GDAL command lines are built without quoting).
 
