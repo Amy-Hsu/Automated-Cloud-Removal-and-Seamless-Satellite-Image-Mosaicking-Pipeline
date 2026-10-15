@@ -75,3 +75,21 @@ def test_build_graph_seamline_follows_low_cost_edge(step2):
     assert seam[0, 4] == 1 and seam[h - 2, 4] == 1
     assert set(cols) <= {4, 5}
     assert set(range(h - 1)) <= set(rows)
+
+
+def test_polygonize_valid_area_outlines_footprint(step2, tmp_path):
+    import geopandas as gpd
+    import rasterio
+    from rasterio.transform import from_origin
+
+    data = np.zeros((2, 50, 60), np.uint16)
+    data[:, 10:40, 5:45] = 500
+    tif = tmp_path / "scene.tif"
+    with rasterio.open(tif, "w", driver="GTiff", width=60, height=50, count=2, dtype="uint16",
+                       crs="EPSG:3826", transform=from_origin(1000, 2000, 10, 10)) as dst:
+        dst.write(data)
+    step2.polygonize_valid_area(str(tif))
+    shp = gpd.read_file(tmp_path / "scene.temp.shp")
+    assert len(shp) == 1
+    assert shp.area.iloc[0] == 30 * 40 * 10 * 10
+    assert shp.total_bounds.tolist() == [1050, 1600, 1450, 1900]

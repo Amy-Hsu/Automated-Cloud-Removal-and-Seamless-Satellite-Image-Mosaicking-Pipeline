@@ -1,0 +1,29 @@
+name: sentinel2-demo
+
+# Runs Steps 2-4 end to end on public Sentinel-2 data. Needs internet access
+# to Earth Search, so it runs on demand and monthly rather than on every push.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 1 * *"
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GDAL command-line tools
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run demo
+        run: python examples/sentinel2_demo/run_demo.py --workdir demo_output
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-results
+          path: |
+            demo_output/step4/mosaic_*.tif

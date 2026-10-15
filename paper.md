@@ -128,19 +128,25 @@ All raster I/O uses rasterio windows, so mosaics larger than RAM (for example,
 cloud mask into connected patches. For each patch it computes SSIM between
 every candidate scene and the cloud-free part of the mosaic window around the
 patch, with clouds and sea masked out. Candidates that are empty, already used
-at that location, or whose SSIM is below 0.10 are rejected. The best remaining
-candidate that is at least 75% cloud-free under the patch is pasted with a
-Gaussian-feathered alpha mask, whose width shrinks when the patch lies near the
-window edge. Copying real
-pixels from a single acquisition per patch keeps the result physically
-interpretable. This is a deliberate alternative to generative or per-pixel
-reconstruction, at the cost of leaving a patch unfilled when no clear
-candidate exists. Such patches remain flagged in the output cloud mask.
+at that location, or below the SSIM threshold (0.75 by default) are rejected.
+The best remaining candidate that is at least 75% cloud-free under the patch is
+inserted with Poisson blending [@perez2003poisson], which takes the texture of
+the candidate and the brightness of the surrounding mosaic, so that no seam is
+visible. Pixels that are cloudy in the candidate itself are then blended back
+with a Gaussian-feathered mask. Using a single real acquisition per patch keeps
+the result physically interpretable. This is a deliberate alternative to
+generative or per-pixel reconstruction, at the cost of leaving a patch unfilled
+when no sufficiently similar, clear candidate exists. Such patches remain
+flagged in the output cloud mask. Both thresholds are set in the Step 4
+parameter file.
 
 **Limitations.** Step 1 uses spatial models for ERDAS IMAGINE, which is
 proprietary. Users without it can supply their own color-balanced scenes and
-start at Step 2. Step 2 calls a compiled boundary-mask tool, and the batch
-wrappers target Windows. Steps 2–4 and the unit tests are pure Python.
+start at Step 2. Steps 2–4 are Python and run on Windows, macOS and Linux; on
+Windows, Step 2 can still use the original compiled boundary-mask tool, and
+elsewhere it uses an equivalent Python implementation. Step 4 requires
+OpenCV < 4.11, because later versions of `seamlessClone` no longer transfer the
+source texture; a unit test guards against this.
 
 # Research impact statement
 
@@ -151,19 +157,24 @@ images. Cloud
 removal rates were 97.8% (SPOT) and 89.9% (Formosat-2), and the mean RMSE in
 overlapping regions stayed below 11.7% of the 12-bit dynamic range. The same
 code also mosaicked Pléiades scenes without modification beyond parameters.
-The repository includes the full four-step workflow, parameter templates,
-step-by-step documentation, a troubleshooting guide and a unit-test suite run
-in continuous integration on Linux and Windows.
+The original imagery cannot be redistributed, so the repository includes a
+demonstration that downloads free Sentinel-2 imagery of the same region and
+runs Steps 2–4 end to end in a few minutes; on it, Step 4 fills roughly three
+quarters of the cloud-covered area. The repository also includes the full
+four-step workflow, parameter templates, step-by-step documentation, a
+troubleshooting guide and a unit-test suite run in continuous integration on
+Linux and Windows.
 
 # AI usage disclosure
 
 Generative AI (Anthropic's Claude) was used to help reorganize the repository,
 rename variables and files, write documentation, write the unit tests and
-continuous-integration configuration, and draft and edit this paper. The
-seamline, normalization and cloud-filling algorithms and their implementation
-were developed by the authors. All AI-assisted changes were reviewed by the
-authors, checked against the original code and the published results, and
-verified by running the test suite.
+continuous-integration configuration, write the Sentinel-2 demonstration,
+make Steps 2–4 portable across operating systems, and draft and edit this
+paper. The seamline, normalization and cloud-filling algorithms and their
+implementation were developed by H.-J. Hsu. All AI-assisted changes were
+reviewed by the authors, checked against the original code and the published
+results, and verified by running the test suite and the demonstration.
 
 # Acknowledgements
 

@@ -3,7 +3,7 @@
 Automatic cloud filling (Step 4).
 
 Segments clouds from the mosaic cloud mask, ranks candidate replacement
-scenes by SSIM similarity, and performs Gaussian-feathered blending
+scenes by SSIM similarity, and performs Poisson (seamless-clone) blending
 to fill cloud-contaminated areas in both XS and Pan mosaics.
 
 Author: Hsiao-Jou Hsu
@@ -36,6 +36,21 @@ def border_elems_generic(a, W): # Input array : a, Edgewidth : W
     r2 = np.minimum(np.arange(n2)[::-1], np.arange(n2))
     return a[np.minimum(r1[:,None],r2)<W]
 
+def pan_scene_path(folder, name):
+    """Return the Pan scene for *name*: SPOT DIMAP layout if present, else <folder>/<name>.tif.
+
+    Both upper- and lower-case scene names are tried so that the lookup also
+    works on case-sensitive file systems.
+    """
+    for n in (name, name.upper(), name.lower()):
+        spot = os.path.join(folder, n, n + '_B1.DAT.raw')
+        if os.path.isfile(spot):
+            return spot
+        tif = os.path.join(folder, n + '.tif')
+        if os.path.isfile(tif):
+            return tif
+    return os.path.join(folder, name, name + '_B1.DAT.raw')
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -43,6 +58,9 @@ def main():
     with open('para_cld.txt', 'r') as f:
         datastore = json.load(f)
     res=float(datastore["res"])
+    # Patch size limits were tuned for 6 m SPOT XS; scale them to the actual resolution
+    min_patch_px = int(round(500 * (6 / res) ** 2))
+    dilate_px = max(1, int(round(300 / res)))
     trueBits=int(datastore["trueBits"])
     candidate_img_path=datastore["CandiImgPath"]
     cloud_work_path=datastore["CldMaskPath"]
@@ -54,6 +72,10 @@ def main():
     Pan_Addr=datastore["PanImgAddress"]
     land_sea_mask_path = datastore["seaBorderAddress"]
     canvas_crs = datastore.get("canvas_crs", "EPSG:3826")
+    # minimum SSIM for a candidate scene to be used for filling
+    ssim_threshold = float(datastore.get("ssim_threshold", 0.75))
+    # maximum fraction of a cloud patch that may be cloudy in the candidate scene
+    cloud_tolerance = float(datastore.get("cloud_tolerance", 0.25))
 
     imgBits=(2**trueBits)/(2**8)
     if trueBits==12:
@@ -99,14 +121,14 @@ def main():
 
         num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(cldRdbineary.astype('uint8'), connectivity=8, ltype=None)
         for a in range(1,num_labels):
-            if stats[a,4]<500:#you can adjust manually. default is 500
+            if stats[a,4]<min_patch_px:# drop cloud scraps smaller than ~0.018 km2 (500 px at 6 m)
                 delnum+=1
                 cldRdbineary[labels==a]=0
 
 
         print('scraps num:',delnum)
 
-        kernel = np.ones((50,50), np.uint8)
+        kernel = np.ones((dilate_px,dilate_px), np.uint8)
         dilation = cv2.dilate(cldRdbineary, kernel, iterations = 1).astype('uint8')
 
         contours, hierarchy = cv2.findContours(dilation.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -169,7 +191,7 @@ def main():
 
             total+=1
             with rasterio.open(
-                        'cldDatabase\\'+str(c)+'_cld.img',
+                        'cldDatabase'+os.sep+str(c)+'_cld.img',
                         'w+',
                         height=h+(expdw+expdh),
                         width=w+(expdw+expdh),
@@ -188,7 +210,7 @@ def main():
             for f in files:
               fullpath1 = join(candidate_img_path, f)
               if isfile(fullpath1) and  f.endswith(".img"):
-                image=rasterio.open(candidate_img_path+'\\'+f)
+                image=rasterio.open(candidate_img_path+os.sep+f)
                 file.append(f)
                 gt_two.append(image.transform[2] )
                 gt_five.append(image.transform[5] )
@@ -209,14 +231,14 @@ def main():
         print('calculate ssim...',i+1,'/',len(allWindow))
         a=0
         for j in cldfile:
-            cld_ds = rasterio.open(cloud_work_path+'\\'+j)
+            cld_ds = rasterio.open(cloud_work_path+os.sep+j)
             cld_gt=cld_ds.transform
             cldWin=Window(((cld_gt[2]-mosaic_origin[0])/res if (cld_gt[2]-mosaic_origin[0])/res>0 else (cld_gt[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-cld_gt[5])/res if (mosaic_origin[1]-cld_gt[5])/res>0 else (mosaic_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
             cldWin6m=Window(((cld_gt[2]-mask_origin[0])/res if (cld_gt[2]-mask_origin[0])/res>0 else (cld_gt[2]-mask_origin[0])/res ),((mask_origin[1]-cld_gt[5])/res if (mask_origin[1]-cld_gt[5])/res>0 else (mask_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
 
             b=0
             for k in file:# candidates images pool
-                imagePool= rasterio.open(candidate_img_path+'\\'+k)
+                imagePool= rasterio.open(candidate_img_path+os.sep+k)
 
                 gt1=imagePool.transform
 
@@ -279,7 +301,7 @@ def main():
         print('cloud removal...',i+1,'/',len(allWindow))
         for j in cldfile:
 
-            cld_ds = rasterio.open(cloud_work_path+'\\'+j)
+            cld_ds = rasterio.open(cloud_work_path+os.sep+j)
             cld_gt=cld_ds.transform
 
             cldWin=Window(((cld_gt[2]-mosaic_origin[0])/res if (cld_gt[2]-mosaic_origin[0])/res>0 else (cld_gt[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-cld_gt[5])/res if (mosaic_origin[1]-cld_gt[5])/res>0 else (mosaic_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )
@@ -293,13 +315,13 @@ def main():
             ssimIndex=np.argsort(ssim[:,a])
             a+=1
             ss=0
-            for s in list(range(1,np.count_nonzero(ssim[:,a-1]>0.10)+1)):
+            for s in list(range(1,np.count_nonzero(ssim[:,a-1]>=ssim_threshold)+1)):
                 if ss==0:
-                    if ssim[ssimIndex[-s],a-1]>= 0.10:#set threshold to filter not good enough img.
+                    if ssim[ssimIndex[-s],a-1]>= ssim_threshold:#set threshold to filter not good enough img.
 
                         fName=file[ssimIndex[-s]]
 
-                        imagePool= rasterio.open(candidate_img_path+'\\'+fName)
+                        imagePool= rasterio.open(candidate_img_path+os.sep+fName)
 
                         gt1=imagePool.transform
 
@@ -322,13 +344,13 @@ def main():
                             # If 1 exists in border; then skip the cld file.
                             if np.any(border_elems_generic(cld,1)==1)==False:# to prevent replicated cld mask from reprocessing several times.
 
-                                cldbList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+cloud_mask_folder+'\\'+'*'+fName[:-4]+'*.tif')
+                                cldbList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+cloud_mask_folder+os.sep+'*'+fName[:-4]+'*.tif')
                                 cldb=rasterio.open(cldbList[0])
                                 cldb=cldb.read(1,window=write_window)
 
                                 imgrgb=imagePool.read(window=write_window)
 
-                                thresh=0.75
+                                thresh=1-cloud_tolerance
                                 if ssim[ssimIndex[-1],a-1]==-0.91 and  np.any(imgrgb[0,:,:][cld==1]==0)==False and np.count_nonzero(cldb[cld==1]<10)/np.count_nonzero(cldb[cld==1])>0.85 :
                                     cldcy=cld.copy()
                                     blendPix=65
@@ -401,7 +423,7 @@ def main():
 
                                     #read pan_imagePool which is cldb mask's counterpart
                                     PAN_fName=fName[0]+str(int(fName[fName.find('0'):fName.find('0')+7])+1).zfill(7)
-                                    pan_imagePool = rasterio.open(Pan_Addr+'\\'+PAN_fName+'\\'+PAN_fName+'_B1.DAT.raw')
+                                    pan_imagePool = rasterio.open(pan_scene_path(Pan_Addr, PAN_fName))
 
                                     smallpan=pan_imagePool.read(1,window= from_bounds(win_transform[2], win_transform[5]-ints_window.height*res, win_transform[2]+ints_window.width*res, win_transform[5], pan_imagePool.transform))
                                     pan_imagePool.close()
@@ -583,7 +605,7 @@ def main():
 
                                         #read pan_imagePool which is cldb mask's counterpart
                                         PAN_fName=fName[0]+str(int(fName[fName.find('0'):fName.find('0')+7])+1).zfill(7)
-                                        pan_imagePool = rasterio.open(Pan_Addr+'\\'+PAN_fName+'\\'+PAN_fName+'_B1.DAT.raw')
+                                        pan_imagePool = rasterio.open(pan_scene_path(Pan_Addr, PAN_fName))
 
                                         smallpan=pan_imagePool.read(1,window= from_bounds(win_transform[2], win_transform[5]-ints_window.height*res, win_transform[2]+ints_window.width*res, win_transform[5], pan_imagePool.transform))
                                         pan_imagePool.close()
@@ -667,7 +689,7 @@ def main():
 
                                     #read pan_imagePool which is cldb mask's counterpart
                                     PAN_fName=fName[0]+str(int(fName[fName.find('0'):fName.find('0')+7])+1).zfill(7)
-                                    pan_imagePool = rasterio.open(Pan_Addr+'\\'+PAN_fName+'\\'+PAN_fName+'_B1.DAT.raw')
+                                    pan_imagePool = rasterio.open(pan_scene_path(Pan_Addr, PAN_fName))
 
                                     smallpan=pan_imagePool.read(1,window= from_bounds(win_transform[2], win_transform[5]-ints_window.height*res, win_transform[2]+ints_window.width*res, win_transform[5], pan_imagePool.transform))
                                     pan_imagePool.close()
@@ -689,7 +711,7 @@ def main():
         print('right,up,left,low:',right,up,left,low)
         cld_ds.close()
         cloudmask.close()
-        dirpath=cloud_work_path+'\\'
+        dirpath=cloud_work_path+os.sep
         for filename in os.listdir(dirpath):
             filepath = os.path.join(dirpath, filename)
             try:

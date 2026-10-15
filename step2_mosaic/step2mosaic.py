@@ -32,10 +32,31 @@ import pathlib
 import json
 import gc
 from shapely import wkt
+from shapely.geometry import shape
+from rasterio import features
 import glob
 CLOUD_MASK_FOLDER = 'cloud_masks'
 
 start = timer()
+def polygonize_valid_area(tif_path):
+    """Write <name>.temp.shp outlining the valid (non-zero) footprint of a scene.
+
+    On Windows with the bundled GetBoundaryMask.exe this calls
+    BndPolygonize_v.bat as before; elsewhere it uses an equivalent
+    rasterio/geopandas implementation.
+    """
+    tool_dir = pathlib.Path('NSPO_GRID_vectorization').absolute()
+    if os.name == 'nt' and (tool_dir / 'GetBoundaryMask.exe').is_file():
+        os.popen('call ' + str(tool_dir / 'BndPolygonize_v.bat') + ' ' + tif_path).read()
+        return
+    with rasterio.open(tif_path) as src:
+        valid = np.zeros((src.height, src.width), dtype=np.uint8)
+        for b in range(1, src.count + 1):
+            valid |= (src.read(b) != 0).astype(np.uint8)
+        geoms = [shape(g) for g, _ in features.shapes(valid, mask=valid.astype(bool), transform=src.transform)]
+        crs = src.crs
+    gpd.GeoDataFrame({'DN': [1] * len(geoms)}, geometry=geoms, crs=crs).to_file(tif_path[:-3] + 'temp.shp')
+
 def add_at_pos(matrix1, matrix2, xypos, inPlace=True):
     """
     Add matrix2 into matrix1 at position xypos (x,y), in-place or in new matrix.
@@ -165,21 +186,19 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
       
     for i in [raster1,raster2]:
         a1=pathlib.Path(i).absolute()
-        a2=pathlib.Path(r'NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute()
-        filepath = str(a2)+ os.path.join('\\',i[:-3]+'temp.shp')
+        a2=pathlib.Path('NSPO_GRID_vectorization','GetBoundaryMask.exe').parent.absolute()
+        filepath = str(a2)+ (os.sep+i[:-3]+'temp.shp')
         if os.path.isfile(filepath) :
             print('done img2shp:'+i)
         else:
 
         
-            cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', i[:-3]+'tif')
+            cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  (os.sep+i[:-3]+'tif')
             ret =  os.popen(cmdIn).read()
     
-            cmdIn='call '+''.join(str(a2))+ os.path.join('\\','BndPolygonize_v.bat ')+''.join(str(a2))  +  os.path.join('\\', i[:-3]+'tif')
-           
-            ret = os.popen(cmdIn).read()  
+            polygonize_valid_area(str(a2)+os.sep+i[:-3]+'tif')
             
-            filepath = str(a2)+ os.path.join('\\',i[:-3]+'temp.shp')
+            filepath = str(a2)+ (os.sep+i[:-3]+'temp.shp')
             if os.path.isfile(filepath) :
                 print('done img2shp:'+i)
             else:
@@ -187,8 +206,8 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
                 time.sleep(1)
             
             
-    shapefile1 = gpd.read_file("NSPO_GRID_vectorization\\"+raster1[:-3]+'temp.shp')
-    shapefile2 = gpd.read_file("NSPO_GRID_vectorization\\"+raster2[:-3]+'temp.shp')
+    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster1[:-3]+'temp.shp')
+    shapefile2 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster2[:-3]+'temp.shp')
     
     
     if len(shapefile1)>1 and len(shapefile2)==1:
@@ -897,26 +916,24 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     
     
     a1=pathlib.Path(raster1).absolute()
-    a2=pathlib.Path(r'NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute() 
-    filepath = str(a2)+ os.path.join('\\',raster1[:-3]+'temp.shp')
+    a2=pathlib.Path('NSPO_GRID_vectorization','GetBoundaryMask.exe').parent.absolute() 
+    filepath = str(a2)+ (os.sep+raster1[:-3]+'temp.shp')
     if os.path.isfile(filepath) :
         print('done img2shp:'+raster1)
     else:       
         
-        cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  os.path.join('\\', raster1[:-3]+'tif')
+        cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  (os.sep+raster1[:-3]+'tif')
         ret =  os.popen(cmdIn).read()
     
-        cmdIn='call '+''.join(str(a2))+ os.path.join('\\','BndPolygonize_v.bat ')+''.join(str(a2))  +  os.path.join('\\', raster1[:-3]+'tif')
-      
-        ret = os.popen(cmdIn).read()  
-        filepath = str(a2)+ os.path.join('\\',raster1[:-3]+'temp.shp')
+        polygonize_valid_area(str(a2)+os.sep+raster1[:-3]+'tif')
+        filepath = str(a2)+ (os.sep+raster1[:-3]+'temp.shp')
         if os.path.isfile(filepath) :
             print('done img2shp:'+raster1)
         else:
             print('oh! oh! memmory may not enough...')
             time.sleep(1)
     
-    shapefile1 = gpd.read_file("NSPO_GRID_vectorization\\"+raster1[:-3]+'temp.shp')
+    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster1[:-3]+'temp.shp')
 
     
     if len(shapefile1)>1:
@@ -933,7 +950,7 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     
    
     points = geom1.boundary.intersection(geom2.boundary) # multipoint
-    Lpoints = list(points) # point list
+    Lpoints = list(points.geoms) if hasattr(points, "geoms") else [points] # point list (Shapely 2)
     del geom1,geom2
     gc.collect()
     intersection_points=[]       
@@ -1487,7 +1504,7 @@ def main():
             kwargs = cloudmask_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")
 
-            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+CLOUD_MASK_FOLDER+os.sep+'*'+image1_ds[:-4]+'*.tif')        
             b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)     
 
             b1d=mask_blend_preprocess_for_order_loop('mosaic_cloudmask.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
@@ -1799,9 +1816,9 @@ def main():
             mosaic_out.close()
 
 
-            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+CLOUD_MASK_FOLDER+os.sep+'*'+image1_ds[:-4]+'*.tif')        
             b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
-            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image2_ds[:-4]+'*.tif')
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+CLOUD_MASK_FOLDER+os.sep+'*'+image2_ds[:-4]+'*.tif')
             b1d=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
 
 
