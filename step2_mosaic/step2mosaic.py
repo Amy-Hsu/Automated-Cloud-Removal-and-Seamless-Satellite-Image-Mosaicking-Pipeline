@@ -12,7 +12,6 @@ License: MIT
 
 import numpy as np
 import cv2
-from osgeo import gdal
 import rasterio
 import networkx as nx
 import scipy.ndimage
@@ -166,7 +165,7 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
       
     for i in [raster1,raster2]:
         a1=pathlib.Path(i).absolute()
-        a2=pathlib.Path('NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute()
+        a2=pathlib.Path(r'NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute()
         filepath = str(a2)+ os.path.join('\\',i[:-3]+'temp.shp')
         if os.path.isfile(filepath) :
             print('done img2shp:'+i)
@@ -898,7 +897,7 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     
     
     a1=pathlib.Path(raster1).absolute()
-    a2=pathlib.Path('NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute() 
+    a2=pathlib.Path(r'NSPO_GRID_vectorization\GetBoundaryMask.exe').parent.absolute() 
     filepath = str(a2)+ os.path.join('\\',raster1[:-3]+'temp.shp')
     if os.path.isfile(filepath) :
         print('done img2shp:'+raster1)
@@ -1147,698 +1146,705 @@ def blendMask(blendPix,im_floodfill_f):
     mask_blurred_1chan = mask_blurred.astype('float32') / (blendPix+1)
     return mask_blurred_1chan
 
-with open('para.txt', 'r') as f:
-    datastore = json.load(f)
+def main():
+    """Run this pipeline step using the parameters in the working folder."""
+    global canvas_crs, res, union_gt
+    with open('para.txt', 'r') as f:
+        datastore = json.load(f)
 
-path_method=datastore["path_method"]
-resampleTo=float(datastore["resampleTo"])
-res=float(datastore["res"])
-trueBits=int(datastore["trueBits"])
-mypath=datastore["imgPath"]
+    path_method=datastore["path_method"]
+    resampleTo=float(datastore["resampleTo"])
+    res=float(datastore["res"])
+    trueBits=int(datastore["trueBits"])
+    mypath=datastore["imgPath"]
 
-kernel=int(datastore["kernel"])
-pan_res=float(datastore["pan_res"])
+    kernel=int(datastore["kernel"])
+    pan_res=float(datastore["pan_res"])
 
-canvas_crs = datastore.get("canvas_crs", "EPSG:3826")
-canvas_x_max = float(datastore.get("canvas_x_max", "406000"))
-canvas_y_min = float(datastore.get("canvas_y_min", "2400000"))
-
-
-scale_factor=1/resampleTo
-del resampleTo
-
-
-NOscale_factor=1/scale_factor
-imgBits=(2**trueBits)/(2**8)
-if trueBits==12:
-    imgtype='uint16'
-else:
-    imgtype='uint'+str(trueBits)
-    
-files = listdir(mypath)
-gt_two=[]
-file=[]
-gt_five=[]
-
-for f in files:
-
-  fullpath = join(mypath, f)
-
-  if isfile(fullpath) and  f.endswith(".img"):
-
-    image=rasterio.open(f)
-    file.append(f)
-    gt_two.append(image.transform[2] )
-    gt_five.append(image.transform[5] )
+    canvas_crs = datastore.get("canvas_crs", "EPSG:3826")
+    canvas_x_max = float(datastore.get("canvas_x_max", "406000"))
+    canvas_y_min = float(datastore.get("canvas_y_min", "2400000"))
 
 
-coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
+    scale_factor=1/resampleTo
+    del resampleTo
 
-dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))# compute Euclidean distance among 2D data points
-distIndex=np.argsort(dist) 
-ReadOrder=[file[i] for i in distIndex.tolist()]
-print("File processing order:", ReadOrder)
 
-allWindow=[]
-ImgInd=[]
-Union_gt=[]
-for i in range(len(ReadOrder)-1):   
-    if i!=0:
-        loop=i
-        image1_ds = ReadOrder[i+1]#
-        image2_ds = 'mosaic_xs.tif'#
-        print('Image Process Progress:',i+2,'/',len(ReadOrder))
-        print('Image Preprocessing...')
-        image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=find_raster_intersect_for_mosaic(image1_ds, image2_ds,mosaic_gt,res,scale_factor,res_union_new)
-        Union_gt.append(union_gt)
-       
-        imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
-        imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
-        
-      
-        imgg1_ui8=image1_isect_array/imgBits
-        imgg2_ui8=image2_isect_array/imgBits
-        
-    
-        imgg1_ui8.astype(np.uint8)
-        imgg2_ui8.astype(np.uint8)
-        
-      
-        imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
-        imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
-        
-        
-       
-        imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
-        imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
-        del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image2_isect_array
-        gc.collect()
-        
-        fc,fr,trueID_intersect=MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor)
-        if len(trueID_intersect)==2:
-            try:
-                data_final,data_final2,height, width=clipImg(kernel,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
-                seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
-            except:
-                data_final,data_final2,height, width=clipImg(11,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
-                seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
-        else:
-            print("please check the intersection of image: " +image1_ds+' and image: '+image2_ds)
-        del  data_final,data_final2,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy
-        print('Generating seamline ...')
-        x=round((gt[2]-union_gt[2])/(res/scale_factor) ) # col
-        y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
-        xypos=(x,y)
-        union_conn[union_conn>0]=1
-        seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)  
-        seamlineff3=border_connection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
-        
-        
-        seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
-        
-               
-        sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)#np.resize =! cv2.resize
-        del seamlineff,seamlineff3 #,seamlinef
-        gc.collect()   
-    
-        if sf.shape[0]>65534 and (sf[60000:,:]==1).any():
-            sff=sf[0:60000,:]
-            sff2=sf[60000:,:]
-            th, im_th = cv2.threshold(sff.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill1 =im_th.copy().astype(np.uint8)   
-            h, w = sff.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-            cv2.floodFill(im_floodfill1, mask, (1,1), 0)  
-          
-            th, im_th = cv2.threshold(sff2.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill2 =im_th.copy().astype(np.uint8)   
-            h, w = sff2.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-           
-            if im_floodfill1[59999,0]==0:
-                cv2.floodFill(im_floodfill2, mask, (1,1),  np.uint32(im_floodfill1[59999,0]).item() )  
-            elif im_floodfill1[59999,im_floodfill1.shape[1]-1]==0 :
-                cv2.floodFill(im_floodfill2, mask, (im_floodfill2.shape[1]-1,1),  np.uint32(im_floodfill1[59999,im_floodfill1.shape[1]-1]).item() )  
-            else:
-                print('floodfill process has something wrong!')
-            
-            h, w = sf.shape[:2]
-            im_floodfill=np.zeros(sf.shape[:2], np.uint8)
-            add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
-            add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
-           
-            del sff,sff2,im_floodfill1,im_floodfill2
-            gc.collect()
-        else:
-            th, im_th = cv2.threshold(sf.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill = im_th.copy().astype(np.uint8)    
-         
-            h, w = im_th.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-            cv2.floodFill(im_floodfill, mask, (1,1), 0)   
-          
-        num_objects, labels = cv2.connectedComponents(im_floodfill, connectivity=8)
-        classN=[np.sum(labels==a) for a in range(num_objects)]
-        classN_ind=np.argsort(classN) 
-        classN_index=classN_ind.tolist()
-        classN_index.reverse()
-        
-        cind=[]
-        for i in classN_index:
-            if classN[i]>1000:
-                cind.append(i)
-        for h in range(len(cind)): 
-            if len(cind)==3:
-                m=h+1
-                if m>len(cind)-1:
-                    m=h-2
-                    if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
-                        im_floodfill_f=im_floodfill.copy()                                 
-                        im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0
-                else: 
-                    if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
-                        im_floodfill_f=im_floodfill.copy()                                 
-                        im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0        
-            else:
-                if all(im_floodfill[np.where(labels==cind[h])]==1):  
-                    im_floodfill_f=im_floodfill.copy()                                 
-                    im_floodfill_f[np.where(labels!=cind[h])]=0 
-                    
-        
-        del th, im_th,mask,num_objects, labels,classN,classN_ind,classN_index,cind
-        gc.collect()
-        print('Saving seamline for:"',image1_ds[:-4],'"...')
-        with rasterio.open(
-            str(image1_ds[:-4])+'_seamline.img',
-            'w+',           
-            height=sf.shape[0],
-            width=sf.shape[1],
-            count=1,
-            dtype=rasterio.uint8,          
-            crs= {'init': canvas_crs},#Initialize from a named CRS
-            transform=union_gt,
-        ) as dst:
-            dst.write(sf.astype(rasterio.uint8), 1)
-        del sf
-        
-                
-
-        
-        
-        
-        print('Mosaic "',image1_ds[:-4],'" images...')
-        mask_blurred_4chan=blendMask(57,im_floodfill_f) 
-        
-        with rasterio.open(
-            str(image1_ds[:-4])+'_seamline_polygon.img',
-            'w+',           
-            height=mask_blurred_4chan.shape[0]*int(res/pan_res),
-            width=mask_blurred_4chan.shape[1]*int(res/pan_res),
-            count=1,
-            dtype=rasterio.float32,          
-            crs= {'init': canvas_crs},#   
-            transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  
-        ) as dst:
-            dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
-        
-        del im_floodfill,im_floodfill_f        
-        b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=blend_preprocess_order_for_mosaic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
-        
-        img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
-              (1,image1_ds,im1_1num, 'b1d','b1' ),
-              (0,image2_ds,im2_0num, 'b1','b1d' ),
-              (1,image2_ds,im2_1num, 'b1','b1d')]
-        imgind=sorted(img,reverse=True,  key = itemgetter(0,2 ))   
-        ImgInd.append(imgind)
-       
-        mosaic_out= rasterio.open(
-                    'mosaic_xs.tif',
-                    'r+',
-                  
-                    height=int( ( float(max( gt_five))-  canvas_y_min   )/res ),
-                    width= int( (   canvas_x_max-  float(min( gt_five)   ))/res ),
-                    count=4,
-                    dtype=image1_isect_array.dtype ,
-                  
-                    crs= {'init': canvas_crs},#Initialize from a named CRS
-                    transform=mosaic_gt)
-        kwargs = mosaic_out.meta.copy()
-        kwargs.update(BIGTIFF="IF_SAFER")
-      
-        
-        for k in range(4):
-            if k==0:
-                try:
-                    
-                    write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )# 
-                    outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
-                    
-                    outcome=outcome.astype(imgtype)
-                    
-                    
-                 
-                    print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
-              
-                    del outcome ,b1,b1d 
-                    gc.collect()
-                
-                except:
-                   
-                    h=int(mask_blurred_4chan.shape[0]/2)
-                    w=int(mask_blurred_4chan.shape[1]/2)
-                    outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
-                    outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                   
-                    print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
-                    del outcome ,write_window2
-                    gc.collect()
-                    
-                    outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
-                    outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                   
-                    print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
-             
-                    del outcome ,b1,b1d ,write_window3
-                    gc.collect()
-                 
-                
-            else:
-                
-                ind=k+1
-                b1,b1d=blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
-                    
-                try:
-                
-                    outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
-                    outcome=outcome.astype(imgtype)
-                    print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
-            
-                    del outcome, b1,b1d 
-                    gc.collect()
-                
-                except:
-                    
-                   
-                    h=int(mask_blurred_4chan.shape[0]/2)
-                    w=int(mask_blurred_4chan.shape[1]/2)
-                    outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
-                    outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                    print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
-                  
-                    del outcome,write_window2
-                    
-                   
-                    outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
-                    outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                   
-                    print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
-            
-                    del outcome, b1,b1d ,write_window3
-                    gc.collect()
-                    
-                    
-                    
-                
-        mosaic_out.close()#
-        
-        cloudmask_out= rasterio.open(
-            'mosaic_cloudmask.tif',
-            'r+',
-           
-            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
-            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
-            count=1,
-            dtype=image1_isect_array.dtype,
-            
-            crs= {'init': canvas_crs},
-            transform=cloudmask_gt)
-        kwargs = cloudmask_out.meta.copy()
-        kwargs.update(BIGTIFF="IF_SAFER")
-       
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
-        b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)     
-       
-        b1d=mask_blend_preprocess_for_order_loop('mosaic_cloudmask.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
-        
-        cldMas=eval(imgind[0][3]) *(1- mask_blurred_4chan)+ eval(imgind[0][4]) *( mask_blurred_4chan)
-        cldMas[np.where(cldMas>0)]=1
-        
-                
-                
-        cldMas=cldMas.astype(imgtype)
-        print('Writing cloud mask to disk...')
-        cloudmask_out.write( cldMas, indexes=1, window=write_window)          
-        cloudmask_out.close()
-        allWindow.append(write_window)
-        del mask_blurred_4chan ,cldMas,cldList,b1,b1d    
-        gc.collect()
+    NOscale_factor=1/scale_factor
+    imgBits=(2**trueBits)/(2**8)
+    if trueBits==12:
+        imgtype='uint16'
     else:
-        
+        imgtype='uint'+str(trueBits)
 
-        
-        image1_ds =ReadOrder[i]
-        image2_ds =ReadOrder[i+1]
-        if (test_overlap(ReadOrder)[0]==True):
-            image1_ds =ReadOrder[i]#
-            image2_ds =ReadOrder[i+1]#'
-            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
-            fp = open("ProcessOrder.txt", "w")         
-            fp.write(str(ReadOrder) )     
-            fp.close()
-        else:
-            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
-        Union_gt.append(union_gt)    
-        mosaic_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
-        cloudmask_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
-       
-        mosaic_out= rasterio.open(
-            'mosaic_xs.tif',
-            'w+',
-           
-            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
-            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
-            count=4,
-            dtype=image1_isect_array.dtype,
-          
-            crs= {'init': canvas_crs},#
-            transform=mosaic_gt)
-        kwargs = mosaic_out.meta.copy()
-        kwargs.update(BIGTIFF="IF_SAFER")
-        
-      
-        cloudmask_out= rasterio.open(
-            'mosaic_cloudmask.tif',
-            'w+',
-           
-            height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
-            width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
-            count=1,
-            dtype=image1_isect_array.dtype,
-           
-            crs= {'init': canvas_crs},#
-            transform=cloudmask_gt)
-        kwargs = cloudmask_out.meta.copy()
-        kwargs.update(BIGTIFF="IF_SAFER")
-        
-                
-     
-        imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
-        imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
-        
-       
-        imgg1_ui8=image1_isect_array/imgBits
-        imgg2_ui8=image2_isect_array/imgBits
-        
-       
-        imgg1_ui8.astype(np.uint8)
-        imgg2_ui8.astype(np.uint8)
-        
-        
-        imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
-        imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
-        
-        
-       
-        imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
-        imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
-        del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image1_isect_array,image2_isect_array
-        gc.collect()
-        
-        fc,fr,trueID_intersect=MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor)
-        if len(trueID_intersect)==2:
-            try:
-                data_final,data_final2,height, width=clipImg(kernel,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
-                seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
-            except:
-                data_final,data_final2,height, width=clipImg(11,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
-                seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
-        else:
-            print("please check the intersection of image: " +image1_ds+' and image: '+image2_ds)
-        del  data_final,data_final2,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy
-        print('Generating seamline ...')
-        x=round((gt[2]-union_gt[2])/(res/scale_factor) ) # col
-        y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
-        xypos=(x,y)
-        union_conn[union_conn>0]=1
-        seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)
-       
-        ##################################################################################################
-        
-        seamlineff3=border_connection(seamlineff, gt, union_gt, res, scale_factor, fc,fr )
-        ###########################################################################################################
-        
-        seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
-        sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
-        
-        del seamlineff4,union_conn,seamlineff3,seamlineff,seamlinef
-        gc.collect()
-      
-        if sf.shape[0]>65534 and (sf[60000:,:]==1).any():
-            sff=sf[0:60000,:]
-            sff2=sf[60000:,:]
-            th, im_th = cv2.threshold(sff.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill1 =im_th.copy().astype(np.uint8)   
-            h, w = sff.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-            cv2.floodFill(im_floodfill1, mask, (1,1), 0)  
-           
-            th, im_th = cv2.threshold(sff2.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill2 =im_th.copy().astype(np.uint8)   
-            h, w = sff2.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-            
-            if im_floodfill1[59999,0]==0:
-                cv2.floodFill(im_floodfill2, mask, (1,1),  np.uint32(im_floodfill1[59999,0]).item() )  
-            elif im_floodfill1[59999,im_floodfill1.shape[1]-1]==0 :
-                cv2.floodFill(im_floodfill2, mask, (im_floodfill2.shape[1]-1,1),  np.uint32(im_floodfill1[59999,im_floodfill1.shape[1]-1]).item() )  
+    files = listdir(mypath)
+    gt_two=[]
+    file=[]
+    gt_five=[]
+
+    for f in files:
+
+      fullpath = join(mypath, f)
+
+      if isfile(fullpath) and  f.endswith(".img"):
+
+        image=rasterio.open(f)
+        file.append(f)
+        gt_two.append(image.transform[2] )
+        gt_five.append(image.transform[5] )
+
+
+    coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
+
+    dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))# compute Euclidean distance among 2D data points
+    distIndex=np.argsort(dist) 
+    ReadOrder=[file[i] for i in distIndex.tolist()]
+    print("File processing order:", ReadOrder)
+
+    allWindow=[]
+    ImgInd=[]
+    Union_gt=[]
+    for i in range(len(ReadOrder)-1):   
+        if i!=0:
+            loop=i
+            image1_ds = ReadOrder[i+1]#
+            image2_ds = 'mosaic_xs.tif'#
+            print('Image Process Progress:',i+2,'/',len(ReadOrder))
+            print('Image Preprocessing...')
+            image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=find_raster_intersect_for_mosaic(image1_ds, image2_ds,mosaic_gt,res,scale_factor,res_union_new)
+            Union_gt.append(union_gt)
+
+            imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
+            imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
+
+
+            imgg1_ui8=image1_isect_array/imgBits
+            imgg2_ui8=image2_isect_array/imgBits
+
+
+            imgg1_ui8.astype(np.uint8)
+            imgg2_ui8.astype(np.uint8)
+
+
+            imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
+            imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
+
+
+
+            imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
+            imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
+            del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image2_isect_array
+            gc.collect()
+
+            fc,fr,trueID_intersect=MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor)
+            if len(trueID_intersect)==2:
+                try:
+                    data_final,data_final2,height, width=clipImg(kernel,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
+                    seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
+                except:
+                    data_final,data_final2,height, width=clipImg(11,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
+                    seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
             else:
-                print('floodfill process has something wrong!')
-           
-            h, w = sf.shape[:2]
-            im_floodfill=np.zeros(sf.shape[:2], np.uint8)
-            add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
-            add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
-            
-            del sff,sff2,im_floodfill1,im_floodfill2
+                print("please check the intersection of image: " +image1_ds+' and image: '+image2_ds)
+            del  data_final,data_final2,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy
+            print('Generating seamline ...')
+            x=round((gt[2]-union_gt[2])/(res/scale_factor) ) # col
+            y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
+            xypos=(x,y)
+            union_conn[union_conn>0]=1
+            seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)  
+            seamlineff3=border_connection(seamlineff, gt, union_gt,res,scale_factor,fc,fr )
+
+
+            seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
+
+
+            sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)#np.resize =! cv2.resize
+            del seamlineff,seamlineff3 #,seamlinef
+            gc.collect()   
+
+            if sf.shape[0]>65534 and (sf[60000:,:]==1).any():
+                sff=sf[0:60000,:]
+                sff2=sf[60000:,:]
+                th, im_th = cv2.threshold(sff.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill1 =im_th.copy().astype(np.uint8)   
+                h, w = sff.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+                cv2.floodFill(im_floodfill1, mask, (1,1), 0)  
+
+                th, im_th = cv2.threshold(sff2.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill2 =im_th.copy().astype(np.uint8)   
+                h, w = sff2.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+
+                if im_floodfill1[59999,0]==0:
+                    cv2.floodFill(im_floodfill2, mask, (1,1),  np.uint32(im_floodfill1[59999,0]).item() )  
+                elif im_floodfill1[59999,im_floodfill1.shape[1]-1]==0 :
+                    cv2.floodFill(im_floodfill2, mask, (im_floodfill2.shape[1]-1,1),  np.uint32(im_floodfill1[59999,im_floodfill1.shape[1]-1]).item() )  
+                else:
+                    print('floodfill process has something wrong!')
+
+                h, w = sf.shape[:2]
+                im_floodfill=np.zeros(sf.shape[:2], np.uint8)
+                add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
+                add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
+
+                del sff,sff2,im_floodfill1,im_floodfill2
+                gc.collect()
+            else:
+                th, im_th = cv2.threshold(sf.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill = im_th.copy().astype(np.uint8)    
+
+                h, w = im_th.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+                cv2.floodFill(im_floodfill, mask, (1,1), 0)   
+
+            num_objects, labels = cv2.connectedComponents(im_floodfill, connectivity=8)
+            classN=[np.sum(labels==a) for a in range(num_objects)]
+            classN_ind=np.argsort(classN) 
+            classN_index=classN_ind.tolist()
+            classN_index.reverse()
+
+            cind=[]
+            for i in classN_index:
+                if classN[i]>1000:
+                    cind.append(i)
+            for h in range(len(cind)): 
+                if len(cind)==3:
+                    m=h+1
+                    if m>len(cind)-1:
+                        m=h-2
+                        if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
+                            im_floodfill_f=im_floodfill.copy()                                 
+                            im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0
+                    else: 
+                        if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
+                            im_floodfill_f=im_floodfill.copy()                                 
+                            im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0        
+                else:
+                    if all(im_floodfill[np.where(labels==cind[h])]==1):  
+                        im_floodfill_f=im_floodfill.copy()                                 
+                        im_floodfill_f[np.where(labels!=cind[h])]=0 
+
+
+            del th, im_th,mask,num_objects, labels,classN,classN_ind,classN_index,cind
+            gc.collect()
+            print('Saving seamline for:"',image1_ds[:-4],'"...')
+            with rasterio.open(
+                str(image1_ds[:-4])+'_seamline.img',
+                'w+',           
+                height=sf.shape[0],
+                width=sf.shape[1],
+                count=1,
+                dtype=rasterio.uint8,          
+                crs= {'init': canvas_crs},#Initialize from a named CRS
+                transform=union_gt,
+            ) as dst:
+                dst.write(sf.astype(rasterio.uint8), 1)
+            del sf
+
+
+
+
+
+
+            print('Mosaic "',image1_ds[:-4],'" images...')
+            mask_blurred_4chan=blendMask(57,im_floodfill_f) 
+
+            with rasterio.open(
+                str(image1_ds[:-4])+'_seamline_polygon.img',
+                'w+',           
+                height=mask_blurred_4chan.shape[0]*int(res/pan_res),
+                width=mask_blurred_4chan.shape[1]*int(res/pan_res),
+                count=1,
+                dtype=rasterio.float32,          
+                crs= {'init': canvas_crs},#   
+                transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  
+            ) as dst:
+                dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
+
+            del im_floodfill,im_floodfill_f        
+            b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=blend_preprocess_order_for_mosaic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
+
+            img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
+                  (1,image1_ds,im1_1num, 'b1d','b1' ),
+                  (0,image2_ds,im2_0num, 'b1','b1d' ),
+                  (1,image2_ds,im2_1num, 'b1','b1d')]
+            imgind=sorted(img,reverse=True,  key = itemgetter(0,2 ))   
+            ImgInd.append(imgind)
+
+            mosaic_out= rasterio.open(
+                        'mosaic_xs.tif',
+                        'r+',
+
+                        height=int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+                        width= int( (   canvas_x_max-  float(min( gt_five)   ))/res ),
+                        count=4,
+                        dtype=image1_isect_array.dtype ,
+
+                        crs= {'init': canvas_crs},#Initialize from a named CRS
+                        transform=mosaic_gt)
+            kwargs = mosaic_out.meta.copy()
+            kwargs.update(BIGTIFF="IF_SAFER")
+
+
+            for k in range(4):
+                if k==0:
+                    try:
+
+                        write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )# 
+                        outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
+
+                        outcome=outcome.astype(imgtype)
+
+
+
+                        print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window)
+
+                        del outcome ,b1,b1d 
+                        gc.collect()
+
+                    except:
+
+                        h=int(mask_blurred_4chan.shape[0]/2)
+                        w=int(mask_blurred_4chan.shape[1]/2)
+                        outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
+                        outcome=outcome.astype(imgtype)
+                        write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+
+                        print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window2)
+                        del outcome ,write_window2
+                        gc.collect()
+
+                        outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
+                        outcome=outcome.astype(imgtype)
+                        write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+
+                        print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window3)
+
+                        del outcome ,b1,b1d ,write_window3
+                        gc.collect()
+
+
+                else:
+
+                    ind=k+1
+                    b1,b1d=blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
+
+                    try:
+
+                        outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
+                        outcome=outcome.astype(imgtype)
+                        print('Writing result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window)
+
+                        del outcome, b1,b1d 
+                        gc.collect()
+
+                    except:
+
+
+                        h=int(mask_blurred_4chan.shape[0]/2)
+                        w=int(mask_blurred_4chan.shape[1]/2)
+                        outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
+                        outcome=outcome.astype(imgtype)
+                        write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                        print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window2)
+
+                        del outcome,write_window2
+
+
+                        outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
+                        outcome=outcome.astype(imgtype)
+                        write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+
+                        print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window3)
+
+                        del outcome, b1,b1d ,write_window3
+                        gc.collect()
+
+
+
+
+            mosaic_out.close()#
+
+            cloudmask_out= rasterio.open(
+                'mosaic_cloudmask.tif',
+                'r+',
+
+                height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+                width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
+                count=1,
+                dtype=image1_isect_array.dtype,
+
+                crs= {'init': canvas_crs},
+                transform=cloudmask_gt)
+            kwargs = cloudmask_out.meta.copy()
+            kwargs.update(BIGTIFF="IF_SAFER")
+
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+            b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)     
+
+            b1d=mask_blend_preprocess_for_order_loop('mosaic_cloudmask.tif',mask_blurred_4chan,res,union_gt,ReadWindow)     
+
+            cldMas=eval(imgind[0][3]) *(1- mask_blurred_4chan)+ eval(imgind[0][4]) *( mask_blurred_4chan)
+            cldMas[np.where(cldMas>0)]=1
+
+
+
+            cldMas=cldMas.astype(imgtype)
+            print('Writing cloud mask to disk...')
+            cloudmask_out.write( cldMas, indexes=1, window=write_window)          
+            cloudmask_out.close()
+            allWindow.append(write_window)
+            del mask_blurred_4chan ,cldMas,cldList,b1,b1d    
             gc.collect()
         else:
-            th, im_th = cv2.threshold(sf.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
-            im_floodfill = im_th.copy().astype(np.uint8)
-            
-            h, w = im_th.shape[:2]
-            mask = np.zeros((h+2, w+2), np.uint8)
-            cv2.floodFill(im_floodfill, mask, (1,1), 0)
-                        
-        
-        num_objects, labels = cv2.connectedComponents(im_floodfill, connectivity=8)
-        classN=[np.sum(labels==i) for i in range(num_objects)]
-        classN_ind=np.argsort(classN) 
-        classN_index=classN_ind.tolist()
-        classN_index.reverse()
-       
-        cind=[]
-        for i in classN_index:
-            if classN[i]>1000:
-                cind.append(i)
-        for h in range(len(cind)): 
-            if len(cind)==3:
-                m=h+1
-                if m>len(cind)-1:
-                    m=h-2
-                    if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
-                        im_floodfill_f=im_floodfill.copy()                                 
-                        im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0
-                else: 
-                    if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
-                        im_floodfill_f=im_floodfill.copy()                                 
-                        im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0                        
+
+
+
+            image1_ds =ReadOrder[i]
+            image2_ds =ReadOrder[i+1]
+            if (test_overlap(ReadOrder)[0]==True):
+                image1_ds =ReadOrder[i]#
+                image2_ds =ReadOrder[i+1]#'
+                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
+                fp = open("ProcessOrder.txt", "w")         
+                fp.write(str(ReadOrder) )     
+                fp.close()
             else:
-                if all(im_floodfill[np.where(labels==cind[h])]==1):  
-                    im_floodfill_f=im_floodfill.copy()                                 
-                    im_floodfill_f[np.where(labels!=cind[h])]=0 
-                    
-        
-     
-        del th, im_th,mask,num_objects, labels,classN,classN_ind,classN_index,cind
-        gc.collect()
-        print('Saving "',image1_ds[:-4],'+',image2_ds[:-4],'"seamline ...')
-        with rasterio.open(
-            str(image1_ds[:-4])+str(image2_ds[:-4])+'_sl.img',
-            'w+',           
-            height=sf.shape[0],
-            width=sf.shape[1],
-            count=1,
-            dtype=rasterio.uint8,           
-            crs= {'init': canvas_crs},#Initialize from a named CRS
-            transform=union_gt,
-        ) as dst:
-            dst.write(sf.astype(rasterio.uint8), 1)   
-        del sf
-        print('Mosaic "',image1_ds[:-4],'+',image2_ds[:-4],'" images...')
-        mask_blurred_4chan=blendMask(57,im_floodfill_f)  
-     
-        with rasterio.open(
-            str(image1_ds[:-4])+str(image2_ds[:-4])+'_seamline_polygon.img',
-            'w+',           
-            height=mask_blurred_4chan.shape[0]*int(res/pan_res),
-            width=mask_blurred_4chan.shape[1]*int(res/pan_res),
-            count=1,
-            dtype=rasterio.float32,          
-            crs= {'init': canvas_crs},#Initialize from a named CRS            
-            transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  union_gt,
-        ) as dst:
-            dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
-        
-            
-        del im_floodfill,im_floodfill_f
-        
-        b1,im1_0num,im1_1num=blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt)
-        b1d,im2_0num,im2_1num=blend_preprocess_for_order(image2_ds,mask_blurred_4chan,res,union_gt)
-        
-    
-        
-        img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
-              (1,image1_ds,im1_1num, 'b1d','b1' ),
-              (0,image2_ds,im2_0num, 'b1','b1d' ),
-              (1,image2_ds,im2_1num, 'b1','b1d')]
-        imgind=sorted(img,reverse=True,  key = itemgetter(0,2 )) 
-        ImgInd.append(imgind)
-        kwargs = mosaic_out.meta.copy()
-        kwargs.update(BIGTIFF="IF_SAFER")
-        for k in range(4):
-            if k==0:
+                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
+            Union_gt.append(union_gt)    
+            mosaic_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
+            cloudmask_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
+
+            mosaic_out= rasterio.open(
+                'mosaic_xs.tif',
+                'w+',
+
+                height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+                width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
+                count=4,
+                dtype=image1_isect_array.dtype,
+
+                crs= {'init': canvas_crs},#
+                transform=mosaic_gt)
+            kwargs = mosaic_out.meta.copy()
+            kwargs.update(BIGTIFF="IF_SAFER")
+
+
+            cloudmask_out= rasterio.open(
+                'mosaic_cloudmask.tif',
+                'w+',
+
+                height= int( ( float(max( gt_five))-  canvas_y_min   )/res ),
+                width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
+                count=1,
+                dtype=image1_isect_array.dtype,
+
+                crs= {'init': canvas_crs},#
+                transform=cloudmask_gt)
+            kwargs = cloudmask_out.meta.copy()
+            kwargs.update(BIGTIFF="IF_SAFER")
+
+
+
+            imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
+            imgg2=cv2.cvtColor(image2_isect_array,cv2.COLOR_RGB2GRAY)
+
+
+            imgg1_ui8=image1_isect_array/imgBits
+            imgg2_ui8=image2_isect_array/imgBits
+
+
+            imgg1_ui8.astype(np.uint8)
+            imgg2_ui8.astype(np.uint8)
+
+
+            imgg1_ui8_nd = np.array(imgg1_ui8, dtype=np.uint8)
+            imgg2_ui8_nd = np.array(imgg2_ui8, dtype=np.uint8)
+
+
+
+            imgg1_ui8_nd_gy=cv2.cvtColor(imgg1_ui8_nd,cv2.COLOR_RGB2GRAY)
+            imgg2_ui8_nd_gy=cv2.cvtColor(imgg2_ui8_nd,cv2.COLOR_RGB2GRAY)
+            del  imgg1,imgg2,imgg1_ui8,imgg2_ui8,imgg1_ui8_nd,imgg2_ui8_nd,image1_isect_array,image2_isect_array
+            gc.collect()
+
+            fc,fr,trueID_intersect=MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor)
+            if len(trueID_intersect)==2:
                 try:
-                    write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )
-                    outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
-                    outcome=outcome.astype(imgtype)                    
-                    print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window)
-                   
-                    del outcome,b1,b1d,union_m
-                    gc.collect()
-                    
+                    data_final,data_final2,height, width=clipImg(kernel,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
+                    seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
                 except:
-                    
-                    h=int(mask_blurred_4chan.shape[0]/2)
-                    w=int(mask_blurred_4chan.shape[1]/2)
-                    outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
-                    outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                    print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
-                    del outcome ,write_window2
-                    gc.collect()
-                    
-                    outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
-                    outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                    print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
-                    # 
-                    del outcome ,b1,b1d ,write_window3
-                    gc.collect()                    
-                    
-                    
-            else:  
-                
-                ind=k+1
-                b1=blend_preprocess(ind,image1_ds,mask_blurred_4chan,res,union_gt)
-                b1d=blend_preprocess(ind,image2_ds,mask_blurred_4chan,res,union_gt)
-                   
-                
-                try:
-                    
-                     
-                    outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
-                    outcome=outcome.astype(imgtype)
-                    # 
-                    print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window)     
-                    # 
-                    del outcome,b1,b1d
-                    gc.collect()
-                
-                
-                except:
-                   
-                    h=int(mask_blurred_4chan.shape[0]/2)
-                    w=int(mask_blurred_4chan.shape[1]/2)
-                    outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
-                    outcome=outcome.astype(imgtype)
-                    write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                   
-                    print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window2)
-                   
-                    del outcome,write_window2
-                    
-                   
-                    outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
-                    outcome=outcome.astype(imgtype)
-                    write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
-                   
-                    print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
-                    mosaic_out.write( outcome, indexes=k+1, window=write_window3)
-                    
-                    del outcome, b1,b1d ,write_window3
-                    gc.collect()                    
-                    
-                    
-        mosaic_out.close()
-        
-       
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
-        b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
-        cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image2_ds[:-4]+'*.tif')
-        b1d=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
-       
-       
-        cldMas=eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)
-        cldMas[np.where(cldMas>0)]=1
-        cldMas=cldMas.astype(imgtype)
-        print('Writing cloud mask to disk...')
-        cloudmask_out.write( cldMas, indexes=1, window=write_window)     
-        cloudmask_out.close()
-        allWindow.append(write_window)
-        del mask_blurred_4chan,union_gt,cldMas,cldList,b1,b1d
-        gc.collect()
+                    data_final,data_final2,height, width=clipImg(11,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc)
+                    seamlinef=buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
+            else:
+                print("please check the intersection of image: " +image1_ds+' and image: '+image2_ds)
+            del  data_final,data_final2,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy
+            print('Generating seamline ...')
+            x=round((gt[2]-union_gt[2])/(res/scale_factor) ) # col
+            y=round((union_gt[5]-gt[5])/(res/scale_factor) ) # row
+            xypos=(x,y)
+            union_conn[union_conn>0]=1
+            seamlineff=add_at_pos(union_conn, seamlinef, xypos, inPlace=False)
 
-fp.close()  
-with open('allWindow.npy', 'wb') as f:
-    np.save(f, allWindow)      
-with open('ImgInd.npy', 'wb') as f:
-    np.save(f, ImgInd)      
-with open('Union_gt.npy', 'wb') as f:
-    np.save(f, Union_gt) 
-    
-gt_two=[]
-file=[]
-gt_five=[]
+            ##################################################################################################
 
-for f in ReadOrder:
+            seamlineff3=border_connection(seamlineff, gt, union_gt, res, scale_factor, fc,fr )
+            ###########################################################################################################
 
-  fullpath = join(mypath, f)
+            seamlineff4 = cv2.resize(seamlineff3,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
+            sf = cv2.resize(seamlineff4,(union_m.shape[1],union_m.shape[0]) ,interpolation=cv2.INTER_NEAREST)
 
-  if isfile(fullpath) and  f.endswith(".img"):
+            del seamlineff4,union_conn,seamlineff3,seamlineff,seamlinef
+            gc.collect()
 
-    image=rasterio.open(f)
-    file.append(f)
-    gt_two.append(image.transform[2] )
-    gt_five.append(image.transform[5] )
-    
-coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
-with open('transform.npy', 'wb') as f:
-    np.save(f, coords)      
-print('All done!')
-end = timer()
-print('Total time spent(hr):',(end - start)/60/60) # Time in seconds
+            if sf.shape[0]>65534 and (sf[60000:,:]==1).any():
+                sff=sf[0:60000,:]
+                sff2=sf[60000:,:]
+                th, im_th = cv2.threshold(sff.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill1 =im_th.copy().astype(np.uint8)   
+                h, w = sff.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+                cv2.floodFill(im_floodfill1, mask, (1,1), 0)  
+
+                th, im_th = cv2.threshold(sff2.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill2 =im_th.copy().astype(np.uint8)   
+                h, w = sff2.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+
+                if im_floodfill1[59999,0]==0:
+                    cv2.floodFill(im_floodfill2, mask, (1,1),  np.uint32(im_floodfill1[59999,0]).item() )  
+                elif im_floodfill1[59999,im_floodfill1.shape[1]-1]==0 :
+                    cv2.floodFill(im_floodfill2, mask, (im_floodfill2.shape[1]-1,1),  np.uint32(im_floodfill1[59999,im_floodfill1.shape[1]-1]).item() )  
+                else:
+                    print('floodfill process has something wrong!')
+
+                h, w = sf.shape[:2]
+                im_floodfill=np.zeros(sf.shape[:2], np.uint8)
+                add_at_pos(im_floodfill, im_floodfill1, (0,0), inPlace=True)
+                add_at_pos(im_floodfill, im_floodfill2, (0,60000), inPlace=True)
+
+                del sff,sff2,im_floodfill1,im_floodfill2
+                gc.collect()
+            else:
+                th, im_th = cv2.threshold(sf.astype(np.float64), 0, 1, cv2.THRESH_BINARY_INV)
+                im_floodfill = im_th.copy().astype(np.uint8)
+
+                h, w = im_th.shape[:2]
+                mask = np.zeros((h+2, w+2), np.uint8)
+                cv2.floodFill(im_floodfill, mask, (1,1), 0)
+
+
+            num_objects, labels = cv2.connectedComponents(im_floodfill, connectivity=8)
+            classN=[np.sum(labels==i) for i in range(num_objects)]
+            classN_ind=np.argsort(classN) 
+            classN_index=classN_ind.tolist()
+            classN_index.reverse()
+
+            cind=[]
+            for i in classN_index:
+                if classN[i]>1000:
+                    cind.append(i)
+            for h in range(len(cind)): 
+                if len(cind)==3:
+                    m=h+1
+                    if m>len(cind)-1:
+                        m=h-2
+                        if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
+                            im_floodfill_f=im_floodfill.copy()                                 
+                            im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0
+                    else: 
+                        if all(im_floodfill[np.where(labels==cind[h] )]==1) and all(im_floodfill[np.where(labels==cind[m] )]==1): 
+                            im_floodfill_f=im_floodfill.copy()                                 
+                            im_floodfill_f[np.where((labels!=cind[h]) &( labels!=cind[m]) )]=0                        
+                else:
+                    if all(im_floodfill[np.where(labels==cind[h])]==1):  
+                        im_floodfill_f=im_floodfill.copy()                                 
+                        im_floodfill_f[np.where(labels!=cind[h])]=0 
+
+
+
+            del th, im_th,mask,num_objects, labels,classN,classN_ind,classN_index,cind
+            gc.collect()
+            print('Saving "',image1_ds[:-4],'+',image2_ds[:-4],'"seamline ...')
+            with rasterio.open(
+                str(image1_ds[:-4])+str(image2_ds[:-4])+'_sl.img',
+                'w+',           
+                height=sf.shape[0],
+                width=sf.shape[1],
+                count=1,
+                dtype=rasterio.uint8,           
+                crs= {'init': canvas_crs},#Initialize from a named CRS
+                transform=union_gt,
+            ) as dst:
+                dst.write(sf.astype(rasterio.uint8), 1)   
+            del sf
+            print('Mosaic "',image1_ds[:-4],'+',image2_ds[:-4],'" images...')
+            mask_blurred_4chan=blendMask(57,im_floodfill_f)  
+
+            with rasterio.open(
+                str(image1_ds[:-4])+str(image2_ds[:-4])+'_seamline_polygon.img',
+                'w+',           
+                height=mask_blurred_4chan.shape[0]*int(res/pan_res),
+                width=mask_blurred_4chan.shape[1]*int(res/pan_res),
+                count=1,
+                dtype=rasterio.float32,          
+                crs= {'init': canvas_crs},#Initialize from a named CRS            
+                transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  union_gt,
+            ) as dst:
+                dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
+
+
+            del im_floodfill,im_floodfill_f
+
+            b1,im1_0num,im1_1num=blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt)
+            b1d,im2_0num,im2_1num=blend_preprocess_for_order(image2_ds,mask_blurred_4chan,res,union_gt)
+
+
+
+            img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
+                  (1,image1_ds,im1_1num, 'b1d','b1' ),
+                  (0,image2_ds,im2_0num, 'b1','b1d' ),
+                  (1,image2_ds,im2_1num, 'b1','b1d')]
+            imgind=sorted(img,reverse=True,  key = itemgetter(0,2 )) 
+            ImgInd.append(imgind)
+            kwargs = mosaic_out.meta.copy()
+            kwargs.update(BIGTIFF="IF_SAFER")
+            for k in range(4):
+                if k==0:
+                    try:
+                        write_window = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    union_m.shape[1], union_m.shape[0]     )
+                        outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
+                        outcome=outcome.astype(imgtype)                    
+                        print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window)
+
+                        del outcome,b1,b1d,union_m
+                        gc.collect()
+
+                    except:
+
+                        h=int(mask_blurred_4chan.shape[0]/2)
+                        w=int(mask_blurred_4chan.shape[1]/2)
+                        outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]     
+                        outcome=outcome.astype(imgtype)
+                        write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                        print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window2)
+                        del outcome ,write_window2
+                        gc.collect()
+
+                        outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]     
+                        outcome=outcome.astype(imgtype)
+                        write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+                        print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window3)
+                        # 
+                        del outcome ,b1,b1d ,write_window3
+                        gc.collect()                    
+
+
+                else:  
+
+                    ind=k+1
+                    b1=blend_preprocess(ind,image1_ds,mask_blurred_4chan,res,union_gt)
+                    b1d=blend_preprocess(ind,image2_ds,mask_blurred_4chan,res,union_gt)
+
+
+                    try:
+
+
+                        outcome= eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)      
+                        outcome=outcome.astype(imgtype)
+                        # 
+                        print('Writing result',image1_ds[:-4],image2_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window)     
+                        # 
+                        del outcome,b1,b1d
+                        gc.collect()
+
+
+                    except:
+
+                        h=int(mask_blurred_4chan.shape[0]/2)
+                        w=int(mask_blurred_4chan.shape[1]/2)
+                        outcome= eval(imgind[0][3])[0:h,:].astype(imgtype) *(1- mask_blurred_4chan)[0:h,:]+ eval(imgind[0][4])[0:h,:].astype(imgtype) *( mask_blurred_4chan)[0:h,:]      
+                        outcome=outcome.astype(imgtype)
+                        write_window2 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+
+                        print('Writing 1/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window2)
+
+                        del outcome,write_window2
+
+
+                        outcome= eval(imgind[0][3])[h:,:].astype(imgtype) *(1- mask_blurred_4chan)[h:,:]+ eval(imgind[0][4])[h:,:].astype(imgtype) *( mask_blurred_4chan)[h:,:]    
+                        outcome=outcome.astype(imgtype)
+                        write_window3 = Window(   (union_gt[2]-mosaic_gt[2])/res,  (mosaic_gt[5]-union_gt[5])/res+h  ,    outcome.shape[1], outcome.shape[0]     )# write_window.height = first, write_window.width = second
+
+                        print('Writing 2/2 result:',image1_ds[:-4],'band:',k+1,'to disk...')
+                        mosaic_out.write( outcome, indexes=k+1, window=write_window3)
+
+                        del outcome, b1,b1d ,write_window3
+                        gc.collect()                    
+
+
+            mosaic_out.close()
+
+
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image1_ds[:-4]+'*.tif')        
+            b1=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
+            cldList=glob.glob(''.join(str(pathlib.Path().absolute()))+'\\'+CLOUD_MASK_FOLDER+'\\'+'*'+image2_ds[:-4]+'*.tif')
+            b1d=mask_blend_preprocess_for_order(cldList[0],mask_blurred_4chan,res,union_gt)
+
+
+            cldMas=eval(imgind[0][3]).astype(imgtype) *(1- mask_blurred_4chan)+ eval(imgind[0][4]).astype(imgtype) *( mask_blurred_4chan)
+            cldMas[np.where(cldMas>0)]=1
+            cldMas=cldMas.astype(imgtype)
+            print('Writing cloud mask to disk...')
+            cloudmask_out.write( cldMas, indexes=1, window=write_window)     
+            cloudmask_out.close()
+            allWindow.append(write_window)
+            del mask_blurred_4chan,union_gt,cldMas,cldList,b1,b1d
+            gc.collect()
+
+    fp.close()  
+    with open('allWindow.npy', 'wb') as f:
+        np.save(f, allWindow)      
+    with open('ImgInd.npy', 'wb') as f:
+        np.save(f, ImgInd)      
+    with open('Union_gt.npy', 'wb') as f:
+        np.save(f, Union_gt) 
+
+    gt_two=[]
+    file=[]
+    gt_five=[]
+
+    for f in ReadOrder:
+
+      fullpath = join(mypath, f)
+
+      if isfile(fullpath) and  f.endswith(".img"):
+
+        image=rasterio.open(f)
+        file.append(f)
+        gt_two.append(image.transform[2] )
+        gt_five.append(image.transform[5] )
+
+    coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
+    with open('transform.npy', 'wb') as f:
+        np.save(f, coords)      
+    print('All done!')
+    end = timer()
+    print('Total time spent(hr):',(end - start)/60/60) # Time in seconds
+
+
+if __name__ == '__main__':
+    main()

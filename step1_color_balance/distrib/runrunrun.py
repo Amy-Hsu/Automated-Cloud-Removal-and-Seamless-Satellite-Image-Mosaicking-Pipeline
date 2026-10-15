@@ -17,49 +17,55 @@ import glob
 import subprocess
 import time
 
-NameIn = glob.glob('col1_*.tbl')
-# skip tables that are already remapped (*.fd.tbl)
-NameCheck = [i for i in NameIn if i[-7:] != '.fd.tbl']
+def main():
+    """Run this pipeline step using the parameters in the working folder."""
+    NameIn = glob.glob('col1_*.tbl')
+    # skip tables that are already remapped (*.fd.tbl)
+    NameCheck = [i for i in NameIn if i[-7:] != '.fd.tbl']
 
-FileIn = []
-for i in NameCheck:
-    iList = i.split('_')
-    FileIn.append([iList[0][:-1] + j + '_' + iList[1] for j in ['1', '2', '3', '4']])
+    FileIn = []
+    for i in NameCheck:
+        iList = i.split('_')
+        FileIn.append([iList[0][:-1] + j + '_' + iList[1] for j in ['1', '2', '3', '4']])
 
-for i in FileIn:
-    checkV = True
-    for j in i:
-        if not os.path.exists(j):
-            checkV = False
-            break
-    if checkV is False:
-        continue
+    for i in FileIn:
+        checkV = True
+        for j in i:
+            if not os.path.exists(j):
+                checkV = False
+                break
+        if checkV is False:
+            continue
 
-    ioutFileN = [j[:-4] + '.fd.tbl' for j in i]
-    for j in ioutFileN:
-        try:
-            os.remove(j)
-        except OSError:
-            pass
-
-    cmdIn = 'MappingReshapeXS ' + ' '.join(i)
-    ret = subprocess.Popen(cmdIn)
-
-    # wait until all four remapped tables exist
-    while 1:
-        fdCurrent = glob.glob('*.fd.tbl')
-        checkValue = 0
-        for k in ioutFileN:
-            if k in fdCurrent:
-                checkValue += 1
-        if checkValue == 4:
-            break
-
-    time.sleep(1)
-    while True:
-        ret.kill()
-        time.sleep(1)
-        if not ret.poll() == 1:
-            if ret.poll() == 0:
+        ioutFileN = [j[:-4] + '.fd.tbl' for j in i]
+        for j in ioutFileN:
+            try:
+                os.remove(j)
+            except OSError:
                 pass
-        break
+
+        cmdIn = 'MappingReshapeXS ' + ' '.join(i)
+        ret = subprocess.Popen(cmdIn)
+
+        # wait until all four remapped tables exist
+        while 1:
+            fdCurrent = glob.glob('*.fd.tbl')
+            checkValue = 0
+            for k in ioutFileN:
+                if k in fdCurrent:
+                    checkValue += 1
+            if checkValue == 4:
+                break
+
+        time.sleep(1)
+        while True:
+            ret.kill()
+            time.sleep(1)
+            if not ret.poll() == 1:
+                if ret.poll() == 0:
+                    pass
+            break
+
+
+if __name__ == '__main__':
+    main()

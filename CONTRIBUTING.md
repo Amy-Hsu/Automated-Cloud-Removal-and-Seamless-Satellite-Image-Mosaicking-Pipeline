@@ -9,11 +9,18 @@ If you find a bug or have a feature request, please open a
 Include as much detail as possible: error messages, input data description,
 Python/GDAL versions, and the step that failed.
 
+## Getting help
+
+Questions about using the pipeline are welcome as
+[GitHub issues](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/issues).
+Please check [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) first.
+
 ## Submitting changes
 
 1. Fork the repository and create a feature branch.
 2. Make your changes; keep commits focused and descriptive.
-3. Test your changes with your own imagery if possible.
+3. Run the unit tests (`pip install -r requirements-dev.txt && pytest`) and,
+   if possible, test your changes with your own imagery.
 4. Open a pull request with a clear description of what you changed and why.
 
 ## Code style

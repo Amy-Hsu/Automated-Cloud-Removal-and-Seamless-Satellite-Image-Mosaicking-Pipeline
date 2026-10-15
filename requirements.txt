@@ -1,14 +1,15 @@
-# Tested with Python 3.9 on Windows.
-# GDAL/rasterio/geopandas are easiest to install via conda:
-#   conda install -c conda-forge gdal rasterio geopandas
+# Tested with Python 3.9-3.13.
+# rasterio/geopandas are easiest to install via conda:
+#   conda install -c conda-forge rasterio geopandas
+# The GDAL command-line tools (gdalwarp, gdal_translate, gdal_polygonize.py,
+# gdal_edit.py) must also be on PATH; they ship with conda-forge's `gdal`.
 numpy
 opencv-python
-gdal
 rasterio
 geopandas
 shapely
 networkx
 scipy
-scikit-image
+scikit-image>=0.19
 matplotlib
 tqdm

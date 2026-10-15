@@ -7,7 +7,7 @@ An end-to-end, largely automated pipeline that turns individual orthorectified s
 
 If you use this code, please cite the accompanying paper:
 
-> Hsu, H.-J., Tseng, K.-H., Tsai, F., Liu, C.-L., Lo, C.-C., & Moortgat, J. (2026). A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking. *Applied Computing and Geosciences*, 100387. https://doi.org/10.1016/j.acags.2026.100387
+> Hsu, H.-J., Tseng, K.-H., Tsai, F., Liu, C.-L., Lo, C.-C., & Moortgat, J. (2026). A novel approach to automated cloud removal and seamless multisensor satellite image mosaicking. *Applied Computing and Geosciences*, 31, 100387. https://doi.org/10.1016/j.acags.2026.100387
 
 **Golden rule for every step: no spaces anywhere in folder or file paths.**
 
@@ -20,7 +20,7 @@ If you use this code, please cite the accompanying paper:
 | 1 | `step1_color_balance/` | Radiometric normalization (color balance) of each raw scene against reference imagery, with dark-area detail preservation | ERDAS IMAGINE 2014 spatial models + `MappingReshapeXS.exe` |
 | 2 | `step2_mosaic/` | Automatic seamline detection (sparse-node Dijkstra over image-difference cost) and seamless mosaicking of the color-balanced XS scenes; builds the mosaic-wide cloud mask | Python (`step2mosaic.py`) + `GetBoundaryMask.exe` |
 | 3 | `step3_pan_mosaic/` | Mosaics the corresponding Pan scenes reusing the seamlines found in Step 2 | Python (`mosaicPan_block_rs.py`) |
-| 4 | `step4_cloud_removal/` | Automatically fills cloud-contaminated areas of the XS and Pan mosaics from a database of candidate scenes, using SSIM-based similarity screening and Poisson-style blending | Python (`step4cloud_removal.py`) |
+| 4 | `step4_cloud_removal/` | Automatically fills cloud-contaminated areas of the XS and Pan mosaics from a database of candidate scenes, using SSIM-based similarity screening and Gaussian-feathered blending | Python (`step4cloud_removal.py`) |
 
 Outputs after Step 4:
 
@@ -138,6 +138,19 @@ step4/
 
 Run with `run.bat`. See `docs/TROUBLESHOOTING.md` for known failure modes and their fixes.
 
+## Testing
+
+Unit tests for the core seamline, blending and cloud-filling helpers run on any OS (no imagery, ERDAS or Windows tools needed):
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+The tests also run in GitHub Actions on Linux and Windows for every push and pull request.
+
+> **Starting without ERDAS IMAGINE:** Step 1 is the only step that needs proprietary software. If you already have radiometrically balanced scenes (from any tool), put them in the Step 2 folder and start there.
+
 ## Troubleshooting
 
 See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md).
@@ -150,6 +163,7 @@ step2_mosaic/          seamline + XS mosaic script, boundary-mask tools, para.tx
 step3_pan_mosaic/      Pan mosaic script, para_pan.txt template
 step4_cloud_removal/   cloud-filling script, para_cld.txt template
 docs/                  troubleshooting notes
+tests/                 unit tests (pytest)
 paper.md               JOSS paper source
 ```
 
