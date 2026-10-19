@@ -51,3 +51,30 @@ def test_pan_scene_path_prefers_spot_layout_and_ignores_case(step4, tmp_path):
     spot.write_bytes(b"")
     found = step4.pan_scene_path(str(tmp_path), "a0000004")
     assert os.path.isfile(found) and found.lower() == str(spot).lower()
+
+
+def test_patch_margins_match_patch_near_window_edge(step4, tmp_path):
+    """A cloud patch touching the window edge must be written at its true size (#2)."""
+    import warnings
+
+    import rasterio
+    from rasterio import Affine
+
+    labels = np.zeros((100, 120), np.uint8)
+    for x, y, w, h in [(3, 40, 20, 15), (50, 2, 10, 30), (100, 80, 16, 15), (40, 40, 20, 20)]:
+        labels[:] = 0
+        labels[y:y + h, x:x + w] = 1
+        expdx, expdy, expdw, expdh, height, width = step4.patch_margins(x, y, w, h, labels.shape)
+        assert min(expdx, expdy, expdw, expdh) >= 0
+        patch = labels[y - expdy:y + h + expdh, x - expdx:x + w + expdw]
+        assert patch.shape == (height, width)
+
+        path = tmp_path / f"{x}_{y}_cld.img"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with rasterio.open(path, "w+", height=height, width=width, count=1,
+                               dtype=rasterio.uint8, crs="EPSG:3826",
+                               transform=Affine.translation(0, 1000) * Affine.scale(6, -6)) as dst:
+                dst.write(patch, 1)
+            with rasterio.open(path) as src:
+                np.testing.assert_array_equal(src.read(1), patch)
