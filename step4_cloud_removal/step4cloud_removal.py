@@ -51,6 +51,19 @@ def pan_scene_path(folder, name):
             return tif
     return os.path.join(folder, name, name + '_B1.DAT.raw')
 
+def patch_margins(x, y, w, h, shape, pad=10):
+    """Margins around a cloud bounding box, clipped to an array of *shape*.
+
+    Returns (expdx, expdy, expdw, expdh, height, width): the left, top, right
+    and bottom margins and the size of the padded patch.
+    """
+    expdx=min(pad, x)
+    expdy=min(pad, y)
+    expdw=min(pad, shape[1]-x-w)
+    expdh=min(pad, shape[0]-y-h)
+    height, width = h+expdy+expdh, w+expdx+expdw
+    return expdx, expdy, expdw, expdh, height, width
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -156,24 +169,12 @@ def main():
             c+=1
             [x , y, w, h] = bbox
 
-            expdx=10
-            expdy=10
-            expdw=10
-            expdh=10
-
-            if x-10<0:
-                expdx=x
-            if y-10<0:
-                expdy=y
-            if y + h + 10 >dilation.shape[0]:
-                expdh=dilation.shape[0]-y-h
-            if x + w + 10 >dilation.shape[1]:
-                expdw=dilation.shape[1]-x-w
+            expdx, expdy, expdw, expdh, patch_h, patch_w = patch_margins(x, y, w, h, dilation.shape)
 
 
             cv2.rectangle(dilation, (x-expdx, y-expdy), (x + w + expdw, y + h + expdh), (255,0, 0), 3)
             cld_gt=A.translation( cdc+(x-expdx)*res , cdr-(y-expdy)*res ) * A.scale(res, -res)
-            write_window = Window( cld_gt[2] , cld_gt[5]   ,  w+(expdw+expdh), h+(expdw+expdh) )
+            write_window = Window( cld_gt[2] , cld_gt[5]   ,  patch_w, patch_h )
 
             clas=[np.sum(labels[y-expdy:y+h+expdh,x-expdx:x+w+expdw]==a) for a in range(num_objects)]
             classN=clas[1:]
@@ -193,8 +194,8 @@ def main():
             with rasterio.open(
                         'cldDatabase'+os.sep+str(c)+'_cld.img',
                         'w+',
-                        height=h+(expdw+expdh),
-                        width=w+(expdw+expdh),
+                        height=patch_h,
+                        width=patch_w,
                         count=1,
                         dtype=rasterio.uint8,
                         crs= {'init': canvas_crs},
