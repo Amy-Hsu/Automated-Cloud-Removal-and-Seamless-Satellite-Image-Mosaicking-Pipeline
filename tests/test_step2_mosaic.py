@@ -77,6 +77,35 @@ def test_build_graph_seamline_follows_low_cost_edge(step2):
     assert set(range(h - 1)) <= set(rows)
 
 
+def test_build_graph_links_every_pixel_to_its_right_and_down_neighbours(step2, monkeypatch):
+    """Every valid pixel gets an edge to its right and lower neighbour.
+
+    Node ids are 1-based and row-major with ``width`` columns, so only the last
+    column (x % width == 0) and the last row lack a right or down neighbour.
+    A height that does not divide the width checks that no other nodes are
+    skipped (issue #3: an extra ``x % height != 0`` condition dropped them).
+    """
+    graphs = []
+    astar_path = step2.nx.astar_path
+
+    def spy(G, *args, **kwargs):
+        graphs.append(G)
+        return astar_path(G, *args, **kwargs)
+
+    monkeypatch.setattr(step2.nx, "astar_path", spy)
+    h, w = 3, 4
+    img = np.arange(1, h * w + 1, dtype=np.uint8).reshape(h, w)
+    step2.buildGraph(img, img.copy(), h, w, "a7", (1, h * w))
+
+    expected = set()
+    for x in range(1, h * w + 1):
+        if x % w != 0:
+            expected.add(frozenset((x, x + 1)))
+        if x <= (h - 1) * w:
+            expected.add(frozenset((x, x + w)))
+    assert {frozenset(e) for e in graphs[0].edges()} == expected
+
+
 def test_polygonize_valid_area_outlines_footprint(step2, tmp_path):
     import geopandas as gpd
     import rasterio
