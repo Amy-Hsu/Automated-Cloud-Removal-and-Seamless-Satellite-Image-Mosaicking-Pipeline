@@ -769,7 +769,7 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
         conf1=new_d[x-1].tolist()
         conf2=new_d2[x-1].tolist()
         
-        if x%width!=0 and x%height!=0 and x<(height-1)*width and conf1 !=0 and conf2 !=0 :
+        if x%width!=0 and x<(height-1)*width and conf1 !=0 and conf2 !=0 :
             j+=1
             right=x+1
             G.add_edge(x, right,  weight = eval(algos_r[path_method])   )
@@ -794,7 +794,6 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
             
             rightck.append(right)      
             xck.append(x) 
-            (np.array(xck[:])==5902489).any()
             
             ck=np.zeros((data_final.shape))
             for f in xck:
