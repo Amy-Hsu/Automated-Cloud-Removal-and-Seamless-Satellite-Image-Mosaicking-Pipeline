@@ -25,7 +25,7 @@ Please check [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) first.
 
 ## Code style
 
-- Python code should be compatible with Python 3.9+.
+- Python code should be compatible with Python 3.10+.
 - Use descriptive variable names and include docstrings for new functions.
 - Keep the four-step pipeline structure intact — changes that break
   downstream steps need careful coordination.
