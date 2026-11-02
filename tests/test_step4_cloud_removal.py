@@ -78,3 +78,36 @@ def test_patch_margins_match_patch_near_window_edge(step4, tmp_path):
                 dst.write(patch, 1)
             with rasterio.open(path) as src:
                 np.testing.assert_array_equal(src.read(1), patch)
+
+
+def test_seamless_clone_ignores_mosaic_nodata(step4):
+    """Mosaic no-data next to a cloud patch must not darken the Poisson fill (#4).
+
+    In the Sentinel-2 demo, patches at the edge of the mosaic footprint were
+    filled with 0-valued speckles because the 0 no-data pixels acted as the
+    boundary of the Poisson solve.
+    """
+    import cv2
+    from scipy import ndimage
+
+    rng = np.random.default_rng(4)
+
+    def texture():  # dark land, as 12-bit data divided by 16
+        t = ndimage.gaussian_filter(rng.normal(0, 1, (120, 120)), 3) * 60 + 25
+        return np.clip(t, 1, 255).astype(np.uint8)[..., None].repeat(3, 2)
+
+    src, dst = texture(), texture()
+    nodata = np.zeros((120, 120), bool)
+    nodata[:, :50] = True              # outside the mosaic footprint
+    dst[nodata] = 0
+    mask = np.zeros((120, 120), np.uint8)
+    mask[30:90, 42:100] = 255          # cloud patch next to the footprint edge
+    inside = mask == 255
+
+    plain = cv2.seamlessClone(src, dst, mask, (71, 60), cv2.NORMAL_CLONE)
+    assert np.any(plain[inside] == 0)  # the speckles reported in #4
+
+    out = step4.seamless_clone_over_nodata(src, dst, mask, (71, 60), nodata)
+    assert not np.any(out[inside] == 0)
+    assert abs(out[inside].mean() - src[inside].mean()) < 3
+    np.testing.assert_array_equal(out[~inside & ~nodata], dst[~inside & ~nodata])

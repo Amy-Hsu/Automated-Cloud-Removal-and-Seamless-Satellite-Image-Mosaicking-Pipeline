@@ -64,6 +64,16 @@ def patch_margins(x, y, w, h, shape, pad=10):
     height, width = h+expdy+expdh, w+expdx+expdw
     return expdx, expdy, expdw, expdh, height, width
 
+def seamless_clone_over_nodata(src, dst, mask, center, nodata):
+    """cv2.seamlessClone with the *nodata* pixels of *dst* taken from *src*.
+
+    Mosaic no-data (0 outside every scene) would otherwise act as a dark
+    boundary for the Poisson solve and pull the filled patch down to 0 (#4).
+    """
+    dst=dst.copy()
+    dst[nodata]=src[nodata]
+    return cv2.seamlessClone(src, dst, mask, center, cv2.NORMAL_CLONE)
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -511,11 +521,12 @@ def main():
                                             imgrgb2=np.moveaxis(imgrgb1, [0, 1, 2], [2, 0, 1]).astype('uint8')
                                             mosaic_rgb2=np.moveaxis(mosaic_rgb1, [0, 1, 2], [2, 0, 1]).astype('uint8')
                                             imgrgb2[tw6mMask==0,:]=0
+                                            nodata=np.all(mosaic_rgb[h:h+3,:,:]==0, axis=0) # outside every scene
 
                                             imgrgb2[temp==1,:]=0
                                             mosaic_rgb2[temp==1,:]=0
                                             cld[cld==1]=255
-                                            mixed_clone = cv2.seamlessClone( imgrgb2, mosaic_rgb2, cld, centerOfBR,cv2.NORMAL_CLONE)
+                                            mixed_clone = seamless_clone_over_nodata( imgrgb2, mosaic_rgb2, cld, centerOfBR, nodata)
 
                                             mixed_clone=np.moveaxis(mixed_clone, [0, 1, 2], [1, 2, 0]).astype('uint16')
                                             out[h:h+3,:,:]=mixed_clone
