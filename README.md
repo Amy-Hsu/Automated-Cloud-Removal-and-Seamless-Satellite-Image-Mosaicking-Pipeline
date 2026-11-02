@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml)
 [![Sentinel-2 demo](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml)
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-BA0C2F.svg?style=flat-square)](LICENSE)
 [![Paper](https://img.shields.io/badge/Paper-10.1016%2Fj.acags.2026.100387-0A7BBB.svg?style=flat-square)](https://doi.org/10.1016/j.acags.2026.100387)
 [![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23404699.svg)](https://doi.org/10.5281/zenodo.23404699)
@@ -39,7 +39,7 @@ Outputs after Step 4:
 
 ```bash
 # Create a conda environment (recommended)
-conda create -n mosaic python=3.9
+conda create -n mosaic python=3.12
 conda activate mosaic
 
 # Install geospatial libraries via conda-forge
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 ## Requirements
 
-- **Python 3.9+** with the packages in `requirements.txt` (Steps 2–4 run on Windows, macOS and Linux)
+- **Python 3.10+** with the packages in `requirements.txt` (Steps 2–4 run on Windows, macOS and Linux)
 - **GDAL command-line tools** on `PATH` (`gdalwarp`, `gdal_translate`; conda-forge's `gdal` package provides them)
 - **ERDAS IMAGINE 2014** for Step 1 only (later versions, e.g. 2018/2020, may produce wrong colors). Without it, start at Step 2 with scenes color-balanced by any other tool.
 - Optional, Windows only: **MATLAB Runtime R2018a (v9.4)** for the original `GetBoundaryMask.exe` used in Step 2. Elsewhere, or if it is missing, Step 2 uses an equivalent pure-Python footprint polygonizer.

@@ -1,4 +1,4 @@
-# Tested with Python 3.9-3.13.
+# Tested with Python 3.10-3.13.
 # rasterio/geopandas are easiest to install via conda:
 #   conda install -c conda-forge rasterio geopandas
 # The GDAL command-line tools (gdalwarp, gdal_translate, gdal_polygonize.py,
