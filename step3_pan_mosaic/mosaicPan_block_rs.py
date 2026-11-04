@@ -168,7 +168,7 @@ def main():
                 width=  int( (   canvas_x_max-  float(min( gt_two)   ))/res ),
                 count=1,
                 dtype=img2.meta['dtype'],
-                crs= {'init': canvas_crs},
+                crs= canvas_crs,
                 transform=mosaic_pan_gt)
             kwargs = mosaic_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")

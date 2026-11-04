@@ -286,7 +286,7 @@ def main():
                         width=patch_w,
                         count=1,
                         dtype=rasterio.uint8,
-                        crs= {'init': canvas_crs},
+                        crs= canvas_crs,
                         transform=cld_gt
                     ) as dst:
                         dst.write(labelscy2.astype(rasterio.uint8), 1)
