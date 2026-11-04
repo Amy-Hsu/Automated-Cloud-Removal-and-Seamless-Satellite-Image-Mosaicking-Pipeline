@@ -207,7 +207,7 @@ def main():
 
             total+=1
             with rasterio.open(
-                        'cldDatabase'+os.sep+str(c)+'_cld.img',
+                        join(cloud_work_path, str(c)+'_cld.img'),
                         'w+',
                         height=patch_h,
                         width=patch_w,
@@ -410,7 +410,7 @@ def main():
                                     Count+=1
                                     outcome=outcome.astype(imgtype)
 
-                                    with rasterio.open('mosaic_xs.tif', 'r+') as dst:
+                                    with rasterio.open(mosaic_xs_path, 'r+') as dst:
                                         dst.write(outcome,  window=ints_window)
                                     mosaic_xs.close()
 
@@ -419,7 +419,7 @@ def main():
                                     taicld[np.where((cld==1) & (temp==0) & (tw6mMask==1))]=0
                                     taicld[np.where( (temp==1) & (tw6mMask==1) ) ]=(i+1)*10
                                     cloudmask.close()
-                                    with rasterio.open('mosaic_cloudmask.tif', 'r+') as dst:
+                                    with rasterio.open(cloudmask_path, 'r+') as dst:
                                         dst.write(taicld.astype(imgtype),1,  window=ints_window_TaicldWin)
 
                                     #resize cldb mask to pan's res
@@ -593,7 +593,7 @@ def main():
                                         Count+=1
                                         outcome=outcome.astype(imgtype)
 
-                                        with rasterio.open('mosaic_xs.tif', 'r+') as dst:
+                                        with rasterio.open(mosaic_xs_path, 'r+') as dst:
                                             dst.write(outcome,  window=ints_window)
                                         mosaic_xs.close()
 
@@ -602,7 +602,7 @@ def main():
                                         taicld[np.where((cld==255) & (temp!=1) & (tw6mMask==1))]=0
                                         taicld[np.where( (temp==1) & (tw6mMask==1) ) ]=(i+1)*10
                                         cloudmask.close()
-                                        with rasterio.open('mosaic_cloudmask.tif', 'r+') as dst:
+                                        with rasterio.open(cloudmask_path, 'r+') as dst:
                                             dst.write(taicld.astype(imgtype),1,  window=ints_window_TaicldWin)
 
                                         #resize cldb mask to pan's res
@@ -678,7 +678,7 @@ def main():
                                     Count+=1
                                     outcome=outcome.astype(imgtype)
 
-                                    with rasterio.open('mosaic_xs.tif', 'r+') as dst:
+                                    with rasterio.open(mosaic_xs_path, 'r+') as dst:
                                         dst.write(outcome,  window=ints_window)
                                     mosaic_xs.close()
 
@@ -687,7 +687,7 @@ def main():
                                     taicld[np.where((cld==1) & (temp==0) & (tw6mMask==1))]=0
                                     taicld[np.where( (temp==1) & (tw6mMask==1) ) ]=(i+1)*10
                                     cloudmask.close()
-                                    with rasterio.open('mosaic_cloudmask.tif', 'r+') as dst:
+                                    with rasterio.open(cloudmask_path, 'r+') as dst:
                                         dst.write(taicld.astype(imgtype), 1, window=ints_window_TaicldWin)
                                     #resize cldb mask to pan's res
                                     mask_blurred_pan_chan=cv2.resize( mask_blurred_4chan[1,:,:],(int(mask_blurred_4chan[1,:,:].shape[1]*(res/pan_res)),int(mask_blurred_4chan[1,:,:].shape[0]*(res/pan_res))) ,interpolation=cv2.INTER_NEAREST)
