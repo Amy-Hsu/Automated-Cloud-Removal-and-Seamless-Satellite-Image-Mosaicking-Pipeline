@@ -373,11 +373,15 @@ def main():
                                 cldbList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+cloud_mask_folder+os.sep+'*'+fName[:-4]+'*.tif')
                                 cldb=rasterio.open(cldbList[0])
                                 cldb=cldb.read(1,window=write_window)
+                                # Zero is a valid clear mask value: count every cloud-patch pixel.
+                                patch_codes = cldb[cld==1]
+                                clear_fraction = (np.count_nonzero(patch_codes < 10) / patch_codes.size
+                                                  if patch_codes.size else 0.0)
 
                                 imgrgb=imagePool.read(window=write_window)
 
                                 thresh=1-cloud_tolerance
-                                if ssim[ssimIndex[-1],a-1]==-0.91 and  np.any(imgrgb[0,:,:][cld==1]==0)==False and np.count_nonzero(cldb[cld==1]<10)/np.count_nonzero(cldb[cld==1])>0.85 :
+                                if ssim[ssimIndex[-1],a-1]==-0.91 and  np.any(imgrgb[0,:,:][cld==1]==0)==False and clear_fraction>0.85 :
                                     cldcy=cld.copy()
                                     blendPix=65
                                     cldcy[np.where(cld==1)]=(blendPix+1)
@@ -459,7 +463,7 @@ def main():
                                     del outcome,smallpan,bigpan
                                     ss=1
 
-                                elif np.any(imgrgb[0,:,:][cld==1]==0)==False and np.count_nonzero(cldb[cld==1]<10)/np.count_nonzero(cldb[cld==1])>thresh : #(cldb[cld==1]<10).all()==True   #cldb.all()<10
+                                elif np.any(imgrgb[0,:,:][cld==1]==0)==False and clear_fraction>thresh : #(cldb[cld==1]<10).all()==True   #cldb.all()<10
                                     mosaic_xs= rasterio.open(mosaic_xs_path)
                                     if np.count_nonzero(cld)==2000000:
                                         cldcy=cld.copy()
@@ -643,7 +647,7 @@ def main():
                                         ss=1
 
 
-                                elif ssim[ssimIndex[-1],a-1]==-0.9 and np.any(imgrgb[0,:,:][cld==1]==0)==False and np.count_nonzero(cldb[cld==1]<10)/np.count_nonzero(cldb[cld==1])>0.55:
+                                elif ssim[ssimIndex[-1],a-1]==-0.9 and np.any(imgrgb[0,:,:][cld==1]==0)==False and clear_fraction>0.55:
                                     cldcy=cld.copy()
                                     blendPix=65
                                     cldcy[np.where(cld==1)]=(blendPix+1)
