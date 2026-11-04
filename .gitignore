@@ -36,3 +36,5 @@ Step2SPOTf.bat
 paper.pdf
 jats/
 demo_output/
+# documentation website build (site/build_site.py)
+site/_build/
