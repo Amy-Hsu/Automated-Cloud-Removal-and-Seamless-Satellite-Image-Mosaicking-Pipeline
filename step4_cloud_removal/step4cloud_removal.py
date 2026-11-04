@@ -234,8 +234,7 @@ def main():
           if isfile(fullpath) and  f.endswith(".img"):
             cldfile.append(f)
         mosaic_xs= rasterio.open(mosaic_xs_path)
-        ssim= np.empty((50,len(cldfile),))* np.nan
-        ssim=np.zeros((50,len(cldfile),))
+        ssim = np.full((len(file), len(cldfile)), -np.inf)
 
         mosaic_origin=mosaic_xs.transform[2],mosaic_xs.transform[5]
 

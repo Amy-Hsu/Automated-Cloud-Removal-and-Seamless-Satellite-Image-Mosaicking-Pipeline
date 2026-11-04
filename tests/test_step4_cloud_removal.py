@@ -1,5 +1,88 @@
 """Unit tests for Step 4 helpers."""
 import numpy as np
+import pytest
+
+
+@pytest.mark.parametrize("candidate_count", [0, 1, 49, 50, 51, 73])
+@pytest.mark.parametrize("patch_count", [1, 2])
+def test_candidate_scores_cover_the_actual_scene_pool(
+    step4, tmp_path, monkeypatch, candidate_count, patch_count
+):
+    """Step 4 must score every candidate, including scene 51 and beyond (#16)."""
+    import json
+    import os
+
+    import rasterio
+    from rasterio.transform import from_origin
+    from rasterio.windows import Window
+
+    transform = from_origin(1000, 10000, 60, 60)
+    rng = np.random.default_rng(16)
+    mosaic = rng.integers(1, 255, (4, 64, 64), dtype=np.uint8)
+
+    def write_raster(path, data):
+        if data.ndim == 2:
+            data = data[None]
+        with rasterio.open(
+            path, "w", driver="GTiff", height=64, width=64, count=data.shape[0],
+            dtype=data.dtype, crs="EPSG:3826", transform=transform,
+        ) as dst:
+            dst.write(data)
+
+    candidates = tmp_path / "candidates"
+    candidates.mkdir()
+    (tmp_path / "cldDatabase").mkdir()
+    for index in range(candidate_count):
+        data = mosaic if index == candidate_count - 1 else np.full_like(mosaic, 100)
+        write_raster(candidates / f"scene_{index:03}.img", data)
+    write_raster(tmp_path / "xs.tif", mosaic)
+    write_raster(tmp_path / "pan.tif", mosaic[0])
+    write_raster(tmp_path / "land.tif", np.ones((64, 64), np.uint8))
+    clouds = np.zeros((64, 64), np.uint8)
+    clouds[10:20, 10:20] = 1
+    if patch_count == 2:
+        clouds[40:50, 40:50] = 1
+    write_raster(tmp_path / "clouds.tif", clouds)
+
+    windows = np.empty(1, dtype=object)
+    windows[0] = Window(0, 0, 64, 64)
+    np.save(tmp_path / "allWindow.npy", windows)
+    np.save(tmp_path / "transform.npy", [[1000, 10000], [1000, 10000]])
+    (tmp_path / "ProcessOrder.txt").write_text("primary_a.img,primary_b.img")
+    (tmp_path / "para_cld.txt").write_text(json.dumps({
+        "res": 60, "pan_res": 60, "trueBits": 8,
+        "CandiImgPath": str(candidates),
+        "CldMaskPath": str(tmp_path / "cldDatabase"),
+        "MosaicImgAddress": str(tmp_path / "xs.tif"),
+        "MosaicCldAddress": str(tmp_path / "clouds.tif"),
+        "PanMosaicImgAddress": str(tmp_path / "pan.tif"),
+        "PanImgAddress": str(tmp_path),
+        "CandiMaskFolderName": "masks",
+        "seaBorderAddress": str(tmp_path / "land.tif"),
+        # Exercise real scoring/ranking without entering the unrelated fill stage.
+        "ssim_threshold": 1.1,
+    }))
+    monkeypatch.chdir(tmp_path)
+
+    ranked_scores = []
+    argsort = np.argsort
+
+    def capture_scores(values, *args, **kwargs):
+        if isinstance(values, np.ndarray) and np.issubdtype(values.dtype, np.floating):
+            ranked_scores.append(values.copy())
+        return argsort(values, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(step4, "listdir", lambda path: sorted(os.listdir(path)))
+        patch.setattr(np, "argsort", capture_scores)
+        step4.main()
+
+    assert len(ranked_scores) == patch_count
+    scores = np.column_stack(ranked_scores)
+    assert scores.shape == (candidate_count, patch_count)
+    if candidate_count:
+        assert np.all(scores[-1] >= 0.95)
+        assert np.all(scores.argmax(axis=0) == candidate_count - 1)
 
 
 def test_border_elems_generic(step4):
