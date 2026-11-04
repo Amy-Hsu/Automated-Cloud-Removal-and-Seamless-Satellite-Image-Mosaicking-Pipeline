@@ -758,11 +758,7 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
              'a6c':'((1/(abs(new_d[x-1]-new_d[down-1]))) if new_d[x-1]-new_d[down-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[down-1]))if new_d2[x-1]-new_d2[down-1] !=0 else 10000000000 )',
              'a7c':'1/(abs(new_d[x-1]-new_d[down-1])+abs(new_d2[x-1]-new_d2[down-1])) if new_d[x-1]-new_d[down-1]!=0 or new_d2[x-1]-new_d2[down-1]!=0 else 10000000000',
              }    
-    j=0        
     
-    rightck=[]
-    downck=[]
-    xck=[]
     
     for x in tqdm.tqdm(range(1,width*height+1)):# 
     
@@ -770,36 +766,22 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
         conf2=new_d2[x-1].tolist()
         
         if x%width!=0 and x<(height-1)*width and conf1 !=0 and conf2 !=0 :
-            j+=1
             right=x+1
             G.add_edge(x, right,  weight = eval(algos_r[path_method])   )
             down=x+width        
             G.add_edge(x, down,  weight = eval(algos_d[path_method])   )
 
-            rightck.append(right) 
-            xck.append(x) 
                        
         elif x%width==0 and x!=width*height and conf1 !=0 and conf2 !=0 :
-            j+=1
             down=x+width         
            
             G.add_edge(x, down,  weight =eval(algos_d[path_method])   )
             
-            xck.append(x) 
-            downck.append(down)   
         elif x>(height-1)*width and  x!=width*height and conf1 !=0 and conf2 !=0: 
-            j+=1
             right=x+1          
             G.add_edge(x, right,  weight =  eval(algos_r[path_method])   )
             
-            rightck.append(right)      
-            xck.append(x) 
             
-            ck=np.zeros((data_final.shape))
-            for f in xck:
-                rowck,colck=f//data_final.shape[1],f%data_final.shape[1]-1
-        
-                ck[rowck,colck]=1            
     source=trueID_intersect[0]
     target=trueID_intersect[1]
     
