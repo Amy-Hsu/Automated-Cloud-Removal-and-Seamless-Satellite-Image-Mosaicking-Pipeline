@@ -18,8 +18,6 @@ If you use this code, please cite the accompanying paper:
 
 To cite the software itself, use its Zenodo archive: https://doi.org/10.5281/zenodo.23404699 (all versions; each release also has its own DOI).
 
-**Golden rule for every step: no spaces anywhere in folder or file paths** (the GDAL command lines are built without quoting).
-
 ---
 
 ## Pipeline overview
