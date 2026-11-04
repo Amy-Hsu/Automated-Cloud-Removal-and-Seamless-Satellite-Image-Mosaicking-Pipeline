@@ -311,6 +311,9 @@ def main():
           fullpath = join(cloud_work_path, f)
           if isfile(fullpath) and  f.endswith(".img"):
             cldfile.append(f)
+        if not cldfile:
+            cloudmask.close()
+            continue
         mosaic_xs= rasterio.open(mosaic_xs_path)
         mosaic_origin=mosaic_xs.transform[2],mosaic_xs.transform[5]
         print('calculate ssim...',i+1,'/',len(allWindow))
