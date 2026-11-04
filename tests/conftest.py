@@ -20,5 +20,10 @@ def step2():
 
 
 @pytest.fixture(scope="session")
+def step3():
+    return _load("mosaicPan_block_rs", "step3_pan_mosaic/mosaicPan_block_rs.py")
+
+
+@pytest.fixture(scope="session")
 def step4():
     return _load("step4cloud_removal", "step4_cloud_removal/step4cloud_removal.py")

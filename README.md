@@ -110,7 +110,7 @@ step2/
 | `res` | XS resolution (m), e.g. `6` |
 | `pan_res` | Pan resolution (m), e.g. `1.5` |
 | `resampleTo` | Downsampling factor for seamline detection (recommended `5`) |
-| `trueBits` | Actual bit depth of the DN values, e.g. `12` |
+| `trueBits` | Actual unsigned DN bit depth (1–64), e.g. `11` or `12`. Storage uses the smallest fitting `uint8`, `uint16`, `uint32`, or `uint64` container. |
 | `imgPath` | Absolute path of the folder containing the scenes |
 | `kernel` | Shrink kernel for seamline detection (odd number, recommended `61`) |
 | `canvas_crs` | CRS of the mosaic canvas (e.g. `EPSG:3826`) |

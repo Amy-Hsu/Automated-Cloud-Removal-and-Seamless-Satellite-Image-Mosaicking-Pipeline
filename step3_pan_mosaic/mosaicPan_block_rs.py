@@ -37,6 +37,14 @@ def pan_scene_path(folder, name):
             return tif
     return os.path.join(folder, name, name + '_B1.DAT.raw')
 
+def image_dtype(true_bits):
+    """Return the smallest unsigned storage dtype that fits the sensor bit depth."""
+    if not 1 <= true_bits <= 64:
+        raise ValueError('trueBits must be between 1 and 64')
+    for storage_bits in (8, 16, 32, 64):
+        if true_bits <= storage_bits:
+            return 'uint' + str(storage_bits)
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -52,11 +60,8 @@ def main():
     StartLetter=datastore["StartLetter"]#
     upscale_factor=int(datastore["upscale_factor"])
 
+    imgtype = image_dtype(trueBits)
     imgBits=(2**trueBits)/(2**8)
-    if trueBits==12:
-        imgtype='uint16'
-    else:
-        imgtype='uint'+str(trueBits)
 
 
     my_file = open('ProcessOrder.txt', "r")

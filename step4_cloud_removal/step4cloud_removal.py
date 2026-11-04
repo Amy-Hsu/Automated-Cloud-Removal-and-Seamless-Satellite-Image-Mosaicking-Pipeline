@@ -74,6 +74,14 @@ def seamless_clone_over_nodata(src, dst, mask, center, nodata):
     dst[nodata]=src[nodata]
     return cv2.seamlessClone(src, dst, mask, center, cv2.NORMAL_CLONE)
 
+def image_dtype(true_bits):
+    """Return the smallest unsigned storage dtype that fits the sensor bit depth."""
+    if not 1 <= true_bits <= 64:
+        raise ValueError('trueBits must be between 1 and 64')
+    for storage_bits in (8, 16, 32, 64):
+        if true_bits <= storage_bits:
+            return 'uint' + str(storage_bits)
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -100,11 +108,8 @@ def main():
     # maximum fraction of a cloud patch that may be cloudy in the candidate scene
     cloud_tolerance = float(datastore.get("cloud_tolerance", 0.25))
 
+    imgtype = image_dtype(trueBits)
     imgBits=(2**trueBits)/(2**8)
-    if trueBits==12:
-        imgtype='uint16'
-    else:
-        imgtype='uint'+str(trueBits)
 
     my_file = open('ProcessOrder.txt', "r")
     ReadOrder =  my_file.read().split(",")
