@@ -3,86 +3,169 @@ import numpy as np
 import pytest
 
 
-@pytest.mark.parametrize("candidate_count", [0, 1, 49, 50, 51, 73])
-@pytest.mark.parametrize("patch_count", [1, 2])
-def test_candidate_scores_cover_the_actual_scene_pool(
-    step4, tmp_path, monkeypatch, candidate_count, patch_count
-):
-    """Step 4 must score every candidate, including scene 51 and beyond (#16)."""
+@pytest.fixture
+def scene_pool(tmp_path):
+    """Small real rasters shared by direct scoring and main-flow tests."""
     import json
-    import os
+    from types import SimpleNamespace
 
     import rasterio
     from rasterio.transform import from_origin
     from rasterio.windows import Window
 
     transform = from_origin(1000, 10000, 60, 60)
-    rng = np.random.default_rng(16)
-    mosaic = rng.integers(1, 255, (4, 64, 64), dtype=np.uint8)
+    mosaic = np.random.default_rng(16).integers(1, 255, (4, 64, 64), dtype=np.uint8)
 
-    def write_raster(path, data):
+    def write_raster(path, data, raster_transform=transform):
         if data.ndim == 2:
             data = data[None]
         with rasterio.open(
-            path, "w", driver="GTiff", height=64, width=64, count=data.shape[0],
-            dtype=data.dtype, crs="EPSG:3826", transform=transform,
+            path, "w", driver="GTiff", height=data.shape[1], width=data.shape[2],
+            count=data.shape[0], dtype=data.dtype, crs="EPSG:3826",
+            transform=raster_transform,
         ) as dst:
             dst.write(data)
 
-    candidates = tmp_path / "candidates"
-    candidates.mkdir()
-    (tmp_path / "cldDatabase").mkdir()
-    for index in range(candidate_count):
-        data = mosaic if index == candidate_count - 1 else np.full_like(mosaic, 100)
-        write_raster(candidates / f"scene_{index:03}.img", data)
-    write_raster(tmp_path / "xs.tif", mosaic)
-    write_raster(tmp_path / "pan.tif", mosaic[0])
-    write_raster(tmp_path / "land.tif", np.ones((64, 64), np.uint8))
-    clouds = np.zeros((64, 64), np.uint8)
-    clouds[10:20, 10:20] = 1
-    if patch_count == 2:
-        clouds[40:50, 40:50] = 1
-    write_raster(tmp_path / "clouds.tif", clouds)
+    def create(candidate_count, patch_count):
+        candidates = tmp_path / "candidates"
+        patches = tmp_path / "patches"
+        candidates.mkdir()
+        patches.mkdir()
+        (tmp_path / "cldDatabase").mkdir()
+        candidate_files = [f"scene_{index:03}.img" for index in range(candidate_count)]
+        for index, name in enumerate(candidate_files):
+            data = mosaic if index == candidate_count - 1 else np.full_like(mosaic, 100)
+            write_raster(candidates / name, data)
+        write_raster(tmp_path / "xs.tif", mosaic)
+        write_raster(tmp_path / "pan.tif", mosaic[0])
+        write_raster(tmp_path / "land.tif", np.ones((64, 64), np.uint8))
+        clouds = np.zeros((64, 64), np.uint8)
+        cloud_files = []
+        for index in range(patch_count):
+            patch = np.zeros_like(clouds)
+            start = 10 + 30 * index
+            patch[start:start + 10, start:start + 10] = 1
+            clouds |= patch
+            name = f"{index}_cld.img"
+            write_raster(patches / name, patch)
+            cloud_files.append(name)
+        write_raster(tmp_path / "clouds.tif", clouds)
 
-    windows = np.empty(1, dtype=object)
-    windows[0] = Window(0, 0, 64, 64)
-    np.save(tmp_path / "allWindow.npy", windows)
-    np.save(tmp_path / "transform.npy", [[1000, 10000], [1000, 10000]])
-    (tmp_path / "ProcessOrder.txt").write_text("primary_a.img,primary_b.img")
-    (tmp_path / "para_cld.txt").write_text(json.dumps({
-        "res": 60, "pan_res": 60, "trueBits": 8,
-        "CandiImgPath": str(candidates),
-        "CldMaskPath": str(tmp_path / "cldDatabase"),
-        "MosaicImgAddress": str(tmp_path / "xs.tif"),
-        "MosaicCldAddress": str(tmp_path / "clouds.tif"),
-        "PanMosaicImgAddress": str(tmp_path / "pan.tif"),
-        "PanImgAddress": str(tmp_path),
-        "CandiMaskFolderName": "masks",
-        "seaBorderAddress": str(tmp_path / "land.tif"),
-        # Exercise real scoring/ranking without entering the unrelated fill stage.
-        "ssim_threshold": 1.1,
-    }))
-    monkeypatch.chdir(tmp_path)
+        windows = np.empty(1, dtype=object)
+        windows[0] = Window(0, 0, 64, 64)
+        np.save(tmp_path / "allWindow.npy", windows)
+        np.save(tmp_path / "transform.npy", [[1000, 10000], [1000, 10000]])
+        (tmp_path / "ProcessOrder.txt").write_text("primary_a.img,primary_b.img")
+        (tmp_path / "para_cld.txt").write_text(json.dumps({
+            "res": 60, "pan_res": 60, "trueBits": 8,
+            "CandiImgPath": str(candidates),
+            "CldMaskPath": str(tmp_path / "cldDatabase"),
+            "MosaicImgAddress": str(tmp_path / "xs.tif"),
+            "MosaicCldAddress": str(tmp_path / "clouds.tif"),
+            "PanMosaicImgAddress": str(tmp_path / "pan.tif"),
+            "PanImgAddress": str(tmp_path),
+            "CandiMaskFolderName": "masks",
+            "seaBorderAddress": str(tmp_path / "land.tif"),
+            # Exercise real scoring/ranking without entering the unrelated fill stage.
+            "ssim_threshold": 1.1,
+        }))
+        return SimpleNamespace(root=tmp_path, candidates=candidates, patches=patches,
+                               candidate_files=candidate_files, cloud_files=cloud_files,
+                               mosaic=mosaic, write_raster=write_raster)
 
-    ranked_scores = []
-    argsort = np.argsort
+    return create
 
-    def capture_scores(values, *args, **kwargs):
-        if isinstance(values, np.ndarray) and np.issubdtype(values.dtype, np.floating):
-            ranked_scores.append(values.copy())
-        return argsort(values, *args, **kwargs)
 
-    with monkeypatch.context() as patch:
-        patch.setattr(step4, "listdir", lambda path: sorted(os.listdir(path)))
-        patch.setattr(np, "argsort", capture_scores)
-        step4.main()
+def score_pool(step4, pool, excluded_scenes=()):
+    import rasterio
 
-    assert len(ranked_scores) == patch_count
-    scores = np.column_stack(ranked_scores)
+    with rasterio.open(pool.root / "xs.tif") as mosaic, rasterio.open(pool.root / "land.tif") as land:
+        scores = step4.score_candidates(pool.candidate_files, pool.cloud_files,
+                                        pool.candidates, pool.patches, mosaic, land, 60, 1,
+                                        excluded_scenes)
+        assert not mosaic.closed and not land.closed
+        return scores
+
+
+@pytest.mark.parametrize("candidate_count", [0, 1, 49, 50, 51, 73])
+@pytest.mark.parametrize("patch_count", [1, 2])
+def test_candidate_scores_cover_the_actual_scene_pool(step4, scene_pool, candidate_count, patch_count):
+    """Score every candidate directly, including scene 51 and beyond (#16)."""
+    scores = score_pool(step4, scene_pool(candidate_count, patch_count))
     assert scores.shape == (candidate_count, patch_count)
     if candidate_count:
-        assert np.all(scores[-1] >= 0.95)
+        np.testing.assert_allclose(scores[-1], 1)
         assert np.all(scores.argmax(axis=0) == candidate_count - 1)
+
+
+def test_candidate_scores_without_cloud_patches(step4, scene_pool):
+    assert score_pool(step4, scene_pool(1, 0)).shape == (1, 0)
+
+
+@pytest.mark.parametrize("case,expected", [
+    ("zero", -3), ("sea", -3), ("no_overlap", -1), ("missing_bands", -1),
+    ("excluded", -2), ("excluded_zero", -2), ("partial_overlap", 0.95),
+])
+def test_candidate_score_rules(step4, scene_pool, case, expected):
+    """Keep the legacy penalty, rejection values and exclusion precedence."""
+    from rasterio.transform import from_origin
+
+    pool = scene_pool(1, 1)
+    candidate = pool.candidates / pool.candidate_files[0]
+    excluded = ()
+    if case in ("zero", "excluded_zero"):
+        pool.write_raster(candidate, np.zeros_like(pool.mosaic))
+    elif case == "sea":
+        pool.write_raster(pool.root / "land.tif", np.zeros((64, 64), np.uint8))
+    elif case == "no_overlap":
+        pool.write_raster(candidate, pool.mosaic, from_origin(100000, 10000, 60, 60))
+    elif case == "missing_bands":
+        pool.write_raster(candidate, pool.mosaic[0])
+    elif case == "partial_overlap":
+        pool.write_raster(candidate, pool.mosaic[:, :, :48])
+    if case in ("excluded", "excluded_zero"):
+        # ProcessOrder contains serialized scene lists, not just bare filenames.
+        excluded = ("['scene_000.img']",)
+    assert score_pool(step4, pool, excluded)[0, 0] == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("window_count", [1, 2])
+def test_main_scores_more_than_fifty_candidates(step4, scene_pool, monkeypatch, window_count):
+    """Keep a real main-flow regression without changing NumPy globally."""
+    import os
+
+    pool = scene_pool(73, 2)
+    if window_count == 2:
+        windows = np.load(pool.root / "allWindow.npy", allow_pickle=True)
+        np.save(pool.root / "allWindow.npy", np.tile(windows, 2))
+        np.save(pool.root / "transform.npy", [[1000, 10000]] * 3)
+        (pool.root / "ProcessOrder.txt").write_text(
+            "['scene_000.img'],['scene_001.img'],['scene_002.img']"
+        )
+    captured = []
+    score_candidates = step4.score_candidates
+
+    def capture_scores(*args, **kwargs):
+        scores = score_candidates(*args, **kwargs)
+        captured.append(scores.copy())
+        return scores
+
+    monkeypatch.chdir(pool.root)
+    monkeypatch.setattr(step4, "listdir", lambda path: sorted(os.listdir(path)))
+    monkeypatch.setattr(step4, "score_candidates", capture_scores)
+    step4.main()
+    assert len(captured) == window_count
+    for scores in captured:
+        assert scores.shape == (73, 2)
+        assert np.all(scores[-1] >= 0.95)
+        assert np.all(scores.argmax(axis=0) == 72)
+    if window_count == 2:
+        # First window excludes the two original mosaic scenes; subsequent
+        # windows exclude only the newly added scene.
+        np.testing.assert_array_equal(captured[0][:2], -2)
+        assert np.all(captured[0][2] != -2)
+        np.testing.assert_array_equal(captured[1][2], -2)
+        assert np.all(captured[1][:2] != -2)
 
 
 def test_border_elems_generic(step4):

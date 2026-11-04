@@ -82,6 +82,79 @@ def image_dtype(true_bits):
         if true_bits <= storage_bits:
             return 'uint' + str(storage_bits)
 
+def score_candidates(candidate_files, cloud_files, candidate_folder, cloud_folder,
+                     mosaic_xs, land_sea_mask, res, img_bits, excluded_scenes=()):
+    """Return SSIM scores with one row per candidate and one column per cloud patch.
+
+    The caller owns the open mosaic and land-mask datasets. Candidate and patch
+    datasets opened here are closed before returning. Preserve the existing
+    partial-overlap penalty and sentinel scores: -1 for scoring errors, -2 for
+    excluded mosaic scenes, and -3 for all-zero usable candidate pixels.
+    Exclusions accept the serialized ProcessOrder entries used by main().
+    """
+    ssim = np.full((len(candidate_files), len(cloud_files)), -np.inf)
+    mosaic_origin=mosaic_xs.transform[2],mosaic_xs.transform[5]
+    mask_origin=land_sea_mask.transform[2],land_sea_mask.transform[5]
+
+    for a, j in enumerate(cloud_files):
+        with rasterio.open(join(cloud_folder, j)) as cld_ds:
+            cld_gt=cld_ds.transform
+            cldWin=Window(((cld_gt[2]-mosaic_origin[0])/res if (cld_gt[2]-mosaic_origin[0])/res>0 else (cld_gt[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-cld_gt[5])/res if (mosaic_origin[1]-cld_gt[5])/res>0 else (mosaic_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
+            cldWin6m=Window(((cld_gt[2]-mask_origin[0])/res if (cld_gt[2]-mask_origin[0])/res>0 else (cld_gt[2]-mask_origin[0])/res ),((mask_origin[1]-cld_gt[5])/res if (mask_origin[1]-cld_gt[5])/res>0 else (mask_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
+
+            for b, k in enumerate(candidate_files):
+                with rasterio.open(join(candidate_folder, k)) as imagePool:
+
+                    gt1=imagePool.transform
+
+                    imgWin=Window(((gt1[2]-mosaic_origin[0])/res if (gt1[2]-mosaic_origin[0])/res>0 else (gt1[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-gt1[5])/res if (mosaic_origin[1]-gt1[5])/res>0 else (mosaic_origin[1]-gt1[5])/res ),  width=imagePool.width ,height=imagePool.height  )
+                    tw6mWin=Window(((gt1[2]-mask_origin[0])/res if (gt1[2]-mask_origin[0])/res>0 else (gt1[2]-mask_origin[0])/res ),((mask_origin[1]-gt1[5])/res if (mask_origin[1]-gt1[5])/res>0 else (mask_origin[1]-gt1[5])/res ),  width=imagePool.width ,height=imagePool.height  )
+
+                    try:
+
+                        ints_window=windows.intersection(imgWin, cldWin)  #big taiwan
+                        ints_window_tw6m=windows.intersection(tw6mWin, cldWin6m)  #tw6m
+                        write_window= Window(abs(imgWin.col_off-ints_window.col_off), abs(ints_window.row_off-imgWin.row_off), height= ints_window.height , width=ints_window.width)
+                        cld_window=Window(abs(cldWin.col_off-ints_window.col_off), abs(ints_window.row_off-cldWin.row_off), height= ints_window.height , width=ints_window.width)# intersection cloud mask
+
+
+                        cld= cld_ds.read(1,window=cld_window)
+
+
+                        mosaic_rgb=np.dstack((mosaic_xs.read(3,window=ints_window)/img_bits, mosaic_xs.read(2,window=ints_window)/img_bits,mosaic_xs.read(1,window=ints_window)/img_bits)).astype('uint8')
+                        mosaic_rgb_masked=mosaic_rgb.copy()
+                        for d in range(3):
+                            mosaic_rgb_masked[:,:,d][np.where(cld==1)]=0 # hallow the cld rgb
+
+                        bigImg2gray=cv2.cvtColor(mosaic_rgb,cv2.COLOR_RGB2GRAY)
+                        bigImg2gray[np.where(cld==1)]=0# hallow the cld gray
+
+                        imgrgb= np.dstack((imagePool.read(3,window=write_window)/img_bits, imagePool.read(2,window=write_window)/img_bits,imagePool.read(1,window=write_window)/img_bits)).astype('uint8')
+                        imgRGB=imgrgb.copy()
+                        for d in range(3):
+                            imgRGB[:,:,d][np.where(cld==1)]=0 # hallow the cld rgb
+
+
+                        tw6mMask=land_sea_mask.read(1,window=ints_window_tw6m)
+
+                        imgRGB[tw6mMask==0]=0
+
+
+                        ssim[b,a]=  structural_similarity(mosaic_rgb_masked, imgRGB, channel_axis=-1,data_range=255,K1=0.01,K2=0.03) if cld_window==cldWin else structural_similarity(mosaic_rgb_masked, imgRGB, channel_axis=-1,data_range=255,K1=0.01,K2=0.03)-0.05
+
+                        if np.all(mosaic_rgb_masked[:]==0) and np.all(imgRGB[:]==0):#to exclude the image which only contains 0.
+                            ssim[b,a]=-3
+                        if np.all(imgRGB[cld==0]==0):# to exclude the image whose intersecting area only contains 0.
+                            ssim[b,a]=-3
+                    except:
+                        ssim[b,a]=-1
+
+                    finally:
+                        if any(k == order[order.find(k[:2]):order.find(k[:2]) + len(k)]
+                               for order in excluded_scenes):
+                            ssim[b,a]=-2
+    return ssim
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     start = timer()
@@ -239,76 +312,11 @@ def main():
           if isfile(fullpath) and  f.endswith(".img"):
             cldfile.append(f)
         mosaic_xs= rasterio.open(mosaic_xs_path)
-        ssim = np.full((len(file), len(cldfile)), -np.inf)
-
         mosaic_origin=mosaic_xs.transform[2],mosaic_xs.transform[5]
-
         print('calculate ssim...',i+1,'/',len(allWindow))
-        a=0
-        for j in cldfile:
-            cld_ds = rasterio.open(cloud_work_path+os.sep+j)
-            cld_gt=cld_ds.transform
-            cldWin=Window(((cld_gt[2]-mosaic_origin[0])/res if (cld_gt[2]-mosaic_origin[0])/res>0 else (cld_gt[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-cld_gt[5])/res if (mosaic_origin[1]-cld_gt[5])/res>0 else (mosaic_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
-            cldWin6m=Window(((cld_gt[2]-mask_origin[0])/res if (cld_gt[2]-mask_origin[0])/res>0 else (cld_gt[2]-mask_origin[0])/res ),((mask_origin[1]-cld_gt[5])/res if (mask_origin[1]-cld_gt[5])/res>0 else (mask_origin[1]-cld_gt[5])/res ), width=cld_ds.width ,height=cld_ds.height  )   #full cld mask
-
-            b=0
-            for k in file:# candidates images pool
-                imagePool= rasterio.open(candidate_img_path+os.sep+k)
-
-                gt1=imagePool.transform
-
-                imgWin=Window(((gt1[2]-mosaic_origin[0])/res if (gt1[2]-mosaic_origin[0])/res>0 else (gt1[2]-mosaic_origin[0])/res ),((mosaic_origin[1]-gt1[5])/res if (mosaic_origin[1]-gt1[5])/res>0 else (mosaic_origin[1]-gt1[5])/res ),  width=imagePool.width ,height=imagePool.height  )
-                tw6mWin=Window(((gt1[2]-mask_origin[0])/res if (gt1[2]-mask_origin[0])/res>0 else (gt1[2]-mask_origin[0])/res ),((mask_origin[1]-gt1[5])/res if (mask_origin[1]-gt1[5])/res>0 else (mask_origin[1]-gt1[5])/res ),  width=imagePool.width ,height=imagePool.height  )
-
-                try:
-
-                    ints_window=windows.intersection(imgWin, cldWin)  #big taiwan
-                    ints_window_tw6m=windows.intersection(tw6mWin, cldWin6m)  #tw6m
-                    write_window= Window(abs(imgWin.col_off-ints_window.col_off), abs(ints_window.row_off-imgWin.row_off), height= ints_window.height , width=ints_window.width)
-                    cld_window=Window(abs(cldWin.col_off-ints_window.col_off), abs(ints_window.row_off-cldWin.row_off), height= ints_window.height , width=ints_window.width)# intersection cloud mask
-
-
-                    cld= cld_ds.read(1,window=cld_window)
-
-
-                    mosaic_rgb=np.dstack((mosaic_xs.read(3,window=ints_window)/imgBits, mosaic_xs.read(2,window=ints_window)/imgBits,mosaic_xs.read(1,window=ints_window)/imgBits)).astype('uint8')
-                    mosaic_rgb_masked=mosaic_rgb.copy()
-                    for d in range(3):
-                        mosaic_rgb_masked[:,:,d][np.where(cld==1)]=0 # hallow the cld rgb
-
-                    bigImg2gray=cv2.cvtColor(mosaic_rgb,cv2.COLOR_RGB2GRAY)
-                    bigImg2gray[np.where(cld==1)]=0# hallow the cld gray
-
-                    imgrgb= np.dstack((imagePool.read(3,window=write_window)/imgBits, imagePool.read(2,window=write_window)/imgBits,imagePool.read(1,window=write_window)/imgBits)).astype('uint8')
-                    imgRGB=imgrgb.copy()
-                    for d in range(3):
-                        imgRGB[:,:,d][np.where(cld==1)]=0 # hallow the cld rgb
-
-
-                    tw6mMask=land_sea_mask.read(1,window=ints_window_tw6m)
-
-                    imgRGB[tw6mMask==0]=0
-
-
-                    ssim[b,a]=  structural_similarity(mosaic_rgb_masked, imgRGB, channel_axis=-1,data_range=255,K1=0.01,K2=0.03) if cld_window==cldWin else structural_similarity(mosaic_rgb_masked, imgRGB, channel_axis=-1,data_range=255,K1=0.01,K2=0.03)-0.05
-
-                    if np.all(mosaic_rgb_masked[:]==0) and np.all(imgRGB[:]==0):#to exclude the image which only contains 0.
-                        ssim[b,a]=-3
-                    if np.all(imgRGB[cld==0]==0):# to exclude the image whose intersecting area only contains 0.
-                        ssim[b,a]=-3
-                except:
-                    ssim[b,a]=-1
-
-                finally:
-                    if i==0:
-                        if (k == ReadOrder[i][ReadOrder[i].find(str(k[0:2])):ReadOrder[i].find(k[0:2])+len(k)]
-                        or k == ReadOrder[i+1][ReadOrder[i+1].find(str(k[0:2])):ReadOrder[i+1].find(k[0:2])+len(k)]):
-                            ssim[b,a]=-2
-                    else:
-                        if k == ReadOrder[i+1][ReadOrder[i+1].find(str(k[0:2])):ReadOrder[i+1].find(k[0:2])+len(k)]:
-                            ssim[b,a]=-2
-                    b+=1
-            a+=1
+        excluded_scenes = ReadOrder[:2] if i == 0 else ReadOrder[i+1:i+2]
+        ssim = score_candidates(file, cldfile, candidate_img_path, cloud_work_path,
+                                mosaic_xs, land_sea_mask, res, imgBits, excluded_scenes)
 
         mosaic_xs.close()
         # to use possion or feather to mend cloud hole from the full extent Taiwan image.
