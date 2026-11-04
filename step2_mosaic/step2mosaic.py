@@ -1429,7 +1429,7 @@ def main():
                 width=sf.shape[1],
                 count=1,
                 dtype=rasterio.uint8,          
-                crs= {'init': canvas_crs},#Initialize from a named CRS
+                crs= canvas_crs,#Initialize from a named CRS
                 transform=union_gt,
             ) as dst:
                 dst.write(sf.astype(rasterio.uint8), 1)
@@ -1450,7 +1450,7 @@ def main():
                 width=mask_blurred_4chan.shape[1]*int(res/pan_res),
                 count=1,
                 dtype=rasterio.float32,          
-                crs= {'init': canvas_crs},#   
+                crs= canvas_crs,#   
                 transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  
             ) as dst:
                 dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
@@ -1474,7 +1474,7 @@ def main():
                         count=4,
                         dtype=image1_isect_array.dtype ,
 
-                        crs= {'init': canvas_crs},#Initialize from a named CRS
+                        crs= canvas_crs,#Initialize from a named CRS
                         transform=mosaic_gt)
             kwargs = mosaic_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")
@@ -1574,7 +1574,7 @@ def main():
                 count=1,
                 dtype=image1_isect_array.dtype,
 
-                crs= {'init': canvas_crs},
+                crs= canvas_crs,
                 transform=cloudmask_gt)
             kwargs = cloudmask_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")
@@ -1624,7 +1624,7 @@ def main():
                 count=4,
                 dtype=image1_isect_array.dtype,
 
-                crs= {'init': canvas_crs},#
+                crs= canvas_crs,#
                 transform=mosaic_gt)
             kwargs = mosaic_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")
@@ -1639,7 +1639,7 @@ def main():
                 count=1,
                 dtype=image1_isect_array.dtype,
 
-                crs= {'init': canvas_crs},#
+                crs= canvas_crs,#
                 transform=cloudmask_gt)
             kwargs = cloudmask_out.meta.copy()
             kwargs.update(BIGTIFF="IF_SAFER")
@@ -1773,7 +1773,7 @@ def main():
                 width=sf.shape[1],
                 count=1,
                 dtype=rasterio.uint8,           
-                crs= {'init': canvas_crs},#Initialize from a named CRS
+                crs= canvas_crs,#Initialize from a named CRS
                 transform=union_gt,
             ) as dst:
                 dst.write(sf.astype(rasterio.uint8), 1)   
@@ -1788,7 +1788,7 @@ def main():
                 width=mask_blurred_4chan.shape[1]*int(res/pan_res),
                 count=1,
                 dtype=rasterio.float32,          
-                crs= {'init': canvas_crs},#Initialize from a named CRS            
+                crs= canvas_crs,#Initialize from a named CRS            
                 transform= A.translation(union_gt[2], union_gt[5]) * A.scale(pan_res, -pan_res) #  union_gt,
             ) as dst:
                 dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
