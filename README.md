@@ -1,7 +1,7 @@
 # Automated Cloud Removal and Seamless Satellite Image Mosaicking Pipeline
 
-[![tests](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml)
-[![Sentinel-2 demo](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml/badge.svg)](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml)
+[![tests](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/tests.yml)
+[![Sentinel-2 demo](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml/badge.svg)](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/actions/workflows/demo.yml)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-BA0C2F.svg?style=flat-square)](LICENSE)
 [![Paper](https://img.shields.io/badge/Paper-10.1016%2Fj.acags.2026.100387-0A7BBB.svg?style=flat-square)](https://doi.org/10.1016/j.acags.2026.100387)
