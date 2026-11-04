@@ -29,6 +29,7 @@ from scipy.spatial import distance
 from rasterio.windows import Window
 import os
 import pathlib
+import subprocess
 import json
 import gc
 from shapely import wkt
@@ -38,16 +39,30 @@ import glob
 CLOUD_MASK_FOLDER = 'cloud_masks'
 
 start = timer()
+def run_tool(args):
+    """Run a command-line tool with an argument list (no shell), raising if it fails.
+
+    Each argument is passed as one item, so paths may contain spaces (#6).
+    """
+    subprocess.run([str(a) for a in args], check=True)
+
+def assign_crs_copy(src_path, dst_path, crs):
+    """Copy a scene to GeoTIFF with *crs* assigned (not reprojected), via gdal_translate."""
+    run_tool(['gdal_translate', '-a_srs', crs, '-of', 'GTiff', src_path, dst_path])
+
 def polygonize_valid_area(tif_path):
     """Write <name>.temp.shp outlining the valid (non-zero) footprint of a scene.
 
     On Windows with the bundled GetBoundaryMask.exe this calls
-    BndPolygonize_v.bat as before; elsewhere it uses an equivalent
+    BndPolygonize_v.bat as before; elsewhere, or when the path contains a
+    space (which the batch file cannot handle), it uses an equivalent
     rasterio/geopandas implementation.
     """
     tool_dir = pathlib.Path('NSPO_GRID_vectorization').absolute()
-    if os.name == 'nt' and (tool_dir / 'GetBoundaryMask.exe').is_file():
-        os.popen('call ' + str(tool_dir / 'BndPolygonize_v.bat') + ' ' + tif_path).read()
+    bat = tool_dir / 'BndPolygonize_v.bat'
+    if (os.name == 'nt' and (tool_dir / 'GetBoundaryMask.exe').is_file()
+            and ' ' not in str(bat) + str(tif_path)):
+        run_tool(['cmd', '/c', bat, tif_path])
         return
     with rasterio.open(tif_path) as src:
         valid = np.zeros((src.height, src.width), dtype=np.uint8)
@@ -193,8 +208,7 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
         else:
 
         
-            cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  (os.sep+i[:-3]+'tif')
-            ret =  os.popen(cmdIn).read()
+            assign_crs_copy(a1, str(a2)+os.sep+i[:-3]+'tif', canvas_crs)
     
             polygonize_valid_area(str(a2)+os.sep+i[:-3]+'tif')
             
@@ -921,8 +935,7 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
         print('done img2shp:'+raster1)
     else:       
         
-        cmdIn='gdal_translate -a_srs ' + canvas_crs + ' -of GTiff '+''.join(str(a1)) +' ' +''.join(str(a2))  +  (os.sep+raster1[:-3]+'tif')
-        ret =  os.popen(cmdIn).read()
+        assign_crs_copy(a1, str(a2)+os.sep+raster1[:-3]+'tif', canvas_crs)
     
         polygonize_valid_area(str(a2)+os.sep+raster1[:-3]+'tif')
         filepath = str(a2)+ (os.sep+raster1[:-3]+'temp.shp')

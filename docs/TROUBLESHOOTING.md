@@ -4,7 +4,7 @@ Known failure modes collected while running the pipeline operationally.
 
 ## General
 
-- **Never** use spaces in any folder or file path.
+- Step 1 only: ERDAS IMAGINE batch files (`.bcf`, `.bls`) cannot handle spaces, so keep the Step 1 folders and the `SM_BATCH_GMDX_*` paths free of spaces. Steps 2-4 accept paths with spaces.
 - When re-running Step 2, delete all previously generated outputs first (`mosaic_xs.tif`, `mosaic_cloudmask.tif`, `*.npy`, `ProcessOrder.txt`, seamline files, `res_union_new.*`), otherwise the run fails. Files inside `NSPO_GRID_vectorization/` can usually stay.
 - When re-running Step 3, delete `mosaic_pan.tif` first. Clear `new_pan/` only if the source Pan imagery changed.
 

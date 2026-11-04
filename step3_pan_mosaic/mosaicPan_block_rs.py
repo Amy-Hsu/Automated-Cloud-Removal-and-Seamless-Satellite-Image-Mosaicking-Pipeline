@@ -17,10 +17,22 @@ from timeit import default_timer as timer
 from rasterio.windows import Window
 import pathlib
 import os
+import subprocess
 import gc
 import json
 from rasterio.enums import Resampling
 
+
+def run_tool(args):
+    """Run a command-line tool with an argument list (no shell), raising if it fails.
+
+    Each argument is passed as one item, so paths may contain spaces (#6).
+    """
+    subprocess.run([str(a) for a in args], check=True)
+
+def clip_pan(src_path, dst_path, crs, bounds):
+    """Warp a Pan scene to *crs*, clipped to *bounds* = (x_min, y_min, x_max, y_max), via gdalwarp."""
+    run_tool(['gdalwarp', '-t_srs', crs, '-te', *bounds, src_path, dst_path])
 
 def pan_scene_path(folder, name):
     """Return the Pan scene for *name*: SPOT DIMAP layout if present, else <folder>/<name>.tif.
@@ -90,8 +102,7 @@ def main():
             if os.path.isfile(new_rawPath+os.sep+image1_ds+'.tif'):
                 print('Done with image clipping:',image1_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+os.sep+image1_ds+'.tif'
-                ret =  os.popen(cmdIn).read()
+                clip_pan(raw1Path, new_rawPath+os.sep+image1_ds+'.tif', canvas_crs, (x_min, y_min, x_max, y_max))
 
             seamline_polygon = rasterio.open(slPath)
 
@@ -133,14 +144,12 @@ def main():
             if os.path.isfile(new_rawPath+os.sep+image1_ds+'.tif'):
                 print('Done with image clipping:',image1_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw1Path)) +' '+''.join(str(new_rawPath ))+os.sep+image1_ds+'.tif'
-                ret =  os.popen(cmdIn).read()
+                clip_pan(raw1Path, new_rawPath+os.sep+image1_ds+'.tif', canvas_crs, (x_min, y_min, x_max, y_max))
 
             if os.path.isfile(new_rawPath+os.sep+image2_ds+'.tif'):
                 print('Done with image clipping:',image2_ds+'.tif')
             else:
-                cmdIn =' gdalwarp  -t_srs '+canvas_crs+' -te '+ str(x_min) +' ' + str(y_min) +' '+ str(x_max) +' '+ str(y_max) +' '+ ''.join(str(raw2Path)) +' '+''.join(str(new_rawPath ))+os.sep+image2_ds+'.tif'
-                ret =  os.popen(cmdIn).read()
+                clip_pan(raw2Path, new_rawPath+os.sep+image2_ds+'.tif', canvas_crs, (x_min, y_min, x_max, y_max))
 
             img2 = rasterio.open(new_rawPath+os.sep+image2_ds+'.tif')
             seamline_polygon = rasterio.open(slPath)

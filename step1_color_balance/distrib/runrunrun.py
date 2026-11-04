@@ -44,8 +44,7 @@ def main():
             except OSError:
                 pass
 
-        cmdIn = 'MappingReshapeXS ' + ' '.join(i)
-        ret = subprocess.Popen(cmdIn)
+        ret = subprocess.Popen(['MappingReshapeXS', *i])
 
         # wait until all four remapped tables exist
         while 1:
