@@ -106,7 +106,7 @@ step2/
 
 | Key | Meaning |
 |-----|---------|
-| `path_method` | Seamline cost function: `a6`, `a7`, `a6c`, `a7c` (`a6c` is a good default) |
+| `path_method` | Seamline cost function: `a6`, `a7`, `a6c`, `a7c`, `a6c_int`, `a7c_int`. Use `a6c_int` for new runs; `a6c`/`a7c` keep historical uint8 arithmetic for reproducibility. |
 | `res` | XS resolution (m), e.g. `6` |
 | `pan_res` | Pan resolution (m), e.g. `1.5` |
 | `resampleTo` | Downsampling factor for seamline detection (recommended `5`) |

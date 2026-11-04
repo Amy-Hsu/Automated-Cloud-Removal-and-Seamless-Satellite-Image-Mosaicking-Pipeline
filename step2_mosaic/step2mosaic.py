@@ -769,7 +769,9 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
     - ``a6``: 1/|d1| + 1/|d2|
     - ``a7``: 1/(|d1| + |d2|)
     - ``a6c``, ``a7c``: the same, with a weight of 1e10 where the
-      difference is zero (see #1 about 8-bit wrap-around)
+      difference is zero; retain historical unsigned wrap-around for uint8 input
+    - ``a6c_int``, ``a7c_int``: signed-integer versions of those two methods,
+      preserving the zero-difference penalty without uint8 subtraction/sum overflow
 
     Strong edges (large differences) are therefore cheap, so the path
     follows roads, rivers and field boundaries. The path between the two
@@ -781,6 +783,11 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
     G = nx.Graph()
     new_d=np.squeeze(np.asarray(data_final)).flatten()
     new_d2=np.squeeze(np.asarray(data_final2)).flatten()    
+    # Opt-in signed arithmetic; retain the original methods for published-run reproduction.
+    if path_method in ('a6c_int', 'a7c_int'):
+        new_d = new_d.astype(np.int64)
+        new_d2 = new_d2.astype(np.int64)
+        path_method = path_method.removesuffix('_int')
     algos_r={'a6':'1/(abs(int(new_d[x-1])-int(new_d[right-1]))+0.000000000000000001)+1/(abs(int(new_d2[x-1])-int(new_d2[right-1]))+0.000000000000000001)',
              'a7':'1/((abs(int(new_d[x-1])-int(new_d[right-1]))+0.000000000000000001)+(abs(int(new_d2[x-1])-int(new_d2[right-1]))+0.000000000000000001))',
              'a6c':'((1/(abs(new_d[x-1]-new_d[right-1]))) if new_d[x-1]-new_d[right-1]!=0 else 10000000000 ) + (1/(abs(new_d2[x-1]-new_d2[right-1]))if new_d2[x-1]-new_d2[right-1] !=0 else 10000000000 )',
