@@ -12,6 +12,7 @@ License: MIT
 
 import glob
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -27,6 +28,8 @@ from rasterio.windows import Window, from_bounds
 from os import listdir
 from os.path import isfile, join
 from timeit import default_timer as timer
+
+logger = logging.getLogger(__name__)
 
 def border_elems_generic(a, W): # Input array : a, Edgewidth : W
     """Return elements within *W* pixels of any edge of 2-D array *a*."""
@@ -146,7 +149,12 @@ def score_candidates(candidate_files, cloud_files, candidate_folder, cloud_folde
                             ssim[b,a]=-3
                         if np.all(imgRGB[cld==0]==0):# to exclude the image whose intersecting area only contains 0.
                             ssim[b,a]=-3
-                    except:
+                    except rasterio.errors.WindowError as error:
+                        logger.debug("SSIM scoring skipped for patch %s, candidate %s: %s", j, k, error)
+                        ssim[b,a]=-1
+                    except Exception as error:
+                        logger.warning("SSIM scoring failed for patch %s, candidate %s: %s",
+                                       j, k, error, exc_info=True)
                         ssim[b,a]=-1
 
                     finally:
@@ -368,6 +376,8 @@ def main():
                             if np.any(border_elems_generic(cld,1)==1)==False:# to prevent replicated cld mask from reprocessing several times.
 
                                 cldbList=glob.glob(''.join(str(pathlib.Path().absolute()))+os.sep+cloud_mask_folder+os.sep+'*'+fName[:-4]+'*.tif')
+                                if not cldbList:
+                                    raise FileNotFoundError(f"No candidate cloud mask for {fName} in {cloud_mask_folder}")
                                 cldb=rasterio.open(cldbList[0])
                                 cldb=cldb.read(1,window=write_window)
 
@@ -380,7 +390,7 @@ def main():
                                     cldcy[np.where(cld==1)]=(blendPix+1)
                                     try:
                                         mask_blurred  = cv2.GaussianBlur(cldcy,(blendPix,blendPix),0)
-                                    except:
+                                    except cv2.error:
                                         blendPix=35
                                         cldcy=cld.copy()
                                         cldcy[np.where(cld==1)]=(blendPix+1)
@@ -464,7 +474,7 @@ def main():
                                         cldcy[np.where(cld==1)]=(blendPix+1)
                                         try:
                                             mask_blurred  = cv2.GaussianBlur(cldcy,(blendPix,blendPix),0)
-                                        except:
+                                        except cv2.error:
                                             blendPix=35
                                             cldcy=cld.copy()
                                             cldcy[np.where(cld==1)]=(blendPix+1)
@@ -577,7 +587,7 @@ def main():
 
                                             try:
                                                 mask_blurred  = cv2.GaussianBlur(cldcy,(blendPix,blendPix),0)
-                                            except:
+                                            except cv2.error:
                                                 blendPix=35
                                                 cldcy=cld.copy()
                                                 cldcy[np.where(cld==255)]=(blendPix+1)
@@ -646,7 +656,7 @@ def main():
                                     cldcy[np.where(cld==1)]=(blendPix+1)
                                     try:
                                         mask_blurred  = cv2.GaussianBlur(cldcy,(blendPix,blendPix),0)
-                                    except:
+                                    except cv2.error:
                                         blendPix=35
                                         cldcy=cld.copy()
                                         cldcy[np.where(cld==1)]=(blendPix+1)
@@ -724,8 +734,12 @@ def main():
 
                                     ss=1
 
-                        except:
-                            pass
+                        except rasterio.errors.WindowError as error:
+                            logger.debug("Cloud filling skipped for patch %s, candidate %s: %s",
+                                         j, fName, error)
+                        except Exception as error:
+                            logger.warning("Cloud filling failed for patch %s, candidate %s: %s",
+                                           j, fName, error, exc_info=True)
 
         print('stage1:',stage1)
         print('stage2:',stage2)
