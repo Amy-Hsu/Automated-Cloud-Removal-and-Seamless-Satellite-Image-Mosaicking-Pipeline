@@ -5,14 +5,14 @@ Thank you for your interest in contributing to this project.
 ## Reporting issues
 
 If you find a bug or have a feature request, please open a
-[GitHub issue](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/issues).
+[GitHub issue](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/issues).
 Include as much detail as possible: error messages, input data description,
 Python/GDAL versions, and the step that failed.
 
 ## Getting help
 
 Questions about using the pipeline are welcome as
-[GitHub issues](https://github.com/Amy-Hsu/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/issues).
+[GitHub issues](https://github.com/buckai-observatory/Automated-Cloud-Removal-and-Seamless-Satellite-Image-Mosaicking-Pipeline/issues).
 Please check [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) first.
 
 ## Submitting changes
