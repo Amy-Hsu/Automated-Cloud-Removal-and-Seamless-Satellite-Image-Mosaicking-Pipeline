@@ -1122,10 +1122,6 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
 
     Returns (fc, fr, trueID_intersect): the columns, the rows and the
     1-based, row-major node ids used by :func:`buildGraph`.
-
-    The coordinates are read from fixed character positions of the WKT
-    strings, which assumes integer coordinates with a 6-digit x value (as in
-    TWD97 / UTM eastings).
     """
     height, width = imgg2_ui8_nd_gy.shape
     p_left=[]
