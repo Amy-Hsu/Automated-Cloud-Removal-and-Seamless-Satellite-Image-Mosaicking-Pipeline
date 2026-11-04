@@ -1162,6 +1162,14 @@ def blendMask(blendPix,im_floodfill_f):
     mask_blurred_1chan = mask_blurred.astype('float32') / (blendPix+1)
     return mask_blurred_1chan
 
+def image_dtype(true_bits):
+    """Return the smallest unsigned storage dtype that fits the sensor bit depth."""
+    if not 1 <= true_bits <= 64:
+        raise ValueError('trueBits must be between 1 and 64')
+    for storage_bits in (8, 16, 32, 64):
+        if true_bits <= storage_bits:
+            return 'uint' + str(storage_bits)
+
 def main():
     """Run this pipeline step using the parameters in the working folder."""
     global canvas_crs, res, union_gt
@@ -1187,11 +1195,8 @@ def main():
 
 
     NOscale_factor=1/scale_factor
+    imgtype = image_dtype(trueBits)
     imgBits=(2**trueBits)/(2**8)
-    if trueBits==12:
-        imgtype='uint16'
-    else:
-        imgtype='uint'+str(trueBits)
 
     files = listdir(mypath)
     gt_two=[]
