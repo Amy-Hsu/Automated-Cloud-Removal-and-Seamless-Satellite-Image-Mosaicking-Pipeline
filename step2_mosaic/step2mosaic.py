@@ -85,6 +85,12 @@ def add_at_pos(matrix1, matrix2, xypos, inPlace=True):
         return matrix1copy
 
 def spiral(X=50, Y=50):
+    """Return [dx, dy] offsets that walk outward from (0, 0) in a square spiral.
+
+    The offsets cover an *X* by *Y* window, nearest first. They are used to
+    search for the closest pixel that is valid in both scenes when a seamline
+    endpoint lands on no-data.
+    """
     x = y = 0
     dx = 0
     dy = -1
@@ -437,6 +443,13 @@ def blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,write
 
 
 def bfs(grid, start,wall, clear, goal,width, height):
+    """Breadth-first search on a 4-connected grid.
+
+    Starts at *start* = (x, y) and returns the shortest path, as a list of
+    (x, y) tuples, to the first cell whose value is *goal*, never entering
+    cells whose value is *wall*. *grid* is indexed ``grid[y][x]``; *clear* is
+    not used. Returns None if no goal cell is reachable.
+    """
     queue = collections.deque([[start]])#
     seen = set([start])
     while queue:
@@ -744,6 +757,27 @@ def border_connection(seamlineff,gt , union_gt,res,scale_factor,fc,fr ):
     return seamlineff3
 
 def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect):
+    """Find the seamline as the cheapest path through a sparse pixel graph.
+
+    *data_final* and *data_final2* are the two (downsampled, 8-bit grayscale)
+    scenes over the overlap, already restricted by :func:`clipImg`. Nodes
+    are pixel ids, 1-based and row-major (``id = row*width + col + 1``).
+    Every pixel that is non-zero in both scenes is linked to its right and
+    lower neighbour. The edge weight is set by *path_method*, from the
+    intensity differences between the two neighbours in each scene:
+
+    - ``a6``: 1/|d1| + 1/|d2|
+    - ``a7``: 1/(|d1| + |d2|)
+    - ``a6c``, ``a7c``: the same, with a weight of 1e10 where the
+      difference is zero (see #1 about 8-bit wrap-around)
+
+    Strong edges (large differences) are therefore cheap, so the path
+    follows roads, rivers and field boundaries. The path between the two
+    node ids in *trueID_intersect* (from :func:`MakeTrueID`) is found with
+    ``networkx.astar_path`` without a heuristic, which is Dijkstra's
+    algorithm. Returns a (height, width) int array that is 1 on the
+    seamline and 0 elsewhere.
+    """
     G = nx.Graph()
     new_d=np.squeeze(np.asarray(data_final)).flatten()
     new_d2=np.squeeze(np.asarray(data_final2)).flatten()    
@@ -794,6 +828,17 @@ def buildGraph(data_final,data_final2,height,width,path_method,trueID_intersect)
 
 
 def clipImg(usrset,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,fr,fc):
+    """Restrict both scenes to the area in which the seamline may run.
+
+    For each scene, the valid (non-zero) area minus a one-pixel frame is
+    eroded with a *usrset* x *usrset* square kernel (the ``kernel`` setting
+    in ``para.txt``), and pixels outside it are set to 0, so they get no
+    graph nodes. Square windows of half-width ``usrset/2 + 30`` around the
+    two seamline endpoints (rows *fr*, columns *fc*) keep their original
+    values, so that the endpoints stay connected to the eroded area.
+
+    Returns (data_final, data_final2, height, width) for :func:`buildGraph`.
+    """
 
     pix0=int(usrset/2)
     data = np.array(imgg1_ui8_nd_gy)#.T
@@ -1048,6 +1093,18 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     return array1, array2, col1, row1, gt,intersection_points,union_gt,union_m,union_conn,window,res_union_new
 
 def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor):
+    """Turn the footprint-boundary intersection points into seamline endpoints.
+
+    *intersection_points* holds the two points where the boundaries of the
+    two scenes' footprints cross, as WKT strings (POINT or LINESTRING). They
+    are converted to rows and columns of the overlap (upper-left corner
+    *gt*, pixel size *res*, then scaled by *scale_factor* to the downsampled
+    grid). If a point does not fall on a pixel that is valid in both scenes,
+    the nearest such pixel within a 35 x 35 spiral (:func:`spiral`) is used.
+
+    Returns (fc, fr, trueID_intersect): the columns, the rows and the
+    1-based, row-major node ids used by :func:`buildGraph`.
+    """
     height, width = imgg2_ui8_nd_gy.shape
     p_left=[]
     p_top=[]
@@ -1138,6 +1195,14 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
     return fc ,fr, trueID_intersect
 
 def blendMask(blendPix,im_floodfill_f):
+    """Gaussian-feathered blend weights from a binary mask.
+
+    Pixels equal to 1 in *im_floodfill_f* are set to ``blendPix + 1``, the
+    mask is blurred with a *blendPix* x *blendPix* Gaussian kernel (*blendPix*
+    must be odd), and the result is divided by ``blendPix + 1``. Returns
+    float32 weights between 0 and 1 that change smoothly over about
+    *blendPix* pixels across the mask boundary.
+    """
     im_floodfill_ftest=im_floodfill_f.copy()
     im_floodfill_ftest[np.where(im_floodfill_f==1)]=(blendPix+1)
     mask_blurred  = cv2.GaussianBlur(im_floodfill_ftest,(blendPix,blendPix),0)
