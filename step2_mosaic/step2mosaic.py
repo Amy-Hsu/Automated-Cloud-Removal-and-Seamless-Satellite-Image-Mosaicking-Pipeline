@@ -1092,6 +1092,23 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     res_union_new.to_file('res_union_new.shp') 
     return array1, array2, col1, row1, gt,intersection_points,union_gt,union_m,union_conn,window,res_union_new
 
+def wkt_point_xy(point_wkt):
+    """Return (x, y) of a WKT POINT, or of the first vertex of a WKT LINESTRING.
+
+    Used for the points where two footprint boundaries cross. Other or empty
+    geometries return None. Coordinates are read by shapely, so they may have
+    any number of digits and decimals (#27).
+    """
+    geom = wkt.loads(point_wkt)
+    if geom.is_empty:
+        return None
+    if geom.geom_type == 'Point':
+        return geom.x, geom.y
+    if geom.geom_type == 'LineString':
+        x, y = geom.coords[0][:2]
+        return x, y
+    return None
+
 def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_factor):
     """Turn the footprint-boundary intersection points into seamline endpoints.
 
@@ -1108,24 +1125,11 @@ def MakeTrueID(intersection_points,imgg1_ui8_nd_gy,imgg2_ui8_nd_gy,gt,res,scale_
     height, width = imgg2_ui8_nd_gy.shape
     p_left=[]
     p_top=[]
-    for i in range(len(intersection_points)):
-        if intersection_points[i][0:5]=='POINT':
-          
-            p_l=intersection_points[i][7:13]
-            p_t=intersection_points[i][14:-1]
-            
-            p_lf=''.join([t for t in p_l ])
-            p_tp=''.join([t for t in p_t ])
-            p_left.append(float(p_lf))
-            p_top.append(float(p_tp))
-        elif  intersection_points[i][0:10]=='LINESTRING':
-            p_l=intersection_points[i][12:18]
-            p_t=intersection_points[i][19:26]
-            
-            p_lf=''.join([t for t in p_l ])
-            p_tp=''.join([t for t in p_t ])
-            p_left.append(float(p_lf))
-            p_top.append(float(p_tp))        
+    for point in intersection_points:
+        xy = wkt_point_xy(point)
+        if xy is not None:
+            p_left.append(xy[0])
+            p_top.append(xy[1])
     
     
     LeftTop_overlapped=[gt[2],gt[5]]
