@@ -1,5 +1,6 @@
 """Unit tests for the seamline and blending helpers in Step 2."""
 import numpy as np
+import pytest
 
 
 def test_add_at_pos_inside(step2):
@@ -104,6 +105,31 @@ def test_build_graph_links_every_pixel_to_its_right_and_down_neighbours(step2, m
         if x <= (h - 1) * w:
             expected.add(frozenset((x, x + w)))
     assert {frozenset(e) for e in graphs[0].edges()} == expected
+
+
+@pytest.mark.parametrize("point_wkt, expected", [
+    ("POINT (213456 2650000)", (213456, 2650000)),
+    ("POINT (213456.5 2650003.25)", (213456.5, 2650003.25)),   # fractional (#27)
+    ("POINT (1213456 2650000)", (1213456, 2650000)),           # 7-digit x (#27)
+    ("POINT (98765 2650000)", (98765, 2650000)),               # 5-digit x (#27)
+    ("LINESTRING (213456 2650000, 213460 2650010)", (213456, 2650000)),
+    ("POINT EMPTY", None),
+    ("MULTIPOINT ((1 2), (3 4))", None),
+])
+def test_wkt_point_xy(step2, point_wkt, expected):
+    assert step2.wkt_point_xy(point_wkt) == expected
+
+
+def test_make_true_id_with_fractional_seven_digit_coordinates(step2):
+    """Endpoints with decimals and a 7-digit x map to the right pixels (#27)."""
+    img = np.ones((20, 20), dtype=np.uint8)
+    res, x0, y0 = 6.0, 1213450.0, 2650060.0
+    gt = (res, 0.0, x0, 0.0, -res, y0)
+    points = ["POINT (1213456.5 2650003.25)", "POINT (1213500 2650000)"]
+    fc, fr, ids = step2.MakeTrueID(points, img, img.copy(), gt, res, 1)
+    assert fc == [1, 8]                       # round((x - x0) / res)
+    assert fr == [9, 10]                      # round((y0 - y) / res)
+    assert ids == [9 * 20 + 1 + 1, 10 * 20 + 8 + 1]
 
 
 def test_polygonize_valid_area_outlines_footprint(step2, tmp_path):
