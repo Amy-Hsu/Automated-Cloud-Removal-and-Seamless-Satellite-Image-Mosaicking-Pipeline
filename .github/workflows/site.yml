@@ -1,0 +1,74 @@
+name: Documentation website
+
+# Renders README.md, the step and demo READMEs, docs/*.md, CONTRIBUTING.md
+# and the API reference (quartodoc, read statically from the docstrings of
+# the step scripts) with Quarto (site/build_site.py). Pull requests build
+# the site to check it; pushes to main also deploy it to GitHub Pages.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'site/**'
+      - 'step2_mosaic/*.py'
+      - 'step3_pan_mosaic/*.py'
+      - 'step4_cloud_removal/*.py'
+      - '.github/workflows/site.yml'
+  pull_request:
+    paths:
+      - '**.md'
+      - 'site/**'
+      - 'step2_mosaic/*.py'
+      - 'step3_pan_mosaic/*.py'
+      - 'step4_cloud_removal/*.py'
+      - '.github/workflows/site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.8.26
+      - name: Install the docs tools
+        # quartodoc reads the docstrings statically (griffe), so the pipeline's
+        # own dependencies are not needed. quartodoc 0.11 is not compatible
+        # with griffe 2.x.
+        run: pip install "quartodoc>=0.10" "griffe<2"
+      - name: Build the Quarto sources
+        run: python3 site/build_site.py
+      - name: Build the API reference from the docstrings
+        working-directory: site/_build
+        env:
+          PYTHONPATH: ${{ github.workspace }}/step2_mosaic:${{ github.workspace }}/step3_pan_mosaic:${{ github.workspace }}/step4_cloud_removal
+        run: python -m quartodoc build --verbose
+      - name: Render
+        run: quarto render site/_build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/_build/_site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
