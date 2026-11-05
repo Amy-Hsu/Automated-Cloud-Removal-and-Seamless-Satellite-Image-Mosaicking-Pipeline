@@ -112,10 +112,13 @@ def main():
             seamline_polygon = rasterio.open(slPath)
 
             print('Mosaicking and writing to disk...')
-            with rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src:
+            # Use a single writer for the scene so block caches cannot overwrite
+            # updates made by another handle on the same mosaic.
+            with (
+                rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src,
+                rasterio.open('mosaic_pan.tif', 'r+') as mosaic_out,
+            ):
                 for ji, window in src.block_windows(1):
-
-                     mosaic_out= rasterio.open( 'mosaic_pan.tif','r+')#
 
                      seamlinef=seamline_polygon.read(1,window=window)
 
@@ -174,7 +177,7 @@ def main():
             kwargs.update(BIGTIFF="IF_SAFER")
 
             print('Mosaicking and writing to disk...')
-            with rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src:
+            with mosaic_out, rasterio.open(new_rawPath+os.sep+image1_ds+'.tif') as src:
                 for ji, window in src.block_windows(1):
 
                      seamlinef=seamline_polygon.read(1,window=window)
@@ -186,7 +189,6 @@ def main():
 
                      mosaic_out.write(outcome , 1, window=write_window)
 
-    mosaic_out.close()
     print('All done!')
     end = timer()
     print('Total time spent(hr):',(end - start)/60/60)
