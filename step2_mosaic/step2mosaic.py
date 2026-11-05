@@ -120,31 +120,26 @@ def spiral(X=50, Y=50):
         x, y = x+dx, y+dy        
     return spiralList
 def test_overlap(ReadOrder, scene_dir=""):
-    """Check whether the first two images in ReadOrder overlap, swapping if needed."""
-    for i in range(1,len(ReadOrder)-1):
-        if 'z' not in globals():   
-            image1_ds = rasterio.open(join(scene_dir, ReadOrder[0]),nodata=0)
-            image2_ds = rasterio.open(join(scene_dir, ReadOrder[1]),nodata=0)
-            gt1=image1_ds.transform
-            gt2=image2_ds.transform           
-            r1 = [gt1[2], gt1[5], gt1[2] + (gt1[0] * image1_ds.width), gt1[5] + (gt1[4] * image1_ds.height)]
-            r2 = [gt2[2], gt2[5], gt2[2] + (gt2[0] * image2_ds.width), gt2[5] + (gt2[4] * image2_ds.height)]
-        
-            # find intersection between bounding boxes
-            intersection = [max(r1[0], r2[0]), min(r1[1], r2[1]), min(r1[2], r2[2]), max(r1[3], r2[3])]
-            if r1 != r2:        
-                if (intersection[2] < intersection[0]) or (intersection[1] < intersection[3]):
-                    intersection = None
-                    print ('\t***no overlap***')                                
-                    ReadOrder[1], ReadOrder[i+1] = ReadOrder[i+1], ReadOrder[1]  
-                    
-                else:
-                    z=0
-                    return True,ReadOrder                      
-        else:
-            z=0
-            return True  ,ReadOrder   
-                
+    """Choose a second scene with a distinct footprint that overlaps the first."""
+    if len(ReadOrder) < 2:
+        return False, ReadOrder
+
+    with rasterio.open(join(scene_dir, ReadOrder[0])) as first:
+        first_bounds = first.bounds
+    for index in range(1, len(ReadOrder)):
+        with rasterio.open(join(scene_dir, ReadOrder[index])) as candidate:
+            candidate_bounds = candidate.bounds
+        if (
+            first_bounds != candidate_bounds
+            and min(first_bounds.right, candidate_bounds.right) > max(first_bounds.left, candidate_bounds.left)
+            and min(first_bounds.top, candidate_bounds.top) > max(first_bounds.bottom, candidate_bounds.bottom)
+        ):
+            ReadOrder[1], ReadOrder[index] = ReadOrder[index], ReadOrder[1]
+            return True, ReadOrder
+
+    return False, ReadOrder
+
+
 def find_raster_intersect(raster1,raster2,res,scale_factor):
     """Compute the spatial intersection of two rasters and return overlap arrays."""
     #raster1 = image1_ds
@@ -1290,6 +1285,9 @@ def main():
 
     coords=np.array([[gt_two[i],gt_five[i]] for i in range(len(gt_two))],dtype='float32')    
 
+    if len(file) < 2:
+        raise ValueError("Step 2 needs at least two input .img scenes.")
+
     dist=np.squeeze(distance.cdist( coords,[coords[0]] , 'euclidean'))# compute Euclidean distance among 2D data points
     distIndex=np.argsort(dist) 
     ReadOrder=[file[i] for i in distIndex.tolist()]
@@ -1602,17 +1600,13 @@ def main():
 
 
 
-            image1_ds =ReadOrder[i]
-            image2_ds =ReadOrder[i+1]
-            if (test_overlap(ReadOrder, mypath)[0]==True):
-                image1_ds =ReadOrder[i]#
-                image2_ds =ReadOrder[i+1]#'
-                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(join(mypath, image1_ds), join(mypath, image2_ds),res,scale_factor)
-                fp = open("ProcessOrder.txt", "w")         
-                fp.write(str(ReadOrder) )     
-                fp.close()
-            else:
-                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(join(mypath, image1_ds), join(mypath, image2_ds),res,scale_factor)
+            has_overlap, _ = test_overlap(ReadOrder, mypath)
+            if not has_overlap:
+                raise ValueError("No scene has a distinct footprint overlapping the first scene.")
+            image1_ds, image2_ds = ReadOrder[:2]
+            image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(join(mypath, image1_ds), join(mypath, image2_ds),res,scale_factor)
+            with open("ProcessOrder.txt", "w") as order_file:
+                order_file.write(str(ReadOrder))
             Union_gt.append(union_gt)    
             mosaic_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
             cloudmask_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
@@ -1909,7 +1903,6 @@ def main():
             del mask_blurred_4chan,union_gt,cldMas,cldList,b1,b1d
             gc.collect()
 
-    fp.close()  
     with open('allWindow.npy', 'wb') as f:
         np.save(f, allWindow)      
     with open('ImgInd.npy', 'wb') as f:
