@@ -119,12 +119,12 @@ def spiral(X=50, Y=50):
             dx, dy = -dy, dx
         x, y = x+dx, y+dy        
     return spiralList
-def test_overlap(ReadOrder):
+def test_overlap(ReadOrder, scene_dir=""):
     """Check whether the first two images in ReadOrder overlap, swapping if needed."""
     for i in range(1,len(ReadOrder)-1):
         if 'z' not in globals():   
-            image1_ds = rasterio.open(ReadOrder[0],nodata=0)
-            image2_ds = rasterio.open(ReadOrder[1],nodata=0)
+            image1_ds = rasterio.open(join(scene_dir, ReadOrder[0]),nodata=0)
+            image2_ds = rasterio.open(join(scene_dir, ReadOrder[1]),nodata=0)
             gt1=image1_ds.transform
             gt2=image2_ds.transform           
             r1 = [gt1[2], gt1[5], gt1[2] + (gt1[0] * image1_ds.width), gt1[5] + (gt1[4] * image1_ds.height)]
@@ -205,8 +205,9 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
     )   
   
       
-    for i in [raster1,raster2]:
-        a1=pathlib.Path(i).absolute()
+    for source in (raster1, raster2):
+        a1 = pathlib.Path(source).absolute()
+        i = a1.name
         a2=pathlib.Path('NSPO_GRID_vectorization','GetBoundaryMask.exe').parent.absolute()
         filepath = str(a2)+ (os.sep+i[:-3]+'temp.shp')
         if os.path.isfile(filepath) :
@@ -226,8 +227,8 @@ def find_raster_intersect(raster1,raster2,res,scale_factor):
                 time.sleep(1)
             
             
-    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster1[:-3]+'temp.shp')
-    shapefile2 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster2[:-3]+'temp.shp')
+    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+os.path.basename(raster1)[:-3]+'temp.shp')
+    shapefile2 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+os.path.basename(raster2)[:-3]+'temp.shp')
     
     
     if len(shapefile1)>1 and len(shapefile2)==1:
@@ -963,23 +964,24 @@ def find_raster_intersect_for_mosaic(raster1,raster2,mosaic_gt,res,scale_factor,
     
     
     a1=pathlib.Path(raster1).absolute()
+    scene_name = a1.name
     a2=pathlib.Path('NSPO_GRID_vectorization','GetBoundaryMask.exe').parent.absolute() 
-    filepath = str(a2)+ (os.sep+raster1[:-3]+'temp.shp')
+    filepath = str(a2)+ (os.sep+scene_name[:-3]+'temp.shp')
     if os.path.isfile(filepath) :
         print('done img2shp:'+raster1)
     else:       
         
-        assign_crs_copy(a1, str(a2)+os.sep+raster1[:-3]+'tif', canvas_crs)
+        assign_crs_copy(a1, str(a2)+os.sep+scene_name[:-3]+'tif', canvas_crs)
     
-        polygonize_valid_area(str(a2)+os.sep+raster1[:-3]+'tif')
-        filepath = str(a2)+ (os.sep+raster1[:-3]+'temp.shp')
+        polygonize_valid_area(str(a2)+os.sep+scene_name[:-3]+'tif')
+        filepath = str(a2)+ (os.sep+scene_name[:-3]+'temp.shp')
         if os.path.isfile(filepath) :
             print('done img2shp:'+raster1)
         else:
             print('oh! oh! memmory may not enough...')
             time.sleep(1)
     
-    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+raster1[:-3]+'temp.shp')
+    shapefile1 = gpd.read_file('NSPO_GRID_vectorization'+os.sep+scene_name[:-3]+'temp.shp')
 
     
     if len(shapefile1)>1:
@@ -1280,7 +1282,7 @@ def main():
 
       if isfile(fullpath) and  f.endswith(".img"):
 
-        image=rasterio.open(f)
+        image=rasterio.open(fullpath)
         file.append(f)
         gt_two.append(image.transform[2] )
         gt_five.append(image.transform[5] )
@@ -1303,7 +1305,7 @@ def main():
             image2_ds = 'mosaic_xs.tif'#
             print('Image Process Progress:',i+2,'/',len(ReadOrder))
             print('Image Preprocessing...')
-            image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=find_raster_intersect_for_mosaic(image1_ds, image2_ds,mosaic_gt,res,scale_factor,res_union_new)
+            image1_isect_array, image2_isect_array, col, row, gt, intersection_points, union_gt, union_m, union_conn,ReadWindow,res_union_new=find_raster_intersect_for_mosaic(join(mypath, image1_ds), image2_ds,mosaic_gt,res,scale_factor,res_union_new)
             Union_gt.append(union_gt)
 
             imgg1=cv2.cvtColor(image1_isect_array,cv2.COLOR_RGB2GRAY)
@@ -1456,7 +1458,7 @@ def main():
                 dst.write(cv2.resize(mask_blurred_4chan,(mask_blurred_4chan.shape[1]*int(res/pan_res) ,mask_blurred_4chan.shape[0]*int(res/pan_res)),interpolation=cv2.INTER_NEAREST).astype(rasterio.float32), 1)        
 
             del im_floodfill,im_floodfill_f        
-            b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=blend_preprocess_order_for_mosaic(image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)        
+            b1,b1d,im1_0num,im1_1num,im2_0num,im2_1num=blend_preprocess_order_for_mosaic(join(mypath, image1_ds),image2_ds,mask_blurred_4chan,ReadWindow)
 
             img=[(0,image1_ds,im1_0num, 'b1d','b1' ),
                   (1,image1_ds,im1_1num, 'b1d','b1' ),
@@ -1524,7 +1526,7 @@ def main():
                 else:
 
                     ind=k+1
-                    b1,b1d=blend_preprocess_for_mosaic(ind,image1_ds,image2_ds,mask_blurred_4chan,ReadWindow)  
+                    b1,b1d=blend_preprocess_for_mosaic(ind,join(mypath, image1_ds),image2_ds,mask_blurred_4chan,ReadWindow)
 
                     try:
 
@@ -1602,15 +1604,15 @@ def main():
 
             image1_ds =ReadOrder[i]
             image2_ds =ReadOrder[i+1]
-            if (test_overlap(ReadOrder)[0]==True):
+            if (test_overlap(ReadOrder, mypath)[0]==True):
                 image1_ds =ReadOrder[i]#
                 image2_ds =ReadOrder[i+1]#'
-                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
+                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(join(mypath, image1_ds), join(mypath, image2_ds),res,scale_factor)
                 fp = open("ProcessOrder.txt", "w")         
                 fp.write(str(ReadOrder) )     
                 fp.close()
             else:
-                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(image1_ds, image2_ds,res,scale_factor)
+                image1_isect_array, image2_isect_array, col, row, isect_bb, gt, intersection_points, union_gt, union_m, union_conn,res_union_new=find_raster_intersect(join(mypath, image1_ds), join(mypath, image2_ds),res,scale_factor)
             Union_gt.append(union_gt)    
             mosaic_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
             cloudmask_gt = A.translation(float(min( gt_two)), float(max( gt_five))) *  A.scale(res, -res) 
@@ -1796,8 +1798,8 @@ def main():
 
             del im_floodfill,im_floodfill_f
 
-            b1,im1_0num,im1_1num=blend_preprocess_for_order(image1_ds,mask_blurred_4chan,res,union_gt)
-            b1d,im2_0num,im2_1num=blend_preprocess_for_order(image2_ds,mask_blurred_4chan,res,union_gt)
+            b1,im1_0num,im1_1num=blend_preprocess_for_order(join(mypath, image1_ds),mask_blurred_4chan,res,union_gt)
+            b1d,im2_0num,im2_1num=blend_preprocess_for_order(join(mypath, image2_ds),mask_blurred_4chan,res,union_gt)
 
 
 
@@ -1846,8 +1848,8 @@ def main():
                 else:  
 
                     ind=k+1
-                    b1=blend_preprocess(ind,image1_ds,mask_blurred_4chan,res,union_gt)
-                    b1d=blend_preprocess(ind,image2_ds,mask_blurred_4chan,res,union_gt)
+                    b1=blend_preprocess(ind,join(mypath, image1_ds),mask_blurred_4chan,res,union_gt)
+                    b1d=blend_preprocess(ind,join(mypath, image2_ds),mask_blurred_4chan,res,union_gt)
 
 
                     try:
@@ -1925,7 +1927,7 @@ def main():
 
       if isfile(fullpath) and  f.endswith(".img"):
 
-        image=rasterio.open(f)
+        image=rasterio.open(fullpath)
         file.append(f)
         gt_two.append(image.transform[2] )
         gt_five.append(image.transform[5] )
