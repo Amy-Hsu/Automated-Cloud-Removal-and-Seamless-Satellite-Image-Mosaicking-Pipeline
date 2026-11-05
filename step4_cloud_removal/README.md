@@ -9,5 +9,5 @@ XS grid/alignment), a `cloud_database/` of candidate XS scenes, the matching
 cloud-mask database folder, a `raw_pan/` of candidate Pan scenes, and an empty
 working folder `cldDatabase/`.
 
-Run `run.bat`. The script fills clouds in place. In `mosaic_cloudmask.tif`, filled
-clouds become `(loop_index+1)*10`; unprocessed clouds stay `1`.
+Run `run.bat`. The script fills clouds in place. See the
+[pipeline overview](../README.md#pipeline-overview) for the final `mosaic_cloudmask.tif` values.
