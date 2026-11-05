@@ -40,7 +40,7 @@ differ radiometrically, and visible seams appear wherever two scenes meet. This
 software is an end-to-end pipeline that turns a set of orthorectified
 multispectral (XS) and panchromatic (Pan) scenes into a single color-balanced,
 seamless, cloud-filled mosaic, together with a mosaic-wide cloud mask that
-records which source filled each cloud.
+flags unfilled clouds and pixels affected by clouds in a selected candidate.
 
 The pipeline has four steps, each in its own folder and driven by a small JSON
 parameter file: (1) radiometric normalization of each scene against reference

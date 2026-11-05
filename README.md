@@ -33,7 +33,11 @@ Outputs after Step 4:
 
 - `mosaic_xs.tif` — final cloud-filled multispectral mosaic (4 bands)
 - `mosaic_pan.tif` — final cloud-filled panchromatic mosaic
-- `mosaic_cloudmask.tif` — final mosaic cloud mask (filled clouds = `(loop_index+1)*10`; unprocessed clouds remain `1`)
+- `mosaic_cloudmask.tif` — final mosaic cloud mask: `0` for clear or successfully
+  filled pixels, `1` for clouds left unfilled, and `(i + 1) * 10` for land pixels
+  flagged by the selected candidate's processed cloud mask. Here `i` is the
+  zero-based index of the Step 2 scene window being processed. The value
+  identifies that window; it does not identify the candidate scene.
 - `*_raw.tif` copies of the pre-Step-4 mosaics for comparison
 
 ## Installation
@@ -151,7 +155,9 @@ Two `para_cld.txt` settings control which candidates are used:
 | `ssim_threshold` | Minimum SSIM between a candidate and the cloud-free surroundings of a patch (default `0.75`) |
 | `cloud_tolerance` | Maximum fraction of a patch that may be cloudy in the candidate itself (default `0.25`) |
 
-Pan scenes may be given either in the SPOT layout (`raw_pan/A0000002/A0000002_B1.DAT.raw`) or as `raw_pan/A0000002.tif`.
+Step 4 adds one to the numeric part of the candidate XS scene name to find its
+Pan counterpart. For example, `A0000001.img` uses
+`raw_pan/A0000002/A0000002_B1.DAT.raw` (SPOT layout) or `raw_pan/A0000002.tif`.
 
 Run with `run.bat` (or `python step4cloud_removal.py`). See `docs/TROUBLESHOOTING.md` for known failure modes and their fixes.
 

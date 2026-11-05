@@ -47,7 +47,7 @@ In `demo_output/step4/`:
 | `mosaic_xs_raw.tif`, `mosaic_pan_raw.tif` | Mosaics after Steps 2 and 3, before cloud filling |
 | `mosaic_cloudmask_raw.tif` | Cloud mask of the mosaic before filling (1 = cloud) |
 | `mosaic_xs.tif`, `mosaic_pan.tif` | Final cloud-filled mosaics |
-| `mosaic_cloudmask.tif` | Final cloud mask: 0 = clear or filled, 1 = cloud left unfilled, 10/20 = filled from a candidate that was itself partly cloudy |
+| `mosaic_cloudmask.tif` | Final cloud mask: 0 = clear or filled, 1 = cloud left unfilled, 10/20 = flagged by the selected candidate's processed cloud mask in the first/second scene window |
 
 With the default settings, Step 4 fills about 16 of 25 cloud patches and
 roughly three quarters of the cloudy area. Patches touching the edge of the
